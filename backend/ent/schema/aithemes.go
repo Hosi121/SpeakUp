@@ -1,6 +1,12 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"time"
+
+	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
+)
 
 // AITHEMES holds the schema definition for the AITHEMES entity.
 type AITHEMES struct {
@@ -9,10 +15,20 @@ type AITHEMES struct {
 
 // Fields of the AITHEMES.
 func (AITHEMES) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.Int("theme.id").
+			Unique().
+			Immutable(),
+		field.String("theme_text"),
+		field.Time("created_at").
+			Default(time.Now()),
+	}
 }
 
 // Edges of the AITHEMES.
 func (AITHEMES) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("used", SESSIONS.Type).
+			Ref("uses"),
+	}
 }
