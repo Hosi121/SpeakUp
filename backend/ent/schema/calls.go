@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -15,9 +16,6 @@ type CALLS struct {
 // Fields of the CALLS.
 func (CALLS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("call_id").
-			Unique().
-			Immutable(),
 		field.Int("session_id"),
 		field.Int("caller_id"),
 		field.Int("callee_id"),
@@ -33,5 +31,9 @@ func (CALLS) Fields() []ent.Field {
 
 // Edges of the CALLS.
 func (CALLS) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("makes", USERS.Type).
+			Unique().
+			Ref("makes"),
+	}
 }

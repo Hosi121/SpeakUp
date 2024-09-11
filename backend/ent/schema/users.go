@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -15,9 +16,6 @@ type USERS struct {
 // Fields of the USERS.
 func (USERS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
-			Unique().
-			Immutable(),
 		field.String("username").
 			NotEmpty().
 			MaxLen(255),
@@ -39,5 +37,10 @@ func (USERS) Fields() []ent.Field {
 
 // Edges of the USERS.
 func (USERS) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("connects", FRIENDS.Type),
+		edge.To("participates", MATCHINGS.Type),
+		edge.To("makes", CALLS.Type),
+		edge.To("creates", SESSIONS.Type),
+	}
 }

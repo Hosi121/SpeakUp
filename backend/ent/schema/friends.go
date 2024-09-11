@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -15,9 +16,6 @@ type FRIENDS struct {
 // Fields of the FRIENDS.
 func (FRIENDS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("user_id").
-			Unique().
-			Immutable(),
 		field.Int("friend_id"),
 		field.Enum("status").
 			Values("PENDING", "FRIEND", "BLOCKED"),
@@ -28,5 +26,9 @@ func (FRIENDS) Fields() []ent.Field {
 
 // Edges of the FRIENDS.
 func (FRIENDS) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("connects", USERS.Type).
+			Unique().
+			Ref("connects"),
+	}
 }
