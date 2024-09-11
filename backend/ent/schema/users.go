@@ -40,7 +40,5 @@ func (USERS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("connects", FRIENDS.Type),
 		edge.To("participates", MATCHINGS.Type),
-		edge.To("makes", CALLS.Type),
-		edge.To("creates", SESSIONS.Type),
 	}
 }

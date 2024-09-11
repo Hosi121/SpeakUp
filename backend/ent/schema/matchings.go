@@ -16,9 +16,6 @@ type MATCHINGS struct {
 // Fields of the MATCHINGS.
 func (MATCHINGS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("matching_id").
-			Unique().
-			Immutable(),
 		field.Int("user_id"),
 		field.Int("matched_user_id"),
 		field.Int("session_id"),
@@ -33,8 +30,10 @@ func (MATCHINGS) Fields() []ent.Field {
 func (MATCHINGS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("member", USERS.Type).
-			Ref("participates").Unique(),
+			Ref("participates"),
 		edge.From("had", SESSIONS.Type).
 			Ref("has").Unique(),
+		edge.To("makes", CALLS.Type).
+			Unique(),
 	}
 }

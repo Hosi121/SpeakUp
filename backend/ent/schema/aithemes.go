@@ -16,9 +16,6 @@ type AITHEMES struct {
 // Fields of the AITHEMES.
 func (AITHEMES) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("theme.id").
-			Unique().
-			Immutable(),
 		field.String("theme_text"),
 		field.Time("created_at").
 			Default(time.Now()),

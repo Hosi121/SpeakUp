@@ -16,7 +16,8 @@ type FRIENDS struct {
 // Fields of the FRIENDS.
 func (FRIENDS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("friend_id"),
+		field.Int("user_id"),
+		field.Int("target_user_id"),
 		field.Enum("status").
 			Values("PENDING", "FRIEND", "BLOCKED"),
 		field.Time("created_at").
@@ -28,7 +29,6 @@ func (FRIENDS) Fields() []ent.Field {
 func (FRIENDS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("connects", USERS.Type).
-			Unique().
 			Ref("connects"),
 	}
 }

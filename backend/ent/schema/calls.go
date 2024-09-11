@@ -17,8 +17,6 @@ type CALLS struct {
 func (CALLS) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("session_id"),
-		field.Int("caller_id"),
-		field.Int("callee_id"),
 		field.Time("call_start").
 			Default(time.Now),
 		field.Time("call_end").
@@ -32,7 +30,7 @@ func (CALLS) Fields() []ent.Field {
 // Edges of the CALLS.
 func (CALLS) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("makes", USERS.Type).
+		edge.From("made", MATCHINGS.Type).
 			Unique().
 			Ref("makes"),
 	}
