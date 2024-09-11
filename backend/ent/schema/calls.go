@@ -1,6 +1,11 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"time"
+
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // CALLS holds the schema definition for the CALLS entity.
 type CALLS struct {
@@ -9,7 +14,21 @@ type CALLS struct {
 
 // Fields of the CALLS.
 func (CALLS) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.Int("call_id").
+			Unique().
+			Immutable(),
+		field.Int("session_id"),
+		field.Int("caller_id"),
+		field.Int("callee_id"),
+		field.Time("call_start").
+			Default(time.Now),
+		field.Time("call_end").
+			Default(time.Now),
+		field.Int("rating"),
+		field.Time("created_at").
+			Default(time.Now),
+	}
 }
 
 // Edges of the CALLS.
