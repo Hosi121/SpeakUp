@@ -25,61 +25,60 @@ const router = createBrowserRouter([
   },
   {
     path: "alert",
-    element: <Alert />
+    element: <Alert />,
   },
   {
     path: "settings",
-    element: <Settings />
+    element: <Settings />,
   },
   {
     path: "login",
-    element: <Login />
+    element: <Login />,
   },
   {
     path: "home",
-    element: <Home />
+    element: <Home />,
   },
   {
     path: "sessionlist",
-    element: <SessionList />
+    element: <SessionList />,
   },
   {
     path: "waiting",
-    element: <Waiting />
+    element: <Waiting />,
   },
   {
     path: "miccheck",
-    element: <MicCheck />
+    element: <MicCheck />,
   },
   {
     path: "session",
-    element: <Session />
+    element: <Session />,
   },
   {
     path: "sessioninterval",
-    element: <SessionInterval />
+    element: <SessionInterval />,
   },
   {
     path: "sessionfinished",
-    element: <SessionFinished />
+    element: <SessionFinished />,
   },
   {
     path: "signup",
-    element: <SignUp />
+    element: <SignUp />,
   },
   {
     path: "record",
-    element: <Record />
+    element: <Record />,
   },
   {
     path: "memo",
-    element: <Memo />
+    element: <Memo />,
   },
   {
     path: "message",
-    element: <Message />
+    element: <Message />,
   },
-
 ]);
 
 const rootElement = document.getElementById("root");
@@ -92,4 +91,3 @@ if (rootElement) {
 } else {
   console.error("Failed to find the root element");
 }
-
