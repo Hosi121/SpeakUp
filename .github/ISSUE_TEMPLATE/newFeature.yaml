@@ -1,0 +1,15 @@
+name: New Feature
+description: Create an issue. 
+title: "[NewFeature]: "
+labels: [enhancement]
+assignees:
+  - octocat
+body:
+  - type: input
+    id: sample-input
+    attributes:
+      label: New feature description.
+      description: Write text here.
+      placeholder: New Feature
+    validations:
+      required: true
