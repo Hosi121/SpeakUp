@@ -5,10 +5,10 @@ import { useNavigate } from "react-router-dom";
 type IconButtonProps = {
   icon: ReactNode;
   text: string;
-  value: string;
+  url: string;
 };
 
-export const IconButton = ({ icon, text, value }: IconButtonProps) => {
+export const IconButton = ({ icon, text, url }: IconButtonProps) => {
   const navigate = useNavigate();
   return (
     <Button
@@ -25,7 +25,7 @@ export const IconButton = ({ icon, text, value }: IconButtonProps) => {
         color: "#da0063",
         fontSize: "1rem",
       }}
-      onClick={() => navigate("/" + value)}
+      onClick={() => navigate("/" + url)}
     >
       <Icon sx={{ width: "fit-content", height: "fit-content", color: "#000" }}>{icon}</Icon>
       {text}
