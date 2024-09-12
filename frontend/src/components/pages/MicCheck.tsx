@@ -1,9 +1,9 @@
 import { Stack } from "@mui/system";
 
-export const Login = () => {
+export const MicCheck = () => {
     return (
         <Stack>
-            login
+            micCheck
         </Stack>
     )
 }

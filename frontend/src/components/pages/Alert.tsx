@@ -1,9 +1,9 @@
 import { Stack } from "@mui/system";
 
-export const Login = () => {
+export const Alert = () => {
     return (
         <Stack>
-            login
+            alert
         </Stack>
     )
 }
