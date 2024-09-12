@@ -6,6 +6,7 @@ import (
 
 	"github.com/Hosi121/SpeakUp/config"
 	"github.com/Hosi121/SpeakUp/ent"
+	"github.com/Hosi121/SpeakUp/mock"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -30,24 +31,5 @@ func main() {
 	}
 
 	// テストデータの挿入
-	createTestData(client)
-}
-
-func createTestData(client *ent.Client) {
-	ctx := context.Background()
-
-	// ユーザーの作成
-	user, err := client.USERS.
-		Create().
-		SetUsername("testuser").
-		SetEmail("testuser@example.com").
-		SetHashedPassword("hashedpassword").
-		SetAvatarURL("https://example.com/avatar.png").
-		SetRole("USER").
-		Save(ctx)
-	if err != nil {
-		log.Fatalf("failed creating user: %v", err)
-	}
-
-	log.Printf("created user: %v", user)
+	mock.CreateTestData(client)
 }
