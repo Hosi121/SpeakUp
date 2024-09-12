@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Box, Button, Container, Typography, IconButton, Avatar, List, ListItem, ListItemAvatar, ListItemText, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Button, Typography, IconButton, Avatar, List, ListItem, ListItemAvatar, ListItemText, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import notifications from '../../mock/notifications.json'; // Import the JSON file directly
 
 const NotificationModal = () => {
   // State to control the modal open/close
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notificationsData, setNotificationsData] = useState([]);
 
   // Function to open the modal
   const handleOpen = () => {
@@ -18,12 +19,9 @@ const NotificationModal = () => {
     setOpen(false);
   };
 
-  // Fetch notifications from the JSON file
+  // Load notifications from imported JSON
   useEffect(() => {
-    fetch('/notifications.json')  // Fetch from the public folder
-      .then((response) => response.json())
-      .then((data) => setNotifications(data))
-      .catch((error) => console.error('Error fetching the notification data:', error));
+    setNotificationsData(notifications); // Set the imported JSON data as state
   }, []);
 
   return (
@@ -59,7 +57,7 @@ const NotificationModal = () => {
         <DialogContent>
           {/* Notifications List */}
           <List sx={{ width: '100%' }}>
-            {notifications.map((notification) => (
+            {notificationsData.map((notification) => (
               <ListItem key={notification.id} sx={{ mb: 2 }}>
                 <ListItemAvatar>
                   <Avatar src={notification.profileIcon} alt={`${notification.user} icon`} />
