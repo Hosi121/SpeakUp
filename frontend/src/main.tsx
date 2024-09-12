@@ -15,7 +15,7 @@ import { SignUp } from './components/pages/SignUp.tsx';
 import { Record } from './components/pages/Record.tsx';
 import { Memo } from './components/pages/Memo.tsx';
 import { Message } from './components/pages/Message.tsx';
-import { Login } from './components/pages/Login.tsx';
+import Login from './components/pages/Login.tsx';
 import { Alert } from './components/pages/Alert.tsx';
 
 const router = createBrowserRouter([
