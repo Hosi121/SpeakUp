@@ -10,7 +10,7 @@ const SignUp = () => {
 
   return (
     <Container
-      maxWidth="xs"
+      maxWidth="md"
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -52,7 +52,6 @@ const SignUp = () => {
         fullWidth
         variant="outlined"
         margin="normal"
-        defaultValue="name@example.com"
       />
 
       {/* Email Field */}
@@ -62,7 +61,6 @@ const SignUp = () => {
         fullWidth
         variant="outlined"
         margin="normal"
-        defaultValue="name@example.com"
       />
 
       {/* Submit Button */}

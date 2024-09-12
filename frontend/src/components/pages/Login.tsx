@@ -1,16 +1,23 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, IconButton, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();  // Initialize the useNavigate hook
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
+  
+  // Function to handle navigation to the sign-up page
+  const handleNavigateToSignup = () => {
+    navigate('/signup');
+  };
 
   return (
     <Container
-      maxWidth="xs"
+      maxWidth="md"
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -52,7 +59,6 @@ const Login = () => {
         fullWidth
         variant="outlined"
         margin="normal"
-        defaultValue="name@example.com"
       />
 
       {/* Password Field */}
@@ -100,7 +106,14 @@ const Login = () => {
         <Typography variant="body2" color="textSecondary">
           パスワードを忘れた場合はこちら
         </Typography>
-        <Typography variant="body2" color="textSecondary" sx={{ cursor: 'pointer', textDecoration: 'underline' }}>
+
+        {/* Clickable Sign-Up text */}
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+          onClick={handleNavigateToSignup} // OnClick handler to navigate to /signup
+        >
           サインアップ
         </Typography>
       </Box>
