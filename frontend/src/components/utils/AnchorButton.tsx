@@ -1,12 +1,15 @@
 import { Button, Icon } from "@mui/material";
 import { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 type AnchorButtonProps = {
   icon: ReactNode;
   text: string;
+  value: string;
 };
 
-export const AnchorButton = ({ icon, text }: AnchorButtonProps) => {
+export const AnchorButton = ({ icon, text, value }: AnchorButtonProps) => {
+  const navigate = useNavigate();
   return (
     <Button
       variant="contained"
@@ -22,6 +25,7 @@ export const AnchorButton = ({ icon, text }: AnchorButtonProps) => {
         color: "#da0063",
         fontSize: "1rem",
       }}
+      onClick={() => navigate("/" + value)}
     >
       <Icon sx={{ width: "fit-content", height: "fit-content", color: "#000" }}>{icon}</Icon>
       {text}

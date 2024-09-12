@@ -13,10 +13,10 @@ export const Record = () => {
         記録
       </Typography>
       <Box sx={{ display: "flex", placeContent: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
-        <AnchorButton icon={<DescriptionIcon sx={{ fontSize: "60px" }} />} text="会話の記録" />
-        <AnchorButton icon={<FolderOutlinedIcon sx={{ fontSize: "60px" }} />} text="履歴" />
-        <AnchorButton icon={<EmojiEventsIcon sx={{ fontSize: "60px" }} />} text="データ" />
-        <AnchorButton icon={<EditNoteIcon sx={{ fontSize: "60px" }} />} text="持ち込みメモ" />
+        <AnchorButton icon={<DescriptionIcon sx={{ fontSize: "60px" }} />} text="会話の記録" value="conversationrecords" />
+        <AnchorButton icon={<FolderOutlinedIcon sx={{ fontSize: "60px" }} />} text="履歴" value="history" />
+        <AnchorButton icon={<EmojiEventsIcon sx={{ fontSize: "60px" }} />} text="データ" value="stats" />
+        <AnchorButton icon={<EditNoteIcon sx={{ fontSize: "60px" }} />} text="持ち込みメモ" value="memo" />
       </Box>
     </Stack>
   );
