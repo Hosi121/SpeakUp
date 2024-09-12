@@ -11,7 +11,7 @@ import { MicCheck } from './components/pages/MicCheck.tsx';
 import { Session } from './components/pages/Session.tsx';
 import { SessionInterval } from './components/pages/SessionInterval.tsx';
 import { SessionFinished } from './components/pages/SessionFinished.tsx';
-import { SignUp } from './components/pages/SignUp.tsx';
+import SignUp from './components/pages/SignUp.tsx';
 import { Record } from './components/pages/Record.tsx';
 import { Memo } from './components/pages/Memo.tsx';
 import { Message } from './components/pages/Message.tsx';
