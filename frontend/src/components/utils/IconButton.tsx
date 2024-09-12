@@ -2,13 +2,13 @@ import { Button, Icon } from "@mui/material";
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-type AnchorButtonProps = {
+type IconButtonProps = {
   icon: ReactNode;
   text: string;
   value: string;
 };
 
-export const AnchorButton = ({ icon, text, value }: AnchorButtonProps) => {
+export const IconButton = ({ icon, text, value }: IconButtonProps) => {
   const navigate = useNavigate();
   return (
     <Button
