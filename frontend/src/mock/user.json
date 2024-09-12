@@ -1,6 +1,6 @@
 {
     "name": "英 話子",
     "email": "name@example.com",
-    "avatar": "/path/to/default-avatar.png" 
+    "avatar": "./image1.png" 
   }
   

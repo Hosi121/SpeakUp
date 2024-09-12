@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App.tsx'
-import { Settings } from './components/pages/Settings.tsx';
+import Settings from './components/pages/Settings.tsx';
 import { Home } from './components/pages/Home.tsx';
 import { SessionList } from './components/pages/SessionList.tsx';
 import { Waiting } from './components/pages/Waiting.tsx';
