@@ -1,9 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import './index.css'
 import App from './App.tsx'
-import { Settings } from './components/pages/Settings.tsx';
+import Settings from './components/pages/Settings.tsx';
 import { Home } from './components/pages/Home.tsx';
 import { SessionList } from './components/pages/SessionList.tsx';
 import { Waiting } from './components/pages/Waiting.tsx';
@@ -16,16 +15,11 @@ import { Record } from './components/pages/Record.tsx';
 import { Memo } from './components/pages/Memo.tsx';
 import { Message } from './components/pages/Message.tsx';
 import Login from './components/pages/Login.tsx';
-import { Alert } from './components/pages/Alert.tsx';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-  },
-  {
-    path: "alert",
-    element: <Alert />,
   },
   {
     path: "settings",
