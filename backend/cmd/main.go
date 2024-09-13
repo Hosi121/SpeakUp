@@ -27,7 +27,6 @@ func main() {
 
 	// supabase APIの準備
 	supabaseAPI.InitSupabase()
-	supabaseClient := supabaseAPI.SupabaseClient
 
 	// Entクライアントを作成
 	client, err := ent.Open("mysql", dsn)
