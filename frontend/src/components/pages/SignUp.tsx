@@ -1,8 +1,40 @@
 import { Box, Button, Container, TextField, Typography, Link } from '@mui/material';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';  // api インスタンスをインポート
 
 const SignUp = () => {
   const navigate = useNavigate();
+
+  // フォームの状態を管理
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');  // パスワードの状態
+  const [error, setError] = useState('');
+
+  // サインアップのPOSTリクエスト
+  const handleSignUp = async () => {
+    // パスワードが8文字以上か確認
+    if (password.length < 8) {
+      setError('パスワードは8文字以上である必要があります。');
+      return;
+    }
+
+    try {
+      const response = await api.post('/signup', {
+        username,  // ユーザー名
+        email,     // メールアドレス
+        password,  // パスワード
+      });
+
+      // 成功した場合、リダイレクトまたはメッセージ表示
+      console.log('サインアップ成功:', response.data);
+      navigate('/login'); // サインアップ後、ログインページにリダイレクト
+    } catch (err) {
+      console.error('サインアップエラー:', err);
+      setError('サインアップに失敗しました。もう一度お試しください。');
+    }
+  };
 
   const handleNavigateToLogin = () => {
     navigate('/login');
@@ -17,7 +49,7 @@ const SignUp = () => {
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
-        backgroundColor: '#FFDD66', // Matches the yellow background color
+        backgroundColor: '#FFDD66',
         padding: '16px',
         borderRadius: '16px',
       }}
@@ -45,6 +77,13 @@ const SignUp = () => {
         サインアップ
       </Typography>
 
+      {/* Error Message */}
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       {/* Username Field */}
       <TextField
         label="ユーザー名(セッション時の表示名)"
@@ -52,6 +91,8 @@ const SignUp = () => {
         fullWidth
         variant="outlined"
         margin="normal"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)} // ユーザー名の状態を更新
       />
 
       {/* Email Field */}
@@ -61,6 +102,19 @@ const SignUp = () => {
         fullWidth
         variant="outlined"
         margin="normal"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)} // メールアドレスの状態を更新
+      />
+
+      {/* Password Field */}
+      <TextField
+        label="パスワード"
+        type="password"
+        fullWidth
+        variant="outlined"
+        margin="normal"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)} // パスワードの状態を更新
       />
 
       {/* Submit Button */}
@@ -75,6 +129,7 @@ const SignUp = () => {
             backgroundColor: '#FF3399',
           },
         }}
+        onClick={handleSignUp}  // ボタンクリックでサインアップリクエスト
       >
         メールを送信して仮登録
       </Button>
