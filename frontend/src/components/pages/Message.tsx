@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Box, Typography, List, ListItem, ListItemText, IconButton, TextField, Button, Paper } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useNavigate } from "react-router-dom";
-import { MainBottomNavigation } from "../utils/MainBottomNavigation"; 
-import NotificationModal from "../utils/NotificationModal"; 
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from "react-router-dom"; 
+import { MainBottomNavigation } from "../utils/MainBottomNavigation";  
+import NotificationModal from "../utils/NotificationModal";
 
 const Message = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Function to handle sending the message
   const handleSendMessage = () => {
@@ -23,13 +24,25 @@ const Message = () => {
     navigate("/settings");
   };
 
+  // Function to go back to the previous page
+  const handleGoBack = () => {
+    navigate(-1);  // Go back to the previous page
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'space-between' }}>
       
       {/* Top Section */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
         {/* Notification Icon */}
-        <NotificationModal />
+        <Box>
+          <NotificationModal />
+
+          {/* Back Button under NotificationModal */}
+          <IconButton onClick={handleGoBack} sx={{ mt: 1 }}>
+            <ArrowBackIcon sx={{ fontSize: 40 }} />
+          </IconButton>
+        </Box>
 
         {/* User Name */}
         <Typography variant="h6">Mike</Typography>
