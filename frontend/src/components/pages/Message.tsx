@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { Avatar, Box, Typography, List, ListItem, ListItemAvatar, ListItemText, IconButton, TextField, Button } from "@mui/material";
-import { Star } from "@mui/icons-material";
+import { useState } from "react";
+import { Box, Typography, List, ListItem, ListItemText, IconButton, TextField, Button, Paper } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
-import { MainBottomNavigation } from "../utils/MainBottomNavigation";  // Assuming you have this component already
-import NotificationModal from "../utils/NotificationModal";  // Assuming you have this component already
+import { useNavigate } from "react-router-dom";
+import { MainBottomNavigation } from "../utils/MainBottomNavigation"; 
+import NotificationModal from "../utils/NotificationModal"; 
 
 const Message = () => {
-  // State to store messages and the current input
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
+  const navigate = useNavigate(); 
 
   // Function to handle sending the message
   const handleSendMessage = () => {
@@ -16,6 +16,11 @@ const Message = () => {
       setMessages([...messages, inputMessage]);
       setInputMessage('');  // Clear the input field after sending
     }
+  };
+
+  // Function to navigate to settings page
+  const handleNavigateSettings = () => {
+    navigate("/settings");
   };
 
   return (
@@ -26,16 +31,11 @@ const Message = () => {
         {/* Notification Icon */}
         <NotificationModal />
 
-        {/* User Avatar and Name */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar sx={{ width: 64, height: 64, bgcolor: '#FFD700' }}>
-            <Star sx={{ fontSize: 40, color: '#FF007F' }} />
-          </Avatar>
-          <Typography variant="h6" sx={{ ml: 2 }}>Mike</Typography>
-        </Box>
+        {/* User Name */}
+        <Typography variant="h6">Mike</Typography>
 
-        {/* Settings Icon */}
-        <IconButton>
+        {/* Settings Icon (navigate to /settings) */}
+        <IconButton onClick={handleNavigateSettings}>
           <SettingsIcon sx={{ fontSize: 40 }} />
         </IconButton>
       </Box>
@@ -45,13 +45,10 @@ const Message = () => {
         <List>
           {/* Render each message from the state */}
           {messages.map((message, index) => (
-            <ListItem key={index}>
-              <ListItemAvatar>
-                <Avatar sx={{ bgcolor: '#FFD700' }}>
-                  <Star sx={{ color: '#FF007F' }} />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={message} />
+            <ListItem key={index} sx={{ justifyContent: 'flex-end' }}>
+              <Paper sx={{ padding: '10px', backgroundColor: '#f0f0f0', maxWidth: '60%', wordWrap: 'break-word' }}>
+                <ListItemText primary={message} />
+              </Paper>
             </ListItem>
           ))}
         </List>
