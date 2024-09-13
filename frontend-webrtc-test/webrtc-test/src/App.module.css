@@ -1,0 +1,10 @@
+.video {
+  width: 160px;
+  height: 120px;
+  border: 1px solid black;
+}
+
+.textArea {
+  rows: "5";
+  cols: "60";
+}
