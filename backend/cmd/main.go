@@ -6,8 +6,9 @@ import (
 
 	"github.com/Hosi121/SpeakUp/config"
 	"github.com/Hosi121/SpeakUp/ent"
-	"github.com/Hosi121/SpeakUp/mock"
 	"github.com/Hosi121/SpeakUp/routes"
+
+	middleware "github.com/Hosi121/SpeakUp/middlewares"
 	supabaseAPI "github.com/Hosi121/SpeakUp/supaseAPI"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -23,6 +24,7 @@ func main() {
 
 	// ginの初期化
 	r := gin.Default()
+	r.Use(middleware.CORSMiddleware())
 	routes.SupabaseAuthRoutes(r)
 
 	// supabase APIの準備
@@ -41,7 +43,7 @@ func main() {
 	}
 
 	// テストデータの挿入
-	mock.CreateTestData(client)
+	// mock.CreateTestData(client)
 
 	// 8080ポートでサーバーを起動
 	if err := r.Run(":8081"); err != nil {
