@@ -26,7 +26,8 @@ const Login = () => {
         justifyContent: "center",
         height: "100vh",
         backgroundColor: "#FFDD66", // Matches the yellow background color
-        padding: "10%",
+        padding: "16px",
+        borderRadius: "16px",
       }}
     >
       {/* Logo */}
