@@ -6,6 +6,7 @@ import (
 )
 
 func SupabaseAuthRoutes(r *gin.Engine) {
-	r.POST("/signup", controllers.SignUp())
-	r.POST("/signin", controllers.SignIn())
+	// サインアップとサインインルートの定義
+	r.POST("/signup", controllers.SignUp)
+	r.POST("/signin", controllers.SignIn)
 }
