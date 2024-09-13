@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthRoutes(r *gin.Engine) {
-	r.POST("/auth", controllers.Auth())
+func SupabaseAuthRoutes(r *gin.Engine) {
+	r.POST("/signup", controllers.SignUp())
+	r.POST("/signin", controllers.SignIn())
 }

@@ -5,10 +5,10 @@ import (
 	"github.com/supabase-community/auth-go"
 )
 
-var SupabaseClient *auth.Client
+var SupabaseClient auth.Client
 
 func InitSupabase() {
 	supabaseRef, supabaseKey := config.GetSupabaseAPI()
 	client := auth.New(supabaseRef, supabaseKey)
-	SupabaseClient = &client
+	SupabaseClient = client
 }
