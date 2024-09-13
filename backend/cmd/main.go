@@ -7,6 +7,9 @@ import (
 	"github.com/Hosi121/SpeakUp/config"
 	"github.com/Hosi121/SpeakUp/ent"
 	"github.com/Hosi121/SpeakUp/mock"
+	"github.com/Hosi121/SpeakUp/routes"
+	supabaseAPI "github.com/Hosi121/SpeakUp/supaseAPI"
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -17,6 +20,14 @@ func main() {
 
 	// DSNを取得してデータベース接続を設定
 	dsn := config.GetDSN()
+
+	// ginの初期化
+	r := gin.Default()
+	routes.SupabaseAuthRoutes(r)
+
+	// supabase APIの準備
+	supabaseAPI.InitSupabase()
+	supabaseClient := supabaseAPI.SupabaseClient
 
 	// Entクライアントを作成
 	client, err := ent.Open("mysql", dsn)
