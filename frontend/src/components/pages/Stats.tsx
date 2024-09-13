@@ -1,42 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, List, IconButton, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import NotificationModal from '../utils/NotificationModal';
-import SettingsIcon from '@mui/icons-material/Settings';
+import { Box, Typography, Paper, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import { useNavigate } from "react-router-dom"; 
 import { MainBottomNavigation } from '../utils/MainBottomNavigation';
 import trophyData from '../../assets/trophy.json';
-
+import TopSection from '../utils/TopSection';  // Import the new TopSection component
 
 const Stats = () => {
   const [trophies, setTrophies] = useState([]);
-  const navigate = useNavigate(); // Initialize useNavigate
 
   // Fetch the trophy data from trophy.json
   useEffect(() => {
     setTrophies(trophyData.trophies);
   }, []);
 
-    // Function to navigate to settings page
-  const handleNavigateSettings = () => {
-      navigate("/settings");
-  };
-  
-
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'space-between', p: 2 }}>
       {/* Top Section */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-        {/* Notification Icon */}
-        <Box>
-          <NotificationModal />
-        </Box>
-
-        {/* Settings Icon (navigate to /settings) */}
-        <IconButton onClick={handleNavigateSettings}>
-          <SettingsIcon sx={{ fontSize: 40 }} />
-        </IconButton>
-      </Box>
+      <TopSection />
 
       {/* Participation Data */}
       <Box sx={{ mb: 3 }}>
