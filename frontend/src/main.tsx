@@ -13,7 +13,7 @@ import { SessionFinished } from './components/pages/SessionFinished.tsx';
 import SignUp from './components/pages/SignUp.tsx';
 import { Record } from './components/pages/Record.tsx';
 import { Memo } from './components/pages/Memo.tsx';
-import { Message } from './components/pages/Message.tsx';
+import Message from './components/pages/Message.tsx';
 import Login from './components/pages/Login.tsx';
 
 const router = createBrowserRouter([
