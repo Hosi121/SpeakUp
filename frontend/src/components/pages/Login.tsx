@@ -1,50 +1,49 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Button, Container, TextField, Typography, IconButton, InputAdornment } from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Button, Container, TextField, Typography, IconButton, InputAdornment } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Logo from "../../assets/logo.tsx";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();  // Initialize the useNavigate hook
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
-  
+
   // Function to handle navigation to the sign-up page
   const handleNavigateToSignup = () => {
-    navigate('/signup');
+    navigate("/signup");
   };
 
   return (
     <Container
       maxWidth="md"
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: '#FFDD66', // Matches the yellow background color
-        padding: '16px',
-        borderRadius: '16px'
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        backgroundColor: "#FFDD66", // Matches the yellow background color
+        padding: "16px",
+        borderRadius: "16px",
       }}
     >
       {/* Logo */}
       <Box
         sx={{
-          backgroundColor: 'white',
-          width: 100,
-          height: 100,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          backgroundColor: "white",
+          width: 150,
+          height: 150,
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           mb: 4,
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#FF007F' }}>
-          SPEAK UP!
-        </Typography>
+        <Logo style={{ width: "80%" }} />
       </Box>
 
       {/* Sign In Title */}
@@ -53,27 +52,19 @@ const Login = () => {
       </Typography>
 
       {/* Email Field */}
-      <TextField
-        label="Email"
-        type="email"
-        fullWidth
-        variant="outlined"
-        margin="normal"
-      />
+      <TextField label="Email" type="email" fullWidth variant="outlined" margin="normal" />
 
       {/* Password Field */}
       <TextField
         label="パスワード"
-        type={showPassword ? 'text' : 'password'}
+        type={showPassword ? "text" : "password"}
         fullWidth
         variant="outlined"
         margin="normal"
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={handleClickShowPassword}>
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
+              <IconButton onClick={handleClickShowPassword}>{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton>
             </InputAdornment>
           ),
         }}
@@ -84,11 +75,11 @@ const Login = () => {
         variant="contained"
         fullWidth
         sx={{
-          backgroundColor: '#FF007F',
-          color: 'white',
+          backgroundColor: "#FF007F",
+          color: "white",
           marginY: 2,
-          '&:hover': {
-            backgroundColor: '#FF3399',
+          "&:hover": {
+            backgroundColor: "#FF3399",
           },
         }}
       >
@@ -98,9 +89,9 @@ const Login = () => {
       {/* Forgot Password and Sign Up */}
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          width: '100%',
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
         }}
       >
         <Typography variant="body2" color="textSecondary">
@@ -111,7 +102,7 @@ const Login = () => {
         <Typography
           variant="body2"
           color="textSecondary"
-          sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+          sx={{ cursor: "pointer", textDecoration: "underline" }}
           onClick={handleNavigateToSignup} // OnClick handler to navigate to /signup
         >
           サインアップ
