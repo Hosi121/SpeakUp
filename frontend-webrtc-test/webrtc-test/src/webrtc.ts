@@ -1,36 +1,54 @@
-import { MutableRefObject, RefObject } from "react";
+import { RefObject } from "react";
+import { remoteVideoRef, textForSendSdpRef, textToReceiveSdpRef } from "./App";
 
-const localVideo = document.getElementById("local_video");
-const remoteVideo = document.getElementById("remote_video");
-const textForSendSdp = document.getElementById("text_for_send_sdp");
-const textToReceiveSdp = document.getElementById("text_for_receive_sdp");
 let localStream: MediaStream;
-let peerConnection = null;
+let peerConnection: RTCPeerConnection | null;
 let negotiationneededCounter = 0;
-const isOffer = false;
 
 // シグナリングサーバへ接続する
 const wsUrl = "ws://localhost:3001/";
 const ws = new WebSocket(wsUrl);
 ws.onopen = (evt) => {
   console.log("ws open()");
+  console.log(evt);
 };
 ws.onerror = (err) => {
   console.error("ws onerror() ERR:", err);
 };
-ws.onmessage = (evt) => {
+ws.onmessage = async (evt) => {
   console.log("ws onmessage() data:", evt.data);
-  const message = JSON.parse(evt.data);
+  let messageText: string;
+
+  if (evt.data instanceof Blob) {
+    try {
+      messageText = await evt.data.text();
+    } catch (error) {
+      console.error("Error reading Blob data:", error);
+      return;
+    }
+  } else if (typeof evt.data === "string") {
+    messageText = evt.data;
+  } else {
+    console.error("Unsupported message data type:", typeof evt.data);
+    return;
+  }
+  const message = JSON.parse(messageText);
   switch (message.type) {
     case "offer": {
       console.log("Received offer ...");
-      textToReceiveSdp.value = message.sdp;
+      const textToReceiveSdp = textToReceiveSdpRef.current;
+      if (textToReceiveSdp !== null) {
+        textToReceiveSdp.value = message.sdp;
+      }
       setOffer(message);
       break;
     }
     case "answer": {
       console.log("Received answer ...");
-      textToReceiveSdp.value = message.sdp;
+      const textToReceiveSdp = textToReceiveSdpRef.current;
+      if (textToReceiveSdp) {
+        textToReceiveSdp.value = message.sdp;
+      }
       setAnswer(message);
       break;
     }
@@ -43,7 +61,9 @@ ws.onmessage = (evt) => {
     }
     case "close": {
       console.log("peer is closed ...");
-      hangUp();
+      const textForSendSdp = textForSendSdpRef.current;
+      const textToReceiveSdp = textToReceiveSdpRef.current;
+      hangUp(textForSendSdp, textToReceiveSdp);
       break;
     }
     default: {
@@ -54,7 +74,7 @@ ws.onmessage = (evt) => {
 };
 
 // ICE candaidate受信時にセットする
-function addIceCandidate(candidate) {
+function addIceCandidate(candidate: RTCIceCandidate) {
   if (peerConnection) {
     peerConnection.addIceCandidate(candidate);
   } else {
@@ -64,7 +84,7 @@ function addIceCandidate(candidate) {
 }
 
 // ICE candidate生成時に送信する
-function sendIceCandidate(candidate) {
+function sendIceCandidate(candidate: RTCIceCandidate) {
   console.log("---sending ICE candidate ---");
   const message = JSON.stringify({ type: "candidate", ice: candidate });
   console.log("sending candidate=" + message);
@@ -93,6 +113,7 @@ export async function playVideo(
 ) {
   element.srcObject = stream;
   try {
+    element.muted = true;
     await element.play();
   } catch (error) {
     console.log("error auto play:" + error);
@@ -100,17 +121,20 @@ export async function playVideo(
 }
 
 // WebRTCを利用する準備をする
-function prepareNewConnection(isOffer) {
+function prepareNewConnection(isOffer: boolean) {
   const pc_config = {
     iceServers: [{ urls: "stun:stun.webrtc.ecl.ntt.com:3478" }],
   };
   const peer = new RTCPeerConnection(pc_config);
 
   // リモートのMediStreamTrackを受信した時
-  peer.ontrack = (evt) => {
-    console.log("-- peer.ontrack()");
-    playVideo(remoteVideo, evt.streams[0]);
-  };
+  const remoteVideo = remoteVideoRef.current;
+  if (remoteVideo) {
+    peer.ontrack = (evt) => {
+      console.log("-- peer.ontrack()");
+      playVideo(remoteVideo, evt.streams[0]);
+    };
+  }
 
   // ICE Candidateを収集したときのイベント
   peer.onicecandidate = (evt) => {
@@ -150,7 +174,9 @@ function prepareNewConnection(isOffer) {
       case "closed":
       case "failed":
         if (peerConnection) {
-          hangUp();
+          const textForSendSdp = textForSendSdpRef.current;
+          const textToReceiveSdp = textToReceiveSdpRef.current;
+          hangUp(textForSendSdp, textToReceiveSdp);
         }
         break;
       case "disconnected":
@@ -172,9 +198,12 @@ function prepareNewConnection(isOffer) {
 }
 
 // 手動シグナリングのための処理を追加する
-function sendSdp(sessionDescription) {
+function sendSdp(sessionDescription: RTCSessionDescription | null) {
   console.log("---sending sdp ---");
-  textForSendSdp.value = sessionDescription.sdp;
+  const textForSendSdp = textForSendSdpRef.current;
+  if (textForSendSdp && sessionDescription) {
+    textForSendSdp.value = sessionDescription.sdp;
+  }
   /*---
    textForSendSdp.focus();
    textForSendSdp.select();
@@ -213,7 +242,11 @@ async function makeAnswer() {
 }
 
 // Receive remote SDPボタンが押されたらOffer側とAnswer側で処理を分岐
-export function onSdpText() {
+export function onSdpText(textToReceiveSdp: HTMLTextAreaElement | null) {
+  if (textToReceiveSdp === null) {
+    console.error("textToReceiveSdp NOT exist!");
+    return;
+  }
   const text = textToReceiveSdp.value;
   if (peerConnection) {
     console.log("Received answer text...");
@@ -234,7 +267,7 @@ export function onSdpText() {
 }
 
 // Offer側のSDPをセットする処理
-async function setOffer(sessionDescription) {
+async function setOffer(sessionDescription: RTCSessionDescription) {
   if (peerConnection) {
     console.error("peerConnection alreay exist!");
   }
@@ -249,7 +282,7 @@ async function setOffer(sessionDescription) {
 }
 
 // Answer側のSDPをセットする場合
-async function setAnswer(sessionDescription) {
+async function setAnswer(sessionDescription: RTCSessionDescription) {
   if (!peerConnection) {
     console.error("peerConnection NOT exist!");
     return;
@@ -263,7 +296,10 @@ async function setAnswer(sessionDescription) {
 }
 
 // P2P通信を切断する
-export function hangUp() {
+export function hangUp(
+  textForSendSdp: HTMLTextAreaElement | null,
+  textToReceiveSdp: HTMLTextAreaElement | null
+) {
   if (peerConnection) {
     if (peerConnection.iceConnectionState !== "closed") {
       peerConnection.close();
@@ -272,9 +308,15 @@ export function hangUp() {
       const message = JSON.stringify({ type: "close" });
       console.log("sending close message");
       ws.send(message);
+      const remoteVideo = remoteVideoRef.current;
       cleanupVideoElement(remoteVideo);
-      textForSendSdp.value = "";
-      textToReceiveSdp.value = "";
+
+      if (textForSendSdp) {
+        textForSendSdp.value = "";
+      }
+      if (textToReceiveSdp) {
+        textToReceiveSdp.value = "";
+      }
       return;
     }
   }
@@ -282,7 +324,9 @@ export function hangUp() {
 }
 
 // ビデオエレメントを初期化する
-function cleanupVideoElement(element) {
-  element.pause();
-  element.srcObject = null;
+function cleanupVideoElement(element: HTMLVideoElement | null) {
+  if (element) {
+    element.pause();
+    element.srcObject = null;
+  }
 }
