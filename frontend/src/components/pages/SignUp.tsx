@@ -19,8 +19,7 @@ const SignUp = () => {
         justifyContent: "center",
         height: "100vh",
         backgroundColor: "#FFDD66", // Matches the yellow background color
-        padding: "16px",
-        borderRadius: "16px",
+        padding: "10%",
       }}
     >
       {/* Logo */}
