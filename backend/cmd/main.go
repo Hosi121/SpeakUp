@@ -43,4 +43,9 @@ func main() {
 
 	// テストデータの挿入
 	mock.CreateTestData(client)
+
+	// 8080ポートでサーバーを起動
+	if err := r.Run(":8081"); err != nil {
+		log.Fatalf("failed to run server: %v", err)
+	}
 }
