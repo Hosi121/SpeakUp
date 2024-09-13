@@ -25,3 +25,9 @@ func GetDSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", dbUser, dbPassword, dbHost, dbPort, dbName)
 }
 
+func GetSupabaseAPI() (string, string) {
+	supabaseRef := os.Getenv("SUPABASE_API_REF")
+	supabaseKey := os.Getenv("SUPABASE_API_KEY")
+
+	return supabaseRef, supabaseKey
+}
