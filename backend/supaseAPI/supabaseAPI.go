@@ -8,6 +8,8 @@ import (
 var SupabaseClient auth.Client
 
 func InitSupabase() {
+	config.LoadEnv()
+
 	supabaseRef, supabaseKey := config.GetSupabaseAPI()
 	client := auth.New(supabaseRef, supabaseKey)
 	SupabaseClient = client
