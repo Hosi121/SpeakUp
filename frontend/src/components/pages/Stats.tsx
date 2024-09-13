@@ -4,7 +4,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { MainBottomNavigation } from '../utils/MainBottomNavigation';
-import trophyData from '../assets/trophy.json';
+import trophyData from '../../assets/trophy.json';
 
 const Stats = () => {
   const [trophies, setTrophies] = useState([]);
