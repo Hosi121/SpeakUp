@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Box, Typography, List, ListItem, ListItemText, IconButton, TextField, Button, Paper } from "@mui/material";
-import SettingsIcon from '@mui/icons-material/Settings';
+import { Box, List, ListItem, ListItemText, Paper, TextField, Button, IconButton } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from "react-router-dom"; 
 import { MainBottomNavigation } from "../utils/MainBottomNavigation";  
-import NotificationModal from "../utils/NotificationModal";
+import TopSection from "../utils/TopSection";  // Import TopSection component
 
 const Message = () => {
   const [messages, setMessages] = useState([]);
@@ -19,11 +18,6 @@ const Message = () => {
     }
   };
 
-  // Function to navigate to settings page
-  const handleNavigateSettings = () => {
-    navigate("/settings");
-  };
-
   // Function to go back to the previous page
   const handleGoBack = () => {
     navigate(-1);  // Go back to the previous page
@@ -32,26 +26,15 @@ const Message = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'space-between' }}>
       
-      {/* Top Section */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-        {/* Notification Icon */}
-        <Box>
-          <NotificationModal />
-
-          {/* Back Button under NotificationModal */}
-          <IconButton onClick={handleGoBack} sx={{ mt: 1 }}>
-            <ArrowBackIcon sx={{ fontSize: 40 }} />
-          </IconButton>
-        </Box>
-
-        {/* User Name */}
-        <Typography variant="h6">Mike</Typography>
-
-        {/* Settings Icon (navigate to /settings) */}
-        <IconButton onClick={handleNavigateSettings}>
-          <SettingsIcon sx={{ fontSize: 40 }} />
+      {/* Back Button at the top-left corner */}
+      <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'flex-start', p: 2 }}>
+        <IconButton onClick={handleGoBack}>
+          <ArrowBackIcon sx={{ fontSize: 40 }} />
         </IconButton>
       </Box>
+
+      {/* Use the TopSection component here */}
+      <TopSection />
 
       {/* Chat Messages */}
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
