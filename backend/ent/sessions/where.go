@@ -55,6 +55,11 @@ func IDLTE(id int) predicate.SESSIONS {
 	return predicate.SESSIONS(sql.FieldLTE(FieldID, id))
 }
 
+// SessionID applies equality check predicate on the "session_id" field. It's identical to SessionIDEQ.
+func SessionID(v int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldEQ(FieldSessionID, v))
+}
+
 // SessionStart applies equality check predicate on the "session_start" field. It's identical to SessionStartEQ.
 func SessionStart(v time.Time) predicate.SESSIONS {
 	return predicate.SESSIONS(sql.FieldEQ(FieldSessionStart, v))
@@ -73,6 +78,46 @@ func ThemeID(v int) predicate.SESSIONS {
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.SESSIONS {
 	return predicate.SESSIONS(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// SessionIDEQ applies the EQ predicate on the "session_id" field.
+func SessionIDEQ(v int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldEQ(FieldSessionID, v))
+}
+
+// SessionIDNEQ applies the NEQ predicate on the "session_id" field.
+func SessionIDNEQ(v int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldNEQ(FieldSessionID, v))
+}
+
+// SessionIDIn applies the In predicate on the "session_id" field.
+func SessionIDIn(vs ...int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldIn(FieldSessionID, vs...))
+}
+
+// SessionIDNotIn applies the NotIn predicate on the "session_id" field.
+func SessionIDNotIn(vs ...int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldNotIn(FieldSessionID, vs...))
+}
+
+// SessionIDGT applies the GT predicate on the "session_id" field.
+func SessionIDGT(v int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldGT(FieldSessionID, v))
+}
+
+// SessionIDGTE applies the GTE predicate on the "session_id" field.
+func SessionIDGTE(v int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldGTE(FieldSessionID, v))
+}
+
+// SessionIDLT applies the LT predicate on the "session_id" field.
+func SessionIDLT(v int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldLT(FieldSessionID, v))
+}
+
+// SessionIDLTE applies the LTE predicate on the "session_id" field.
+func SessionIDLTE(v int) predicate.SESSIONS {
+	return predicate.SESSIONS(sql.FieldLTE(FieldSessionID, v))
 }
 
 // SessionStartEQ applies the EQ predicate on the "session_start" field.

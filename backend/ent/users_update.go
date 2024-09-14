@@ -31,6 +31,27 @@ func (uu *USERSUpdate) Where(ps ...predicate.USERS) *USERSUpdate {
 	return uu
 }
 
+// SetUserID sets the "user_id" field.
+func (uu *USERSUpdate) SetUserID(i int) *USERSUpdate {
+	uu.mutation.ResetUserID()
+	uu.mutation.SetUserID(i)
+	return uu
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (uu *USERSUpdate) SetNillableUserID(i *int) *USERSUpdate {
+	if i != nil {
+		uu.SetUserID(*i)
+	}
+	return uu
+}
+
+// AddUserID adds i to the "user_id" field.
+func (uu *USERSUpdate) AddUserID(i int) *USERSUpdate {
+	uu.mutation.AddUserID(i)
+	return uu
+}
+
 // SetUsername sets the "username" field.
 func (uu *USERSUpdate) SetUsername(s string) *USERSUpdate {
 	uu.mutation.SetUsername(s)
@@ -310,6 +331,12 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := uu.mutation.UserID(); ok {
+		_spec.SetField(users.FieldUserID, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.AddedUserID(); ok {
+		_spec.AddField(users.FieldUserID, field.TypeInt, value)
+	}
 	if value, ok := uu.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 	}
@@ -474,6 +501,27 @@ type USERSUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *USERSMutation
+}
+
+// SetUserID sets the "user_id" field.
+func (uuo *USERSUpdateOne) SetUserID(i int) *USERSUpdateOne {
+	uuo.mutation.ResetUserID()
+	uuo.mutation.SetUserID(i)
+	return uuo
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableUserID(i *int) *USERSUpdateOne {
+	if i != nil {
+		uuo.SetUserID(*i)
+	}
+	return uuo
+}
+
+// AddUserID adds i to the "user_id" field.
+func (uuo *USERSUpdateOne) AddUserID(i int) *USERSUpdateOne {
+	uuo.mutation.AddUserID(i)
+	return uuo
 }
 
 // SetUsername sets the "username" field.
@@ -784,6 +832,12 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := uuo.mutation.UserID(); ok {
+		_spec.SetField(users.FieldUserID, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.AddedUserID(); ok {
+		_spec.AddField(users.FieldUserID, field.TypeInt, value)
 	}
 	if value, ok := uuo.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)

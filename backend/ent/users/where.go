@@ -55,6 +55,11 @@ func IDLTE(id int) predicate.USERS {
 	return predicate.USERS(sql.FieldLTE(FieldID, id))
 }
 
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldUserID, v))
+}
+
 // Username applies equality check predicate on the "username" field. It's identical to UsernameEQ.
 func Username(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldUsername, v))
@@ -88,6 +93,46 @@ func UpdatedAt(v time.Time) predicate.USERS {
 // AccessToken applies equality check predicate on the "access_token" field. It's identical to AccessTokenEQ.
 func AccessToken(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldAccessToken, v))
+}
+
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldUserID, v))
+}
+
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldNEQ(FieldUserID, v))
+}
+
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.USERS {
+	return predicate.USERS(sql.FieldIn(FieldUserID, vs...))
+}
+
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.USERS {
+	return predicate.USERS(sql.FieldNotIn(FieldUserID, vs...))
+}
+
+// UserIDGT applies the GT predicate on the "user_id" field.
+func UserIDGT(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldGT(FieldUserID, v))
+}
+
+// UserIDGTE applies the GTE predicate on the "user_id" field.
+func UserIDGTE(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldGTE(FieldUserID, v))
+}
+
+// UserIDLT applies the LT predicate on the "user_id" field.
+func UserIDLT(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldLT(FieldUserID, v))
+}
+
+// UserIDLTE applies the LTE predicate on the "user_id" field.
+func UserIDLTE(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldLTE(FieldUserID, v))
 }
 
 // UsernameEQ applies the EQ predicate on the "username" field.

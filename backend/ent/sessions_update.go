@@ -30,6 +30,27 @@ func (su *SESSIONSUpdate) Where(ps ...predicate.SESSIONS) *SESSIONSUpdate {
 	return su
 }
 
+// SetSessionID sets the "session_id" field.
+func (su *SESSIONSUpdate) SetSessionID(i int) *SESSIONSUpdate {
+	su.mutation.ResetSessionID()
+	su.mutation.SetSessionID(i)
+	return su
+}
+
+// SetNillableSessionID sets the "session_id" field if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableSessionID(i *int) *SESSIONSUpdate {
+	if i != nil {
+		su.SetSessionID(*i)
+	}
+	return su
+}
+
+// AddSessionID adds i to the "session_id" field.
+func (su *SESSIONSUpdate) AddSessionID(i int) *SESSIONSUpdate {
+	su.mutation.AddSessionID(i)
+	return su
+}
+
 // SetSessionStart sets the "session_start" field.
 func (su *SESSIONSUpdate) SetSessionStart(t time.Time) *SESSIONSUpdate {
 	su.mutation.SetSessionStart(t)
@@ -195,6 +216,12 @@ func (su *SESSIONSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := su.mutation.SessionID(); ok {
+		_spec.SetField(sessions.FieldSessionID, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedSessionID(); ok {
+		_spec.AddField(sessions.FieldSessionID, field.TypeInt, value)
+	}
 	if value, ok := su.mutation.SessionStart(); ok {
 		_spec.SetField(sessions.FieldSessionStart, field.TypeTime, value)
 	}
@@ -302,6 +329,27 @@ type SESSIONSUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *SESSIONSMutation
+}
+
+// SetSessionID sets the "session_id" field.
+func (suo *SESSIONSUpdateOne) SetSessionID(i int) *SESSIONSUpdateOne {
+	suo.mutation.ResetSessionID()
+	suo.mutation.SetSessionID(i)
+	return suo
+}
+
+// SetNillableSessionID sets the "session_id" field if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableSessionID(i *int) *SESSIONSUpdateOne {
+	if i != nil {
+		suo.SetSessionID(*i)
+	}
+	return suo
+}
+
+// AddSessionID adds i to the "session_id" field.
+func (suo *SESSIONSUpdateOne) AddSessionID(i int) *SESSIONSUpdateOne {
+	suo.mutation.AddSessionID(i)
+	return suo
 }
 
 // SetSessionStart sets the "session_start" field.
@@ -498,6 +546,12 @@ func (suo *SESSIONSUpdateOne) sqlSave(ctx context.Context) (_node *SESSIONS, err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := suo.mutation.SessionID(); ok {
+		_spec.SetField(sessions.FieldSessionID, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedSessionID(); ok {
+		_spec.AddField(sessions.FieldSessionID, field.TypeInt, value)
 	}
 	if value, ok := suo.mutation.SessionStart(); ok {
 		_spec.SetField(sessions.FieldSessionStart, field.TypeTime, value)

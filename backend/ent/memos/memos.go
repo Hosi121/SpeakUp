@@ -12,6 +12,8 @@ const (
 	Label = "memos"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldMemoID holds the string denoting the memo_id field in the database.
+	FieldMemoID = "memo_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
 	// FieldMemo1 holds the string denoting the memo1 field in the database.
@@ -34,6 +36,7 @@ const (
 // Columns holds all SQL columns for memos fields.
 var Columns = []string{
 	FieldID,
+	FieldMemoID,
 	FieldUserID,
 	FieldMemo1,
 	FieldMemo2,
@@ -77,6 +80,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByMemoID orders the results by the memo_id field.
+func ByMemoID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMemoID, opts...).ToFunc()
 }
 
 // ByUserID orders the results by the user_id field.

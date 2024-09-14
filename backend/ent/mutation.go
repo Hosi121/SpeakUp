@@ -45,6 +45,8 @@ type AITHEMESMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	theme_id      *int
+	addtheme_id   *int
 	theme_text    *string
 	created_at    *time.Time
 	clearedFields map[string]struct{}
@@ -152,6 +154,62 @@ func (m *AITHEMESMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetThemeID sets the "theme_id" field.
+func (m *AITHEMESMutation) SetThemeID(i int) {
+	m.theme_id = &i
+	m.addtheme_id = nil
+}
+
+// ThemeID returns the value of the "theme_id" field in the mutation.
+func (m *AITHEMESMutation) ThemeID() (r int, exists bool) {
+	v := m.theme_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldThemeID returns the old "theme_id" field's value of the AITHEMES entity.
+// If the AITHEMES object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AITHEMESMutation) OldThemeID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldThemeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldThemeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldThemeID: %w", err)
+	}
+	return oldValue.ThemeID, nil
+}
+
+// AddThemeID adds i to the "theme_id" field.
+func (m *AITHEMESMutation) AddThemeID(i int) {
+	if m.addtheme_id != nil {
+		*m.addtheme_id += i
+	} else {
+		m.addtheme_id = &i
+	}
+}
+
+// AddedThemeID returns the value that was added to the "theme_id" field in this mutation.
+func (m *AITHEMESMutation) AddedThemeID() (r int, exists bool) {
+	v := m.addtheme_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetThemeID resets all changes to the "theme_id" field.
+func (m *AITHEMESMutation) ResetThemeID() {
+	m.theme_id = nil
+	m.addtheme_id = nil
 }
 
 // SetThemeText sets the "theme_text" field.
@@ -314,7 +372,10 @@ func (m *AITHEMESMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AITHEMESMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
+	if m.theme_id != nil {
+		fields = append(fields, aithemes.FieldThemeID)
+	}
 	if m.theme_text != nil {
 		fields = append(fields, aithemes.FieldThemeText)
 	}
@@ -329,6 +390,8 @@ func (m *AITHEMESMutation) Fields() []string {
 // schema.
 func (m *AITHEMESMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case aithemes.FieldThemeID:
+		return m.ThemeID()
 	case aithemes.FieldThemeText:
 		return m.ThemeText()
 	case aithemes.FieldCreatedAt:
@@ -342,6 +405,8 @@ func (m *AITHEMESMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *AITHEMESMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case aithemes.FieldThemeID:
+		return m.OldThemeID(ctx)
 	case aithemes.FieldThemeText:
 		return m.OldThemeText(ctx)
 	case aithemes.FieldCreatedAt:
@@ -355,6 +420,13 @@ func (m *AITHEMESMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *AITHEMESMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case aithemes.FieldThemeID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetThemeID(v)
+		return nil
 	case aithemes.FieldThemeText:
 		v, ok := value.(string)
 		if !ok {
@@ -376,13 +448,21 @@ func (m *AITHEMESMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *AITHEMESMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addtheme_id != nil {
+		fields = append(fields, aithemes.FieldThemeID)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *AITHEMESMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case aithemes.FieldThemeID:
+		return m.AddedThemeID()
+	}
 	return nil, false
 }
 
@@ -391,6 +471,13 @@ func (m *AITHEMESMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *AITHEMESMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case aithemes.FieldThemeID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddThemeID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown AITHEMES numeric field %s", name)
 }
@@ -418,6 +505,9 @@ func (m *AITHEMESMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *AITHEMESMutation) ResetField(name string) error {
 	switch name {
+	case aithemes.FieldThemeID:
+		m.ResetThemeID()
+		return nil
 	case aithemes.FieldThemeText:
 		m.ResetThemeText()
 		return nil
@@ -518,6 +608,8 @@ type CALLSMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	call_id       *int
+	addcall_id    *int
 	session_id    *int
 	addsession_id *int
 	call_start    *time.Time
@@ -629,6 +721,62 @@ func (m *CALLSMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetCallID sets the "call_id" field.
+func (m *CALLSMutation) SetCallID(i int) {
+	m.call_id = &i
+	m.addcall_id = nil
+}
+
+// CallID returns the value of the "call_id" field in the mutation.
+func (m *CALLSMutation) CallID() (r int, exists bool) {
+	v := m.call_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCallID returns the old "call_id" field's value of the CALLS entity.
+// If the CALLS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CALLSMutation) OldCallID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCallID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCallID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCallID: %w", err)
+	}
+	return oldValue.CallID, nil
+}
+
+// AddCallID adds i to the "call_id" field.
+func (m *CALLSMutation) AddCallID(i int) {
+	if m.addcall_id != nil {
+		*m.addcall_id += i
+	} else {
+		m.addcall_id = &i
+	}
+}
+
+// AddedCallID returns the value that was added to the "call_id" field in this mutation.
+func (m *CALLSMutation) AddedCallID() (r int, exists bool) {
+	v := m.addcall_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCallID resets all changes to the "call_id" field.
+func (m *CALLSMutation) ResetCallID() {
+	m.call_id = nil
+	m.addcall_id = nil
 }
 
 // SetSessionID sets the "session_id" field.
@@ -924,7 +1072,10 @@ func (m *CALLSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CALLSMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
+	if m.call_id != nil {
+		fields = append(fields, calls.FieldCallID)
+	}
 	if m.session_id != nil {
 		fields = append(fields, calls.FieldSessionID)
 	}
@@ -948,6 +1099,8 @@ func (m *CALLSMutation) Fields() []string {
 // schema.
 func (m *CALLSMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case calls.FieldCallID:
+		return m.CallID()
 	case calls.FieldSessionID:
 		return m.SessionID()
 	case calls.FieldCallStart:
@@ -967,6 +1120,8 @@ func (m *CALLSMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *CALLSMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case calls.FieldCallID:
+		return m.OldCallID(ctx)
 	case calls.FieldSessionID:
 		return m.OldSessionID(ctx)
 	case calls.FieldCallStart:
@@ -986,6 +1141,13 @@ func (m *CALLSMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *CALLSMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case calls.FieldCallID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCallID(v)
+		return nil
 	case calls.FieldSessionID:
 		v, ok := value.(int)
 		if !ok {
@@ -1029,6 +1191,9 @@ func (m *CALLSMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *CALLSMutation) AddedFields() []string {
 	var fields []string
+	if m.addcall_id != nil {
+		fields = append(fields, calls.FieldCallID)
+	}
 	if m.addsession_id != nil {
 		fields = append(fields, calls.FieldSessionID)
 	}
@@ -1043,6 +1208,8 @@ func (m *CALLSMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *CALLSMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case calls.FieldCallID:
+		return m.AddedCallID()
 	case calls.FieldSessionID:
 		return m.AddedSessionID()
 	case calls.FieldRating:
@@ -1056,6 +1223,13 @@ func (m *CALLSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CALLSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case calls.FieldCallID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCallID(v)
+		return nil
 	case calls.FieldSessionID:
 		v, ok := value.(int)
 		if !ok {
@@ -1097,6 +1271,9 @@ func (m *CALLSMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *CALLSMutation) ResetField(name string) error {
 	switch name {
+	case calls.FieldCallID:
+		m.ResetCallID()
+		return nil
 	case calls.FieldSessionID:
 		m.ResetSessionID()
 		return nil
@@ -1196,6 +1373,8 @@ type FRIENDSMutation struct {
 	op                Op
 	typ               string
 	id                *int
+	friend_id         *int
+	addfriend_id      *int
 	user_id           *int
 	adduser_id        *int
 	target_user_id    *int
@@ -1307,6 +1486,62 @@ func (m *FRIENDSMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetFriendID sets the "friend_id" field.
+func (m *FRIENDSMutation) SetFriendID(i int) {
+	m.friend_id = &i
+	m.addfriend_id = nil
+}
+
+// FriendID returns the value of the "friend_id" field in the mutation.
+func (m *FRIENDSMutation) FriendID() (r int, exists bool) {
+	v := m.friend_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFriendID returns the old "friend_id" field's value of the FRIENDS entity.
+// If the FRIENDS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FRIENDSMutation) OldFriendID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFriendID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFriendID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFriendID: %w", err)
+	}
+	return oldValue.FriendID, nil
+}
+
+// AddFriendID adds i to the "friend_id" field.
+func (m *FRIENDSMutation) AddFriendID(i int) {
+	if m.addfriend_id != nil {
+		*m.addfriend_id += i
+	} else {
+		m.addfriend_id = &i
+	}
+}
+
+// AddedFriendID returns the value that was added to the "friend_id" field in this mutation.
+func (m *FRIENDSMutation) AddedFriendID() (r int, exists bool) {
+	v := m.addfriend_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetFriendID resets all changes to the "friend_id" field.
+func (m *FRIENDSMutation) ResetFriendID() {
+	m.friend_id = nil
+	m.addfriend_id = nil
 }
 
 // SetUserID sets the "user_id" field.
@@ -1581,7 +1816,10 @@ func (m *FRIENDSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FRIENDSMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
+	if m.friend_id != nil {
+		fields = append(fields, friends.FieldFriendID)
+	}
 	if m.user_id != nil {
 		fields = append(fields, friends.FieldUserID)
 	}
@@ -1602,6 +1840,8 @@ func (m *FRIENDSMutation) Fields() []string {
 // schema.
 func (m *FRIENDSMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case friends.FieldFriendID:
+		return m.FriendID()
 	case friends.FieldUserID:
 		return m.UserID()
 	case friends.FieldTargetUserID:
@@ -1619,6 +1859,8 @@ func (m *FRIENDSMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *FRIENDSMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case friends.FieldFriendID:
+		return m.OldFriendID(ctx)
 	case friends.FieldUserID:
 		return m.OldUserID(ctx)
 	case friends.FieldTargetUserID:
@@ -1636,6 +1878,13 @@ func (m *FRIENDSMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *FRIENDSMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case friends.FieldFriendID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFriendID(v)
+		return nil
 	case friends.FieldUserID:
 		v, ok := value.(int)
 		if !ok {
@@ -1672,6 +1921,9 @@ func (m *FRIENDSMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *FRIENDSMutation) AddedFields() []string {
 	var fields []string
+	if m.addfriend_id != nil {
+		fields = append(fields, friends.FieldFriendID)
+	}
 	if m.adduser_id != nil {
 		fields = append(fields, friends.FieldUserID)
 	}
@@ -1686,6 +1938,8 @@ func (m *FRIENDSMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *FRIENDSMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case friends.FieldFriendID:
+		return m.AddedFriendID()
 	case friends.FieldUserID:
 		return m.AddedUserID()
 	case friends.FieldTargetUserID:
@@ -1699,6 +1953,13 @@ func (m *FRIENDSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *FRIENDSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case friends.FieldFriendID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFriendID(v)
+		return nil
 	case friends.FieldUserID:
 		v, ok := value.(int)
 		if !ok {
@@ -1740,6 +2001,9 @@ func (m *FRIENDSMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *FRIENDSMutation) ResetField(name string) error {
 	switch name {
+	case friends.FieldFriendID:
+		m.ResetFriendID()
+		return nil
 	case friends.FieldUserID:
 		m.ResetUserID()
 		return nil
@@ -1846,6 +2110,8 @@ type MATCHINGSMutation struct {
 	op                 Op
 	typ                string
 	id                 *int
+	match_id           *int
+	addmatch_id        *int
 	user_id            *int
 	adduser_id         *int
 	matched_user_id    *int
@@ -1963,6 +2229,62 @@ func (m *MATCHINGSMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetMatchID sets the "match_id" field.
+func (m *MATCHINGSMutation) SetMatchID(i int) {
+	m.match_id = &i
+	m.addmatch_id = nil
+}
+
+// MatchID returns the value of the "match_id" field in the mutation.
+func (m *MATCHINGSMutation) MatchID() (r int, exists bool) {
+	v := m.match_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMatchID returns the old "match_id" field's value of the MATCHINGS entity.
+// If the MATCHINGS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MATCHINGSMutation) OldMatchID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMatchID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMatchID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMatchID: %w", err)
+	}
+	return oldValue.MatchID, nil
+}
+
+// AddMatchID adds i to the "match_id" field.
+func (m *MATCHINGSMutation) AddMatchID(i int) {
+	if m.addmatch_id != nil {
+		*m.addmatch_id += i
+	} else {
+		m.addmatch_id = &i
+	}
+}
+
+// AddedMatchID returns the value that was added to the "match_id" field in this mutation.
+func (m *MATCHINGSMutation) AddedMatchID() (r int, exists bool) {
+	v := m.addmatch_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMatchID resets all changes to the "match_id" field.
+func (m *MATCHINGSMutation) ResetMatchID() {
+	m.match_id = nil
+	m.addmatch_id = nil
 }
 
 // SetUserID sets the "user_id" field.
@@ -2371,7 +2693,10 @@ func (m *MATCHINGSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MATCHINGSMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
+	if m.match_id != nil {
+		fields = append(fields, matchings.FieldMatchID)
+	}
 	if m.user_id != nil {
 		fields = append(fields, matchings.FieldUserID)
 	}
@@ -2395,6 +2720,8 @@ func (m *MATCHINGSMutation) Fields() []string {
 // schema.
 func (m *MATCHINGSMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case matchings.FieldMatchID:
+		return m.MatchID()
 	case matchings.FieldUserID:
 		return m.UserID()
 	case matchings.FieldMatchedUserID:
@@ -2414,6 +2741,8 @@ func (m *MATCHINGSMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MATCHINGSMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case matchings.FieldMatchID:
+		return m.OldMatchID(ctx)
 	case matchings.FieldUserID:
 		return m.OldUserID(ctx)
 	case matchings.FieldMatchedUserID:
@@ -2433,6 +2762,13 @@ func (m *MATCHINGSMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *MATCHINGSMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case matchings.FieldMatchID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMatchID(v)
+		return nil
 	case matchings.FieldUserID:
 		v, ok := value.(int)
 		if !ok {
@@ -2476,6 +2812,9 @@ func (m *MATCHINGSMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MATCHINGSMutation) AddedFields() []string {
 	var fields []string
+	if m.addmatch_id != nil {
+		fields = append(fields, matchings.FieldMatchID)
+	}
 	if m.adduser_id != nil {
 		fields = append(fields, matchings.FieldUserID)
 	}
@@ -2493,6 +2832,8 @@ func (m *MATCHINGSMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MATCHINGSMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case matchings.FieldMatchID:
+		return m.AddedMatchID()
 	case matchings.FieldUserID:
 		return m.AddedUserID()
 	case matchings.FieldMatchedUserID:
@@ -2508,6 +2849,13 @@ func (m *MATCHINGSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MATCHINGSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case matchings.FieldMatchID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMatchID(v)
+		return nil
 	case matchings.FieldUserID:
 		v, ok := value.(int)
 		if !ok {
@@ -2556,6 +2904,9 @@ func (m *MATCHINGSMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MATCHINGSMutation) ResetField(name string) error {
 	switch name {
+	case matchings.FieldMatchID:
+		m.ResetMatchID()
+		return nil
 	case matchings.FieldUserID:
 		m.ResetUserID()
 		return nil
@@ -2701,6 +3052,8 @@ type MEMOSMutation struct {
 	op              Op
 	typ             string
 	id              *int
+	memo_id         *int
+	addmemo_id      *int
 	user_id         *int
 	adduser_id      *int
 	memo1           *string
@@ -2809,6 +3162,62 @@ func (m *MEMOSMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetMemoID sets the "memo_id" field.
+func (m *MEMOSMutation) SetMemoID(i int) {
+	m.memo_id = &i
+	m.addmemo_id = nil
+}
+
+// MemoID returns the value of the "memo_id" field in the mutation.
+func (m *MEMOSMutation) MemoID() (r int, exists bool) {
+	v := m.memo_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemoID returns the old "memo_id" field's value of the MEMOS entity.
+// If the MEMOS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MEMOSMutation) OldMemoID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemoID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemoID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemoID: %w", err)
+	}
+	return oldValue.MemoID, nil
+}
+
+// AddMemoID adds i to the "memo_id" field.
+func (m *MEMOSMutation) AddMemoID(i int) {
+	if m.addmemo_id != nil {
+		*m.addmemo_id += i
+	} else {
+		m.addmemo_id = &i
+	}
+}
+
+// AddedMemoID returns the value that was added to the "memo_id" field in this mutation.
+func (m *MEMOSMutation) AddedMemoID() (r int, exists bool) {
+	v := m.addmemo_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMemoID resets all changes to the "memo_id" field.
+func (m *MEMOSMutation) ResetMemoID() {
+	m.memo_id = nil
+	m.addmemo_id = nil
 }
 
 // SetUserID sets the "user_id" field.
@@ -3012,7 +3421,10 @@ func (m *MEMOSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MEMOSMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
+	if m.memo_id != nil {
+		fields = append(fields, memos.FieldMemoID)
+	}
 	if m.user_id != nil {
 		fields = append(fields, memos.FieldUserID)
 	}
@@ -3030,6 +3442,8 @@ func (m *MEMOSMutation) Fields() []string {
 // schema.
 func (m *MEMOSMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case memos.FieldMemoID:
+		return m.MemoID()
 	case memos.FieldUserID:
 		return m.UserID()
 	case memos.FieldMemo1:
@@ -3045,6 +3459,8 @@ func (m *MEMOSMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MEMOSMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case memos.FieldMemoID:
+		return m.OldMemoID(ctx)
 	case memos.FieldUserID:
 		return m.OldUserID(ctx)
 	case memos.FieldMemo1:
@@ -3060,6 +3476,13 @@ func (m *MEMOSMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *MEMOSMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case memos.FieldMemoID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemoID(v)
+		return nil
 	case memos.FieldUserID:
 		v, ok := value.(int)
 		if !ok {
@@ -3089,6 +3512,9 @@ func (m *MEMOSMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MEMOSMutation) AddedFields() []string {
 	var fields []string
+	if m.addmemo_id != nil {
+		fields = append(fields, memos.FieldMemoID)
+	}
 	if m.adduser_id != nil {
 		fields = append(fields, memos.FieldUserID)
 	}
@@ -3100,6 +3526,8 @@ func (m *MEMOSMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MEMOSMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case memos.FieldMemoID:
+		return m.AddedMemoID()
 	case memos.FieldUserID:
 		return m.AddedUserID()
 	}
@@ -3111,6 +3539,13 @@ func (m *MEMOSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MEMOSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case memos.FieldMemoID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMemoID(v)
+		return nil
 	case memos.FieldUserID:
 		v, ok := value.(int)
 		if !ok {
@@ -3145,6 +3580,9 @@ func (m *MEMOSMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MEMOSMutation) ResetField(name string) error {
 	switch name {
+	case memos.FieldMemoID:
+		m.ResetMemoID()
+		return nil
 	case memos.FieldUserID:
 		m.ResetUserID()
 		return nil
@@ -3238,6 +3676,8 @@ type SESSIONSMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	session_id    *int
+	addsession_id *int
 	session_start *time.Time
 	session_end   *time.Time
 	theme_id      *int
@@ -3350,6 +3790,62 @@ func (m *SESSIONSMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetSessionID sets the "session_id" field.
+func (m *SESSIONSMutation) SetSessionID(i int) {
+	m.session_id = &i
+	m.addsession_id = nil
+}
+
+// SessionID returns the value of the "session_id" field in the mutation.
+func (m *SESSIONSMutation) SessionID() (r int, exists bool) {
+	v := m.session_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSessionID returns the old "session_id" field's value of the SESSIONS entity.
+// If the SESSIONS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SESSIONSMutation) OldSessionID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSessionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSessionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSessionID: %w", err)
+	}
+	return oldValue.SessionID, nil
+}
+
+// AddSessionID adds i to the "session_id" field.
+func (m *SESSIONSMutation) AddSessionID(i int) {
+	if m.addsession_id != nil {
+		*m.addsession_id += i
+	} else {
+		m.addsession_id = &i
+	}
+}
+
+// AddedSessionID returns the value that was added to the "session_id" field in this mutation.
+func (m *SESSIONSMutation) AddedSessionID() (r int, exists bool) {
+	v := m.addsession_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSessionID resets all changes to the "session_id" field.
+func (m *SESSIONSMutation) ResetSessionID() {
+	m.session_id = nil
+	m.addsession_id = nil
 }
 
 // SetSessionStart sets the "session_start" field.
@@ -3643,7 +4139,10 @@ func (m *SESSIONSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SESSIONSMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
+	if m.session_id != nil {
+		fields = append(fields, sessions.FieldSessionID)
+	}
 	if m.session_start != nil {
 		fields = append(fields, sessions.FieldSessionStart)
 	}
@@ -3664,6 +4163,8 @@ func (m *SESSIONSMutation) Fields() []string {
 // schema.
 func (m *SESSIONSMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case sessions.FieldSessionID:
+		return m.SessionID()
 	case sessions.FieldSessionStart:
 		return m.SessionStart()
 	case sessions.FieldSessionEnd:
@@ -3681,6 +4182,8 @@ func (m *SESSIONSMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *SESSIONSMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case sessions.FieldSessionID:
+		return m.OldSessionID(ctx)
 	case sessions.FieldSessionStart:
 		return m.OldSessionStart(ctx)
 	case sessions.FieldSessionEnd:
@@ -3698,6 +4201,13 @@ func (m *SESSIONSMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *SESSIONSMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case sessions.FieldSessionID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSessionID(v)
+		return nil
 	case sessions.FieldSessionStart:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -3734,6 +4244,9 @@ func (m *SESSIONSMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *SESSIONSMutation) AddedFields() []string {
 	var fields []string
+	if m.addsession_id != nil {
+		fields = append(fields, sessions.FieldSessionID)
+	}
 	if m.addtheme_id != nil {
 		fields = append(fields, sessions.FieldThemeID)
 	}
@@ -3745,6 +4258,8 @@ func (m *SESSIONSMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *SESSIONSMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case sessions.FieldSessionID:
+		return m.AddedSessionID()
 	case sessions.FieldThemeID:
 		return m.AddedThemeID()
 	}
@@ -3756,6 +4271,13 @@ func (m *SESSIONSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *SESSIONSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case sessions.FieldSessionID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSessionID(v)
+		return nil
 	case sessions.FieldThemeID:
 		v, ok := value.(int)
 		if !ok {
@@ -3790,6 +4312,9 @@ func (m *SESSIONSMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *SESSIONSMutation) ResetField(name string) error {
 	switch name {
+	case sessions.FieldSessionID:
+		m.ResetSessionID()
+		return nil
 	case sessions.FieldSessionStart:
 		m.ResetSessionStart()
 		return nil
@@ -3914,6 +4439,8 @@ type USERSMutation struct {
 	op                  Op
 	typ                 string
 	id                  *int
+	user_id             *int
+	adduser_id          *int
 	username            *string
 	email               *string
 	avatar_url          *string
@@ -4032,6 +4559,62 @@ func (m *USERSMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetUserID sets the "user_id" field.
+func (m *USERSMutation) SetUserID(i int) {
+	m.user_id = &i
+	m.adduser_id = nil
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *USERSMutation) UserID() (r int, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the USERS entity.
+// If the USERS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *USERSMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// AddUserID adds i to the "user_id" field.
+func (m *USERSMutation) AddUserID(i int) {
+	if m.adduser_id != nil {
+		*m.adduser_id += i
+	} else {
+		m.adduser_id = &i
+	}
+}
+
+// AddedUserID returns the value that was added to the "user_id" field in this mutation.
+func (m *USERSMutation) AddedUserID() (r int, exists bool) {
+	v := m.adduser_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *USERSMutation) ResetUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
 }
 
 // SetUsername sets the "username" field.
@@ -4516,7 +5099,10 @@ func (m *USERSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *USERSMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
+	if m.user_id != nil {
+		fields = append(fields, users.FieldUserID)
+	}
 	if m.username != nil {
 		fields = append(fields, users.FieldUsername)
 	}
@@ -4549,6 +5135,8 @@ func (m *USERSMutation) Fields() []string {
 // schema.
 func (m *USERSMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case users.FieldUserID:
+		return m.UserID()
 	case users.FieldUsername:
 		return m.Username()
 	case users.FieldEmail:
@@ -4574,6 +5162,8 @@ func (m *USERSMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *USERSMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case users.FieldUserID:
+		return m.OldUserID(ctx)
 	case users.FieldUsername:
 		return m.OldUsername(ctx)
 	case users.FieldEmail:
@@ -4599,6 +5189,13 @@ func (m *USERSMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *USERSMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case users.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
 	case users.FieldUsername:
 		v, ok := value.(string)
 		if !ok {
@@ -4662,13 +5259,21 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *USERSMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.adduser_id != nil {
+		fields = append(fields, users.FieldUserID)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *USERSMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case users.FieldUserID:
+		return m.AddedUserID()
+	}
 	return nil, false
 }
 
@@ -4677,6 +5282,13 @@ func (m *USERSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *USERSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case users.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown USERS numeric field %s", name)
 }
@@ -4713,6 +5325,9 @@ func (m *USERSMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *USERSMutation) ResetField(name string) error {
 	switch name {
+	case users.FieldUserID:
+		m.ResetUserID()
+		return nil
 	case users.FieldUsername:
 		m.ResetUsername()
 		return nil

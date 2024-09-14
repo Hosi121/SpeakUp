@@ -299,12 +299,12 @@ func (mq *MEMOSQuery) WithPrepared(opts ...func(*USERSQuery)) *MEMOSQuery {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		MemoID int `json:"memo_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MEMOS.Query().
-//		GroupBy(memos.FieldUserID).
+//		GroupBy(memos.FieldMemoID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (mq *MEMOSQuery) GroupBy(field string, fields ...string) *MEMOSGroupBy {
@@ -322,11 +322,11 @@ func (mq *MEMOSQuery) GroupBy(field string, fields ...string) *MEMOSGroupBy {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		MemoID int `json:"memo_id,omitempty"`
 //	}
 //
 //	client.MEMOS.Query().
-//		Select(memos.FieldUserID).
+//		Select(memos.FieldMemoID).
 //		Scan(ctx, &v)
 func (mq *MEMOSQuery) Select(fields ...string) *MEMOSSelect {
 	mq.ctx.Fields = append(mq.ctx.Fields, fields...)
