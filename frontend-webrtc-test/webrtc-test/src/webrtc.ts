@@ -1,5 +1,5 @@
 import { RefObject } from "react";
-import { remoteVideoRef, textForSendSdpRef, textToReceiveSdpRef } from "./App";
+import { textForSendSdpRef, textToReceiveSdpRef } from "./App";
 
 let localStream: MediaStream;
 let peerConnection: RTCPeerConnection | null;
@@ -7,12 +7,10 @@ let negotiationneededCounter = 0;
 const iceCandidateQueue: RTCIceCandidate[] = [];
 
 // シグナリングサーバへ接続する
-//const wsUrl = "ws://localhost:3001/";
 const wsUrl = "ws://10.70.174.103:3001/";
 const ws = new WebSocket(wsUrl);
 ws.onopen = (evt) => {
   console.log("ws open()");
-  console.log(evt);
 };
 ws.onerror = (err) => {
   console.error("ws onerror() ERR:", err);
@@ -75,7 +73,6 @@ ws.onmessage = async (evt) => {
   }
 };
 
-// ICE candaidate受信時にセットする
 function addIceCandidate(candidate: RTCIceCandidate) {
   if (
     peerConnection &&
@@ -94,7 +91,6 @@ function addIceCandidate(candidate: RTCIceCandidate) {
   }
 }
 
-// ICE candidate生成時に送信する
 function sendIceCandidate(candidate: RTCIceCandidate) {
   console.log("---sending ICE candidate ---");
   const message = JSON.stringify({ type: "candidate", ice: candidate });
@@ -102,31 +98,15 @@ function sendIceCandidate(candidate: RTCIceCandidate) {
   ws.send(message);
 }
 
-// getUserMediaでカメラ、マイクにアクセス
-export async function startVideo(localVideo: RefObject<HTMLVideoElement>) {
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false,
-    });
-    if (localVideo.current) {
-      playVideo(localVideo.current, localStream);
-    }
-  } catch (err) {
-    console.error("mediaDevice.getUserMedia() error:", err);
-  }
-}
-
 export async function startLocalStream(
-  localVideo: RefObject<HTMLVideoElement>
+  localAudio: RefObject<HTMLAudioElement>
 ) {
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
       audio: true,
     });
-    if (localVideo.current) {
-      playVideo(localVideo.current, localStream);
+    if (localAudio.current) {
+      localAudio.current.srcObject = localStream;
     }
   } catch (err) {
     console.error("mediaDevice.getUserMedia() error:", err);
@@ -134,45 +114,18 @@ export async function startLocalStream(
   }
 }
 
-// Videoの再生を開始する
-export async function playVideo(
-  element: HTMLVideoElement,
-  stream: MediaStream
-) {
-  element.srcObject = stream;
-  try {
-    await element.play();
-  } catch (error) {
-    console.log("error auto play:" + error);
-  }
-}
-
-// WebRTCを利用する準備をする
-function prepareNewConnection(
-  isOffer: boolean,
-  remoteVideoRef: RefObject<HTMLVideoElement>
-) {
+function prepareNewConnection(isOffer: boolean) {
   const pc_config = {
     iceServers: [
       { urls: "stun:stun.webrtc.ecl.ntt.com:3478" },
-      { urls: "stun:stun.l.google.com:19302" }, // バックアップとして Google の STUN サーバーを追加
+      { urls: "stun:stun.l.google.com:19302" },
     ],
   };
   const peer = new RTCPeerConnection(pc_config);
 
-  // リモートのMediaStreamTrackを受信した時
   peer.ontrack = (evt) => {
     console.log("-- peer.ontrack()", evt.track.kind);
-    if (evt.track.kind === "video") {
-      const remoteVideo = remoteVideoRef.current;
-      if (remoteVideo) {
-        if (remoteVideo.srcObject !== evt.streams[0]) {
-          remoteVideo.srcObject = evt.streams[0];
-          console.log("Received remote video stream");
-        }
-      }
-    } else if (evt.track.kind === "audio") {
-      // オーディオトラックの処理
+    if (evt.track.kind === "audio") {
       const remoteAudio = new Audio();
       remoteAudio.srcObject = evt.streams[0];
       remoteAudio.play();
@@ -180,7 +133,6 @@ function prepareNewConnection(
     }
   };
 
-  // ICE Candidateを収集したときのイベント
   peer.onicecandidate = (evt) => {
     if (evt.candidate) {
       console.log("New ICE candidate: ", evt.candidate);
@@ -190,7 +142,6 @@ function prepareNewConnection(
     }
   };
 
-  // ICE接続状態が変化したときのイベント
   peer.oniceconnectionstatechange = () => {
     console.log("ICE connection state changed to: ", peer.iceConnectionState);
     switch (peer.iceConnectionState) {
@@ -217,7 +168,6 @@ function prepareNewConnection(
     }
   }
 
-  // Offer側でネゴシエーションが必要になったときの処理
   peer.onnegotiationneeded = async () => {
     try {
       if (isOffer) {
@@ -236,7 +186,6 @@ function prepareNewConnection(
     }
   };
 
-  // データチャネルの作成 (オプション)
   if (isOffer) {
     const dataChannel = peer.createDataChannel("chat");
     setupDataChannel(dataChannel);
@@ -258,34 +207,28 @@ function setupDataChannel(dataChannel: RTCDataChannel) {
   };
 }
 
-// 手動シグナリングのための処理を追加する
 function sendSdp(sessionDescription: RTCSessionDescription | null) {
   console.log("---sending sdp ---");
   const textForSendSdp = textForSendSdpRef.current;
   if (textForSendSdp && sessionDescription) {
     textForSendSdp.value = sessionDescription.sdp;
   }
-  /*---
-   textForSendSdp.focus();
-   textForSendSdp.select();
-   ----*/
   const message = JSON.stringify(sessionDescription);
   console.log("sending SDP=" + message);
   ws.send(message);
 }
 
-// Connectボタンが押されたらWebRTCのOffer処理を開始
-export function connect(remoteVideoRef: RefObject<HTMLVideoElement>) {
+export function connect() {
   if (!peerConnection) {
     console.log("Creating new peer connection");
-    peerConnection = prepareNewConnection(true, remoteVideoRef);
+    peerConnection = prepareNewConnection(true);
     if (localStream) {
       localStream.getTracks().forEach((track) => {
         peerConnection!.addTrack(track, localStream);
       });
     } else {
       console.error("Local stream is not available");
-      return; // ローカルストリームがない場合は接続を開始しない
+      return;
     }
     createAndSendOffer();
   } else {
@@ -308,7 +251,6 @@ async function createAndSendOffer() {
   }
 }
 
-// Answer SDPを生成する
 async function makeAnswer() {
   if (!peerConnection) {
     console.error("PeerConnection does not exist!");
@@ -324,7 +266,6 @@ async function makeAnswer() {
   }
 }
 
-// Receive remote SDPボタンが押されたらOffer側とAnswer側で処理を分岐
 export function onSdpText(textToReceiveSdp: HTMLTextAreaElement | null) {
   if (textToReceiveSdp === null) {
     console.error("textToReceiveSdp NOT exist!");
@@ -358,7 +299,6 @@ async function setRemoteDescription(sessionDescription: RTCSessionDescription) {
     await peerConnection.setRemoteDescription(sessionDescription);
     console.log("Remote description set successfully");
 
-    // Process queued ICE candidates
     while (iceCandidateQueue.length > 0) {
       const candidate = iceCandidateQueue.shift();
       await peerConnection.addIceCandidate(candidate!);
@@ -373,13 +313,12 @@ async function setRemoteDescription(sessionDescription: RTCSessionDescription) {
   }
 }
 
-// Offer側のSDPをセットする処理
 async function setOffer(sessionDescription: RTCSessionDescription) {
   if (peerConnection) {
     console.warn("PeerConnection already exists, closing existing connection");
     peerConnection.close();
   }
-  peerConnection = prepareNewConnection(false, remoteVideoRef);
+  peerConnection = prepareNewConnection(false);
 
   if (localStream) {
     localStream.getTracks().forEach((track) => {
@@ -393,7 +332,6 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
   await setRemoteDescription(sessionDescription);
 }
 
-// Answer側のSDPをセットする場合
 async function setAnswer(sessionDescription: RTCSessionDescription) {
   if (!peerConnection) {
     console.error("peerConnection NOT exist!");
@@ -402,7 +340,6 @@ async function setAnswer(sessionDescription: RTCSessionDescription) {
   await setRemoteDescription(sessionDescription);
 }
 
-// P2P通信を切断する
 export function hangUp(
   textForSendSdp: HTMLTextAreaElement | null,
   textToReceiveSdp: HTMLTextAreaElement | null
@@ -415,8 +352,6 @@ export function hangUp(
       const message = JSON.stringify({ type: "close" });
       console.log("sending close message");
       ws.send(message);
-      const remoteVideo = remoteVideoRef.current;
-      cleanupVideoElement(remoteVideo);
 
       if (textForSendSdp) {
         textForSendSdp.value = "";
@@ -428,12 +363,4 @@ export function hangUp(
     }
   }
   console.log("peerConnection is closed.");
-}
-
-// ビデオエレメントを初期化する
-function cleanupVideoElement(element: HTMLVideoElement | null) {
-  if (element) {
-    element.pause();
-    element.srcObject = null;
-  }
 }

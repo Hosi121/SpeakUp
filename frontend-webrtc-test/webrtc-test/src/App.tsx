@@ -3,7 +3,6 @@ import "./App.css";
 import { connect, hangUp, onSdpText, startLocalStream } from "./webrtc";
 import styles from "./App.module.css";
 
-export let remoteVideoRef: React.RefObject<HTMLVideoElement>;
 export let textForSendSdpRef: React.RefObject<HTMLTextAreaElement>;
 export let textToReceiveSdpRef: React.RefObject<HTMLTextAreaElement>;
 
@@ -11,8 +10,8 @@ function App() {
   const [mediaDeviceStatus, setMediaDeviceStatus] = useState<
     "checking" | "available" | "unavailable" | "error"
   >("checking");
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const localAudioRef = useRef<HTMLAudioElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
   textForSendSdpRef = useRef<HTMLTextAreaElement>(null);
   textToReceiveSdpRef = useRef<HTMLTextAreaElement>(null);
 
@@ -26,15 +25,14 @@ function App() {
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
           audio: true,
         });
-        console.log("Media devices accessed successfully", stream);
+        console.log("Audio devices accessed successfully", stream);
         setMediaDeviceStatus("available");
         // ストリームを停止 (必要に応じて)
         // stream.getTracks().forEach(track => track.stop());
       } catch (error) {
-        console.error("Error accessing media devices:", error);
+        console.error("Error accessing audio devices:", error);
         setMediaDeviceStatus("error");
       }
     }
@@ -42,19 +40,19 @@ function App() {
     initMediaDevices();
   }, []);
 
-  const handleStartVideo = () => {
+  const handleStartAudio = () => {
     if (mediaDeviceStatus === "available") {
-      startLocalStream(localVideoRef);
+      startLocalStream(localAudioRef);
     } else {
-      console.warn("Media devices are not available");
+      console.warn("Audio devices are not available");
     }
   };
 
   const handleConnect = () => {
     if (mediaDeviceStatus === "available") {
-      connect(remoteVideoRef);
+      connect(remoteAudioRef);
     } else {
-      console.warn("Media devices are not available for connection");
+      console.warn("Audio devices are not available for connection");
     }
   };
 
@@ -72,16 +70,16 @@ function App() {
 
   return (
     <div>
-      <h1>WebRTC test</h1>
-      {mediaDeviceStatus === "checking" && <p>Checking media devices...</p>}
+      <h1>WebRTC Audio-only Test</h1>
+      {mediaDeviceStatus === "checking" && <p>Checking audio devices...</p>}
       {mediaDeviceStatus === "unavailable" && (
-        <p>Media devices are not available</p>
+        <p>Audio devices are not available</p>
       )}
-      {mediaDeviceStatus === "error" && <p>Error accessing media devices</p>}
+      {mediaDeviceStatus === "error" && <p>Error accessing audio devices</p>}
       {mediaDeviceStatus === "available" && (
         <>
-          <button type="button" onClick={handleStartVideo}>
-            Start Video
+          <button type="button" onClick={handleStartAudio}>
+            Start Audio
           </button>
           <button type="button" onClick={handleConnect}>
             Connect
@@ -90,19 +88,8 @@ function App() {
             Hang Up
           </button>
           <div>
-            <video
-              className={styles.video}
-              ref={localVideoRef}
-              id="local_video"
-              autoPlay
-              muted
-            />
-            <video
-              className={styles.video}
-              ref={remoteVideoRef}
-              id="remote_video"
-              autoPlay
-            />
+            <audio ref={localAudioRef} id="local_audio" autoPlay muted />
+            <audio ref={remoteAudioRef} id="remote_audio" autoPlay />
           </div>
           <p>
             SDP to send:
