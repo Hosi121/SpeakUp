@@ -4,6 +4,7 @@ import { remoteAudioRef, textForSendSdpRef, textToReceiveSdpRef } from "./App";
 let localStream: MediaStream;
 let peerConnection: RTCPeerConnection | null;
 let negotiationneededCounter = 0;
+const iceCandidateQueue: RTCIceCandidate[] = [];
 
 // シグナリングサーバへ接続する
 //const wsUrl = "ws://localhost:3001/";
@@ -41,7 +42,7 @@ ws.onmessage = async (evt) => {
       if (textToReceiveSdp !== null) {
         textToReceiveSdp.value = message.sdp;
       }
-      setOffer(message);
+      await setOffer(new RTCSessionDescription(message));
       break;
     }
     case "answer": {
@@ -50,7 +51,7 @@ ws.onmessage = async (evt) => {
       if (textToReceiveSdp) {
         textToReceiveSdp.value = message.sdp;
       }
-      setAnswer(message);
+      setAnswer(new RTCSessionDescription(message));
       break;
     }
     case "candidate": {
@@ -76,7 +77,11 @@ ws.onmessage = async (evt) => {
 
 // ICE candaidate受信時にセットする
 function addIceCandidate(candidate: RTCIceCandidate) {
-  if (peerConnection) {
+  if (
+    peerConnection &&
+    peerConnection.remoteDescription &&
+    peerConnection.remoteDescription.type
+  ) {
     peerConnection
       .addIceCandidate(candidate)
       .then(() => console.log("Added ICE candidate successfully"))
@@ -84,7 +89,8 @@ function addIceCandidate(candidate: RTCIceCandidate) {
         console.error("Error adding received ICE candidate", err)
       );
   } else {
-    console.warn("Cannot add ICE candidate: peerConnection is not set up");
+    iceCandidateQueue.push(candidate);
+    console.log("ICE candidate added to queue");
   }
 }
 
@@ -332,6 +338,30 @@ export function onSdpText(textToReceiveSdp: HTMLTextAreaElement | null) {
   textToReceiveSdp.value = "";
 }
 
+async function setRemoteDescription(sessionDescription: RTCSessionDescription) {
+  if (!peerConnection) {
+    console.error("PeerConnection does not exist!");
+    return;
+  }
+  try {
+    await peerConnection.setRemoteDescription(sessionDescription);
+    console.log("Remote description set successfully");
+
+    // Process queued ICE candidates
+    while (iceCandidateQueue.length > 0) {
+      const candidate = iceCandidateQueue.shift();
+      await peerConnection.addIceCandidate(candidate!);
+      console.log("Queued ICE candidate added");
+    }
+
+    if (sessionDescription.type === "offer") {
+      await makeAnswer();
+    }
+  } catch (err) {
+    console.error("Error setting remote description:", err);
+  }
+}
+
 // Offer側のSDPをセットする処理
 async function setOffer(sessionDescription: RTCSessionDescription) {
   if (peerConnection) {
@@ -346,16 +376,10 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
     });
   } else {
     console.error("Local stream is not available for answer");
-    return; // ローカルストリームがない場合は応答しない
+    return;
   }
 
-  try {
-    await peerConnection.setRemoteDescription(sessionDescription);
-    console.log("Remote description set successfully");
-    await makeAnswer();
-  } catch (err) {
-    console.error("Error setting remote description:", err);
-  }
+  await setRemoteDescription(sessionDescription);
 }
 
 // Answer側のSDPをセットする場合
@@ -364,12 +388,7 @@ async function setAnswer(sessionDescription: RTCSessionDescription) {
     console.error("peerConnection NOT exist!");
     return;
   }
-  try {
-    await peerConnection.setRemoteDescription(sessionDescription);
-    console.log("setRemoteDescription(answer) succsess in promise");
-  } catch (err) {
-    console.error("setRemoteDescription(answer) ERROR: ", err);
-  }
+  await setRemoteDescription(sessionDescription);
 }
 
 // P2P通信を切断する
