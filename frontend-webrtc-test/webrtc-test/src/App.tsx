@@ -50,7 +50,7 @@ function App() {
 
   const handleConnect = () => {
     if (mediaDeviceStatus === "available") {
-      connect(remoteAudioRef);
+      connect();
     } else {
       console.warn("Audio devices are not available for connection");
     }

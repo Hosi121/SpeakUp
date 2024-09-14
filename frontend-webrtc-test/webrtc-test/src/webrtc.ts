@@ -9,7 +9,7 @@ const iceCandidateQueue: RTCIceCandidate[] = [];
 // シグナリングサーバへ接続する
 const wsUrl = "ws://10.70.174.103:3001/";
 const ws = new WebSocket(wsUrl);
-ws.onopen = (evt) => {
+ws.onopen = () => {
   console.log("ws open()");
 };
 ws.onerror = (err) => {
