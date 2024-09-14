@@ -3,16 +3,39 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, IconButton, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import api from '../../services/api';  // api インスタンスをインポート
 
 const Login = () => {
+  const [email, setEmail] = useState(''); // メールアドレスの状態
+  const [password, setPassword] = useState(''); // パスワードの状態
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(''); // エラーメッセージの状態
   const navigate = useNavigate();  // Initialize the useNavigate hook
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
-  
+
   // Function to handle navigation to the sign-up page
   const handleNavigateToSignup = () => {
     navigate('/signup');
+  };
+
+  // ログインのPOSTリクエスト
+  const handleLogin = async () => {
+    try {
+      // ログインのためのPOSTリクエストを送信
+      const response = await api.post('/signin', {
+        email,
+        password,
+      });
+
+      // ログインに成功した場合
+      console.log('ログイン成功:', response.data);
+      navigate('/home'); // ホームページにリダイレクト
+    } catch (err) {
+      // エラーハンドリング
+      console.error('ログインエラー:', err);
+      setError('ログインに失敗しました。もう一度お試しください。');
+    }
   };
 
   return (
@@ -24,7 +47,7 @@ const Login = () => {
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
-        backgroundColor: '#FFDD66', // Matches the yellow background color
+        backgroundColor: '#FFDD66',
         padding: '16px',
         borderRadius: '16px'
       }}
@@ -52,6 +75,13 @@ const Login = () => {
         サインイン
       </Typography>
 
+      {/* Error Message */}
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       {/* Email Field */}
       <TextField
         label="Email"
@@ -59,6 +89,8 @@ const Login = () => {
         fullWidth
         variant="outlined"
         margin="normal"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)} // メールアドレスの状態を更新
       />
 
       {/* Password Field */}
@@ -68,6 +100,8 @@ const Login = () => {
         fullWidth
         variant="outlined"
         margin="normal"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)} // パスワードの状態を更新
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -91,6 +125,7 @@ const Login = () => {
             backgroundColor: '#FF3399',
           },
         }}
+        onClick={handleLogin} // サインインの処理を実行
       >
         サインイン
       </Button>
