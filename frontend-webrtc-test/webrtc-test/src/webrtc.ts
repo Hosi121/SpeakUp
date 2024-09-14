@@ -1,5 +1,5 @@
 import { RefObject } from "react";
-import { textForSendSdpRef, textToReceiveSdpRef } from "./App";
+import { remoteAudioRef, textForSendSdpRef, textToReceiveSdpRef } from "./App";
 
 let localStream: MediaStream;
 let peerConnection: RTCPeerConnection | null;
@@ -76,7 +76,7 @@ ws.onmessage = async (evt) => {
 
 // ICE candaidate受信時にセットする
 function addIceCandidate(candidate: RTCIceCandidate) {
-  if (peerConnection && peerConnection.remoteDescription) {
+  if (peerConnection) {
     peerConnection
       .addIceCandidate(candidate)
       .then(() => console.log("Added ICE candidate successfully"))
@@ -84,9 +84,7 @@ function addIceCandidate(candidate: RTCIceCandidate) {
         console.error("Error adding received ICE candidate", err)
       );
   } else {
-    console.warn(
-      "Cannot add ICE candidate: peerConnection is not set up or remoteDescription is not set"
-    );
+    console.warn("Cannot add ICE candidate: peerConnection is not set up");
   }
 }
 
@@ -184,10 +182,23 @@ function prepareNewConnection(
         break;
       case "failed":
         console.log("ICE connection failed");
-        // ここで接続の再試行ロジックを実装できます
+        retryConnection();
+        break;
+      case "disconnected":
+        console.log("ICE disconnected");
+        retryConnection();
         break;
     }
   };
+
+  function retryConnection() {
+    if (peerConnection) {
+      peerConnection.restartIce();
+      if (peerConnection.iceConnectionState === "failed") {
+        createAndSendOffer();
+      }
+    }
+  }
 
   // Offer側でネゴシエーションが必要になったときの処理
   peer.onnegotiationneeded = async () => {
@@ -257,6 +268,7 @@ export function connect(remoteAudioRef: RefObject<HTMLAudioElement>) {
       });
     } else {
       console.error("Local stream is not available");
+      return; // ローカルストリームがない場合は接続を開始しない
     }
     createAndSendOffer();
   } else {
@@ -332,12 +344,15 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
     localStream.getTracks().forEach((track) => {
       peerConnection!.addTrack(track, localStream);
     });
+  } else {
+    console.error("Local stream is not available for answer");
+    return; // ローカルストリームがない場合は応答しない
   }
 
   try {
     await peerConnection.setRemoteDescription(sessionDescription);
     console.log("Remote description set successfully");
-    makeAnswer();
+    await makeAnswer();
   } catch (err) {
     console.error("Error setting remote description:", err);
   }
