@@ -76,16 +76,27 @@ ws.onmessage = async (evt) => {
 
 // ICE candaidate受信時にセットする
 function addIceCandidate(candidate: RTCIceCandidate) {
-  if (peerConnection) {
-    peerConnection.addIceCandidate(candidate);
+  if (peerConnection && peerConnection.remoteDescription) {
+    peerConnection
+      .addIceCandidate(candidate)
+      .then(() => console.log("Added ICE candidate successfully"))
+      .catch((err) =>
+        console.error("Error adding received ICE candidate", err)
+      );
   } else {
-    console.error("PeerConnection not exist!");
-    return;
+    console.warn(
+      "Cannot add ICE candidate: peerConnection is not set up or remoteDescription is not set"
+    );
   }
 }
 
 // ICE candidate生成時に送信する
 function sendIceCandidate(candidate: RTCIceCandidate) {
+  // 空のcandidateは送信しない
+  if (!candidate || !candidate.candidate) {
+    console.log("Skipping empty ICE candidate");
+    return;
+  }
   console.log("Sending ICE candidate", candidate);
   const message = JSON.stringify({ type: "candidate", ice: candidate });
   ws.send(message);
@@ -252,37 +263,50 @@ function sendSdp(sessionDescription: RTCSessionDescription | null) {
 // Connectボタンが押されたらWebRTCのOffer処理を開始
 export function connect(remoteVideoRef: RefObject<HTMLVideoElement>) {
   if (!peerConnection) {
-    console.log("make Offer");
+    console.log("Creating new peer connection");
     peerConnection = prepareNewConnection(true, remoteVideoRef);
+    if (localStream) {
+      localStream.getTracks().forEach((track) => {
+        peerConnection!.addTrack(track, localStream);
+      });
+    } else {
+      console.error("Local stream is not available");
+    }
+    // 明示的にOfferを作成して送信
+    createAndSendOffer();
   } else {
-    console.warn("peer already exist.");
+    console.warn("Peer connection already exists");
   }
-  if (localStream && peerConnection) {
-    localStream.getTracks().forEach((track) => {
-      if (peerConnection) {
-        peerConnection.addTrack(track, localStream!);
-      }
-    });
-  } else {
-    console.error("Local stream or peer connection is not available");
+}
+
+async function createAndSendOffer() {
+  if (!peerConnection) {
+    console.error("PeerConnection does not exist!");
+    return;
+  }
+  try {
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    console.log("Offer created:", offer);
+    sendSdp(peerConnection.localDescription);
+  } catch (err) {
+    console.error("Error creating offer:", err);
   }
 }
 
 // Answer SDPを生成する
 async function makeAnswer() {
-  console.log("sending Answer. Creating remote session description...");
   if (!peerConnection) {
-    console.error("peerConnection NOT exist!");
+    console.error("PeerConnection does not exist!");
     return;
   }
   try {
     const answer = await peerConnection.createAnswer();
-    console.log("createAnswer() succsess in promise");
     await peerConnection.setLocalDescription(answer);
-    console.log("setLocalDescription() succsess in promise");
+    console.log("Answer created:", answer);
     sendSdp(peerConnection.localDescription);
   } catch (err) {
-    console.error(err);
+    console.error("Error creating answer:", err);
   }
 }
 
@@ -314,15 +338,16 @@ export function onSdpText(textToReceiveSdp: HTMLTextAreaElement | null) {
 // Offer側のSDPをセットする処理
 async function setOffer(sessionDescription: RTCSessionDescription) {
   if (peerConnection) {
-    console.error("peerConnection alreay exist!");
+    console.warn("PeerConnection already exists, closing existing connection");
+    peerConnection.close();
   }
   peerConnection = prepareNewConnection(false, remoteVideoRef);
   try {
     await peerConnection.setRemoteDescription(sessionDescription);
-    console.log("setRemoteDescription(answer) succsess in promise");
+    console.log("Remote description set successfully");
     makeAnswer();
   } catch (err) {
-    console.error("setRemoteDescription(offer) ERROR: ", err);
+    console.error("Error setting remote description:", err);
   }
 }
 
