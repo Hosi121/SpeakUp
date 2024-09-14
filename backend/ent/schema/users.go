@@ -28,8 +28,8 @@ func (USERS) Fields() []ent.Field {
 			Values("SUPERUSER", "ADMIN", "USER"),
 		field.Time("created_at").
 			Default(time.Now),
-		field.Time("deleted_at").
-			Default(time.Now),
+		field.Bool("is_deleted").
+			Default(false),
 		field.Time("updated_at").
 			Default(time.Now),
 		field.Text("access_token").
