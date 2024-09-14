@@ -8,8 +8,8 @@ import { IconButton } from "../utils/IconButton";
 
 export const Record = () => {
   return (
-    <Stack sx={{ margin: "0 auto", width: "90%" }}>
-      <Typography align="left" sx={{ marginBottom: "30px", fontSize: "2rem", color: "#da0063" }}>
+    <Stack sx={{ margin: "0 auto", width: "90%", p: 3 }}>
+      <Typography align="left" sx={{ marginBottom: "30px", fontSize: "2rem", color: "primary.main" }}>
         記録
       </Typography>
       <Box sx={{ display: "flex", placeContent: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
