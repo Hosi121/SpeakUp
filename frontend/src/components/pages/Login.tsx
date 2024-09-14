@@ -21,7 +21,7 @@ const Login = () => {
       console.log('ログイン成功:', data);
       navigate('/home');  // ログイン成功後にリダイレクト
     } catch (err) {
-      setError(err.message);  // エラーメッセージを設定
+      setError((err as Error).message);  // エラーメッセージを設定
     }
   };
 

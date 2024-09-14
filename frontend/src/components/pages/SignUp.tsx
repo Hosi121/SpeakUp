@@ -21,7 +21,7 @@ const SignUp = () => {
       console.log('サインアップ成功:', data);
       navigate('/login');  // サインアップ後、ログインページにリダイレクト
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
     }
   };
 
