@@ -16,22 +16,26 @@ type USERS struct {
 // Fields of the USERS.
 func (USERS) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int("user_id").
+			Unique(),
 		field.String("username").
 			NotEmpty().
 			MaxLen(255),
 		field.String("email").
 			NotEmpty().
 			MaxLen(255),
-		field.Text("hashed_password").
-			NotEmpty(),
 		field.Text("avatar_url").
 			Optional(),
 		field.Enum("role").
 			Values("SUPERUSER", "ADMIN", "USER"),
 		field.Time("created_at").
 			Default(time.Now),
-		field.Time("deleted_at").
+		field.Bool("is_deleted").
+			Default(false),
+		field.Time("updated_at").
 			Default(time.Now),
+		field.Text("access_token").
+			Default(""),
 	}
 }
 
@@ -40,5 +44,7 @@ func (USERS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("connects", FRIENDS.Type),
 		edge.To("participates", MATCHINGS.Type),
+		edge.To("prepares", MEMOS.Type).
+			Unique(),
 	}
 }

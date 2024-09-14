@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
@@ -27,6 +28,27 @@ type USERSUpdate struct {
 // Where appends a list predicates to the USERSUpdate builder.
 func (uu *USERSUpdate) Where(ps ...predicate.USERS) *USERSUpdate {
 	uu.mutation.Where(ps...)
+	return uu
+}
+
+// SetUserID sets the "user_id" field.
+func (uu *USERSUpdate) SetUserID(i int) *USERSUpdate {
+	uu.mutation.ResetUserID()
+	uu.mutation.SetUserID(i)
+	return uu
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (uu *USERSUpdate) SetNillableUserID(i *int) *USERSUpdate {
+	if i != nil {
+		uu.SetUserID(*i)
+	}
+	return uu
+}
+
+// AddUserID adds i to the "user_id" field.
+func (uu *USERSUpdate) AddUserID(i int) *USERSUpdate {
+	uu.mutation.AddUserID(i)
 	return uu
 }
 
@@ -54,20 +76,6 @@ func (uu *USERSUpdate) SetEmail(s string) *USERSUpdate {
 func (uu *USERSUpdate) SetNillableEmail(s *string) *USERSUpdate {
 	if s != nil {
 		uu.SetEmail(*s)
-	}
-	return uu
-}
-
-// SetHashedPassword sets the "hashed_password" field.
-func (uu *USERSUpdate) SetHashedPassword(s string) *USERSUpdate {
-	uu.mutation.SetHashedPassword(s)
-	return uu
-}
-
-// SetNillableHashedPassword sets the "hashed_password" field if the given value is not nil.
-func (uu *USERSUpdate) SetNillableHashedPassword(s *string) *USERSUpdate {
-	if s != nil {
-		uu.SetHashedPassword(*s)
 	}
 	return uu
 }
@@ -120,16 +128,44 @@ func (uu *USERSUpdate) SetNillableCreatedAt(t *time.Time) *USERSUpdate {
 	return uu
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (uu *USERSUpdate) SetDeletedAt(t time.Time) *USERSUpdate {
-	uu.mutation.SetDeletedAt(t)
+// SetIsDeleted sets the "is_deleted" field.
+func (uu *USERSUpdate) SetIsDeleted(b bool) *USERSUpdate {
+	uu.mutation.SetIsDeleted(b)
 	return uu
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (uu *USERSUpdate) SetNillableDeletedAt(t *time.Time) *USERSUpdate {
+// SetNillableIsDeleted sets the "is_deleted" field if the given value is not nil.
+func (uu *USERSUpdate) SetNillableIsDeleted(b *bool) *USERSUpdate {
+	if b != nil {
+		uu.SetIsDeleted(*b)
+	}
+	return uu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (uu *USERSUpdate) SetUpdatedAt(t time.Time) *USERSUpdate {
+	uu.mutation.SetUpdatedAt(t)
+	return uu
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (uu *USERSUpdate) SetNillableUpdatedAt(t *time.Time) *USERSUpdate {
 	if t != nil {
-		uu.SetDeletedAt(*t)
+		uu.SetUpdatedAt(*t)
+	}
+	return uu
+}
+
+// SetAccessToken sets the "access_token" field.
+func (uu *USERSUpdate) SetAccessToken(s string) *USERSUpdate {
+	uu.mutation.SetAccessToken(s)
+	return uu
+}
+
+// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
+func (uu *USERSUpdate) SetNillableAccessToken(s *string) *USERSUpdate {
+	if s != nil {
+		uu.SetAccessToken(*s)
 	}
 	return uu
 }
@@ -162,6 +198,25 @@ func (uu *USERSUpdate) AddParticipates(m ...*MATCHINGS) *USERSUpdate {
 		ids[i] = m[i].ID
 	}
 	return uu.AddParticipateIDs(ids...)
+}
+
+// SetPreparesID sets the "prepares" edge to the MEMOS entity by ID.
+func (uu *USERSUpdate) SetPreparesID(id int) *USERSUpdate {
+	uu.mutation.SetPreparesID(id)
+	return uu
+}
+
+// SetNillablePreparesID sets the "prepares" edge to the MEMOS entity by ID if the given value is not nil.
+func (uu *USERSUpdate) SetNillablePreparesID(id *int) *USERSUpdate {
+	if id != nil {
+		uu = uu.SetPreparesID(*id)
+	}
+	return uu
+}
+
+// SetPrepares sets the "prepares" edge to the MEMOS entity.
+func (uu *USERSUpdate) SetPrepares(m *MEMOS) *USERSUpdate {
+	return uu.SetPreparesID(m.ID)
 }
 
 // Mutation returns the USERSMutation object of the builder.
@@ -211,6 +266,12 @@ func (uu *USERSUpdate) RemoveParticipates(m ...*MATCHINGS) *USERSUpdate {
 	return uu.RemoveParticipateIDs(ids...)
 }
 
+// ClearPrepares clears the "prepares" edge to the MEMOS entity.
+func (uu *USERSUpdate) ClearPrepares() *USERSUpdate {
+	uu.mutation.ClearPrepares()
+	return uu
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (uu *USERSUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, uu.sqlSave, uu.mutation, uu.hooks)
@@ -250,11 +311,6 @@ func (uu *USERSUpdate) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.HashedPassword(); ok {
-		if err := users.HashedPasswordValidator(v); err != nil {
-			return &ValidationError{Name: "hashed_password", err: fmt.Errorf(`ent: validator failed for field "USERS.hashed_password": %w`, err)}
-		}
-	}
 	if v, ok := uu.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -275,14 +331,17 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := uu.mutation.UserID(); ok {
+		_spec.SetField(users.FieldUserID, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.AddedUserID(); ok {
+		_spec.AddField(users.FieldUserID, field.TypeInt, value)
+	}
 	if value, ok := uu.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.Email(); ok {
 		_spec.SetField(users.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.HashedPassword(); ok {
-		_spec.SetField(users.FieldHashedPassword, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
@@ -296,8 +355,14 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.CreatedAt(); ok {
 		_spec.SetField(users.FieldCreatedAt, field.TypeTime, value)
 	}
-	if value, ok := uu.mutation.DeletedAt(); ok {
-		_spec.SetField(users.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := uu.mutation.IsDeleted(); ok {
+		_spec.SetField(users.FieldIsDeleted, field.TypeBool, value)
+	}
+	if value, ok := uu.mutation.UpdatedAt(); ok {
+		_spec.SetField(users.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := uu.mutation.AccessToken(); ok {
+		_spec.SetField(users.FieldAccessToken, field.TypeString, value)
 	}
 	if uu.mutation.ConnectsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -389,6 +454,35 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.PreparesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.PreparesTable,
+			Columns: []string{users.PreparesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.PreparesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.PreparesTable,
+			Columns: []string{users.PreparesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{users.Label}
@@ -407,6 +501,27 @@ type USERSUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *USERSMutation
+}
+
+// SetUserID sets the "user_id" field.
+func (uuo *USERSUpdateOne) SetUserID(i int) *USERSUpdateOne {
+	uuo.mutation.ResetUserID()
+	uuo.mutation.SetUserID(i)
+	return uuo
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableUserID(i *int) *USERSUpdateOne {
+	if i != nil {
+		uuo.SetUserID(*i)
+	}
+	return uuo
+}
+
+// AddUserID adds i to the "user_id" field.
+func (uuo *USERSUpdateOne) AddUserID(i int) *USERSUpdateOne {
+	uuo.mutation.AddUserID(i)
+	return uuo
 }
 
 // SetUsername sets the "username" field.
@@ -433,20 +548,6 @@ func (uuo *USERSUpdateOne) SetEmail(s string) *USERSUpdateOne {
 func (uuo *USERSUpdateOne) SetNillableEmail(s *string) *USERSUpdateOne {
 	if s != nil {
 		uuo.SetEmail(*s)
-	}
-	return uuo
-}
-
-// SetHashedPassword sets the "hashed_password" field.
-func (uuo *USERSUpdateOne) SetHashedPassword(s string) *USERSUpdateOne {
-	uuo.mutation.SetHashedPassword(s)
-	return uuo
-}
-
-// SetNillableHashedPassword sets the "hashed_password" field if the given value is not nil.
-func (uuo *USERSUpdateOne) SetNillableHashedPassword(s *string) *USERSUpdateOne {
-	if s != nil {
-		uuo.SetHashedPassword(*s)
 	}
 	return uuo
 }
@@ -499,16 +600,44 @@ func (uuo *USERSUpdateOne) SetNillableCreatedAt(t *time.Time) *USERSUpdateOne {
 	return uuo
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (uuo *USERSUpdateOne) SetDeletedAt(t time.Time) *USERSUpdateOne {
-	uuo.mutation.SetDeletedAt(t)
+// SetIsDeleted sets the "is_deleted" field.
+func (uuo *USERSUpdateOne) SetIsDeleted(b bool) *USERSUpdateOne {
+	uuo.mutation.SetIsDeleted(b)
 	return uuo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (uuo *USERSUpdateOne) SetNillableDeletedAt(t *time.Time) *USERSUpdateOne {
+// SetNillableIsDeleted sets the "is_deleted" field if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableIsDeleted(b *bool) *USERSUpdateOne {
+	if b != nil {
+		uuo.SetIsDeleted(*b)
+	}
+	return uuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (uuo *USERSUpdateOne) SetUpdatedAt(t time.Time) *USERSUpdateOne {
+	uuo.mutation.SetUpdatedAt(t)
+	return uuo
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableUpdatedAt(t *time.Time) *USERSUpdateOne {
 	if t != nil {
-		uuo.SetDeletedAt(*t)
+		uuo.SetUpdatedAt(*t)
+	}
+	return uuo
+}
+
+// SetAccessToken sets the "access_token" field.
+func (uuo *USERSUpdateOne) SetAccessToken(s string) *USERSUpdateOne {
+	uuo.mutation.SetAccessToken(s)
+	return uuo
+}
+
+// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableAccessToken(s *string) *USERSUpdateOne {
+	if s != nil {
+		uuo.SetAccessToken(*s)
 	}
 	return uuo
 }
@@ -541,6 +670,25 @@ func (uuo *USERSUpdateOne) AddParticipates(m ...*MATCHINGS) *USERSUpdateOne {
 		ids[i] = m[i].ID
 	}
 	return uuo.AddParticipateIDs(ids...)
+}
+
+// SetPreparesID sets the "prepares" edge to the MEMOS entity by ID.
+func (uuo *USERSUpdateOne) SetPreparesID(id int) *USERSUpdateOne {
+	uuo.mutation.SetPreparesID(id)
+	return uuo
+}
+
+// SetNillablePreparesID sets the "prepares" edge to the MEMOS entity by ID if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillablePreparesID(id *int) *USERSUpdateOne {
+	if id != nil {
+		uuo = uuo.SetPreparesID(*id)
+	}
+	return uuo
+}
+
+// SetPrepares sets the "prepares" edge to the MEMOS entity.
+func (uuo *USERSUpdateOne) SetPrepares(m *MEMOS) *USERSUpdateOne {
+	return uuo.SetPreparesID(m.ID)
 }
 
 // Mutation returns the USERSMutation object of the builder.
@@ -588,6 +736,12 @@ func (uuo *USERSUpdateOne) RemoveParticipates(m ...*MATCHINGS) *USERSUpdateOne {
 		ids[i] = m[i].ID
 	}
 	return uuo.RemoveParticipateIDs(ids...)
+}
+
+// ClearPrepares clears the "prepares" edge to the MEMOS entity.
+func (uuo *USERSUpdateOne) ClearPrepares() *USERSUpdateOne {
+	uuo.mutation.ClearPrepares()
+	return uuo
 }
 
 // Where appends a list predicates to the USERSUpdate builder.
@@ -642,11 +796,6 @@ func (uuo *USERSUpdateOne) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.HashedPassword(); ok {
-		if err := users.HashedPasswordValidator(v); err != nil {
-			return &ValidationError{Name: "hashed_password", err: fmt.Errorf(`ent: validator failed for field "USERS.hashed_password": %w`, err)}
-		}
-	}
 	if v, ok := uuo.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -684,14 +833,17 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 			}
 		}
 	}
+	if value, ok := uuo.mutation.UserID(); ok {
+		_spec.SetField(users.FieldUserID, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.AddedUserID(); ok {
+		_spec.AddField(users.FieldUserID, field.TypeInt, value)
+	}
 	if value, ok := uuo.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.Email(); ok {
 		_spec.SetField(users.FieldEmail, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.HashedPassword(); ok {
-		_spec.SetField(users.FieldHashedPassword, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
@@ -705,8 +857,14 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 	if value, ok := uuo.mutation.CreatedAt(); ok {
 		_spec.SetField(users.FieldCreatedAt, field.TypeTime, value)
 	}
-	if value, ok := uuo.mutation.DeletedAt(); ok {
-		_spec.SetField(users.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := uuo.mutation.IsDeleted(); ok {
+		_spec.SetField(users.FieldIsDeleted, field.TypeBool, value)
+	}
+	if value, ok := uuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(users.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := uuo.mutation.AccessToken(); ok {
+		_spec.SetField(users.FieldAccessToken, field.TypeString, value)
 	}
 	if uuo.mutation.ConnectsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -791,6 +949,35 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.PreparesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.PreparesTable,
+			Columns: []string{users.PreparesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.PreparesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.PreparesTable,
+			Columns: []string{users.PreparesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

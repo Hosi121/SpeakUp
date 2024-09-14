@@ -17,6 +17,8 @@ type FRIENDS struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// FriendID holds the value of the "friend_id" field.
+	FriendID int `json:"friend_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
 	// TargetUserID holds the value of the "target_user_id" field.
@@ -54,7 +56,7 @@ func (*FRIENDS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case friends.FieldID, friends.FieldUserID, friends.FieldTargetUserID:
+		case friends.FieldID, friends.FieldFriendID, friends.FieldUserID, friends.FieldTargetUserID:
 			values[i] = new(sql.NullInt64)
 		case friends.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -81,6 +83,12 @@ func (f *FRIENDS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			f.ID = int(value.Int64)
+		case friends.FieldFriendID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field friend_id", values[i])
+			} else if value.Valid {
+				f.FriendID = int(value.Int64)
+			}
 		case friends.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
@@ -146,6 +154,9 @@ func (f *FRIENDS) String() string {
 	var builder strings.Builder
 	builder.WriteString("FRIENDS(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", f.ID))
+	builder.WriteString("friend_id=")
+	builder.WriteString(fmt.Sprintf("%v", f.FriendID))
+	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", f.UserID))
 	builder.WriteString(", ")

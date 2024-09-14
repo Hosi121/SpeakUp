@@ -14,6 +14,8 @@ const (
 	Label = "sessions"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldSessionID holds the string denoting the session_id field in the database.
+	FieldSessionID = "session_id"
 	// FieldSessionStart holds the string denoting the session_start field in the database.
 	FieldSessionStart = "session_start"
 	// FieldSessionEnd holds the string denoting the session_end field in the database.
@@ -47,6 +49,7 @@ const (
 // Columns holds all SQL columns for sessions fields.
 var Columns = []string{
 	FieldID,
+	FieldSessionID,
 	FieldSessionStart,
 	FieldSessionEnd,
 	FieldThemeID,
@@ -85,6 +88,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// BySessionID orders the results by the session_id field.
+func BySessionID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSessionID, opts...).ToFunc()
 }
 
 // BySessionStart orders the results by the session_start field.

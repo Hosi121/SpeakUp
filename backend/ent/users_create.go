@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -20,6 +21,12 @@ type USERSCreate struct {
 	config
 	mutation *USERSMutation
 	hooks    []Hook
+}
+
+// SetUserID sets the "user_id" field.
+func (uc *USERSCreate) SetUserID(i int) *USERSCreate {
+	uc.mutation.SetUserID(i)
+	return uc
 }
 
 // SetUsername sets the "username" field.
@@ -31,12 +38,6 @@ func (uc *USERSCreate) SetUsername(s string) *USERSCreate {
 // SetEmail sets the "email" field.
 func (uc *USERSCreate) SetEmail(s string) *USERSCreate {
 	uc.mutation.SetEmail(s)
-	return uc
-}
-
-// SetHashedPassword sets the "hashed_password" field.
-func (uc *USERSCreate) SetHashedPassword(s string) *USERSCreate {
-	uc.mutation.SetHashedPassword(s)
 	return uc
 }
 
@@ -74,16 +75,44 @@ func (uc *USERSCreate) SetNillableCreatedAt(t *time.Time) *USERSCreate {
 	return uc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (uc *USERSCreate) SetDeletedAt(t time.Time) *USERSCreate {
-	uc.mutation.SetDeletedAt(t)
+// SetIsDeleted sets the "is_deleted" field.
+func (uc *USERSCreate) SetIsDeleted(b bool) *USERSCreate {
+	uc.mutation.SetIsDeleted(b)
 	return uc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (uc *USERSCreate) SetNillableDeletedAt(t *time.Time) *USERSCreate {
+// SetNillableIsDeleted sets the "is_deleted" field if the given value is not nil.
+func (uc *USERSCreate) SetNillableIsDeleted(b *bool) *USERSCreate {
+	if b != nil {
+		uc.SetIsDeleted(*b)
+	}
+	return uc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (uc *USERSCreate) SetUpdatedAt(t time.Time) *USERSCreate {
+	uc.mutation.SetUpdatedAt(t)
+	return uc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (uc *USERSCreate) SetNillableUpdatedAt(t *time.Time) *USERSCreate {
 	if t != nil {
-		uc.SetDeletedAt(*t)
+		uc.SetUpdatedAt(*t)
+	}
+	return uc
+}
+
+// SetAccessToken sets the "access_token" field.
+func (uc *USERSCreate) SetAccessToken(s string) *USERSCreate {
+	uc.mutation.SetAccessToken(s)
+	return uc
+}
+
+// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
+func (uc *USERSCreate) SetNillableAccessToken(s *string) *USERSCreate {
+	if s != nil {
+		uc.SetAccessToken(*s)
 	}
 	return uc
 }
@@ -116,6 +145,25 @@ func (uc *USERSCreate) AddParticipates(m ...*MATCHINGS) *USERSCreate {
 		ids[i] = m[i].ID
 	}
 	return uc.AddParticipateIDs(ids...)
+}
+
+// SetPreparesID sets the "prepares" edge to the MEMOS entity by ID.
+func (uc *USERSCreate) SetPreparesID(id int) *USERSCreate {
+	uc.mutation.SetPreparesID(id)
+	return uc
+}
+
+// SetNillablePreparesID sets the "prepares" edge to the MEMOS entity by ID if the given value is not nil.
+func (uc *USERSCreate) SetNillablePreparesID(id *int) *USERSCreate {
+	if id != nil {
+		uc = uc.SetPreparesID(*id)
+	}
+	return uc
+}
+
+// SetPrepares sets the "prepares" edge to the MEMOS entity.
+func (uc *USERSCreate) SetPrepares(m *MEMOS) *USERSCreate {
+	return uc.SetPreparesID(m.ID)
 }
 
 // Mutation returns the USERSMutation object of the builder.
@@ -157,14 +205,25 @@ func (uc *USERSCreate) defaults() {
 		v := users.DefaultCreatedAt()
 		uc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := uc.mutation.DeletedAt(); !ok {
-		v := users.DefaultDeletedAt()
-		uc.mutation.SetDeletedAt(v)
+	if _, ok := uc.mutation.IsDeleted(); !ok {
+		v := users.DefaultIsDeleted
+		uc.mutation.SetIsDeleted(v)
+	}
+	if _, ok := uc.mutation.UpdatedAt(); !ok {
+		v := users.DefaultUpdatedAt()
+		uc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := uc.mutation.AccessToken(); !ok {
+		v := users.DefaultAccessToken
+		uc.mutation.SetAccessToken(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *USERSCreate) check() error {
+	if _, ok := uc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "USERS.user_id"`)}
+	}
 	if _, ok := uc.mutation.Username(); !ok {
 		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "USERS.username"`)}
 	}
@@ -181,14 +240,6 @@ func (uc *USERSCreate) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.HashedPassword(); !ok {
-		return &ValidationError{Name: "hashed_password", err: errors.New(`ent: missing required field "USERS.hashed_password"`)}
-	}
-	if v, ok := uc.mutation.HashedPassword(); ok {
-		if err := users.HashedPasswordValidator(v); err != nil {
-			return &ValidationError{Name: "hashed_password", err: fmt.Errorf(`ent: validator failed for field "USERS.hashed_password": %w`, err)}
-		}
-	}
 	if _, ok := uc.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "USERS.role"`)}
 	}
@@ -200,8 +251,14 @@ func (uc *USERSCreate) check() error {
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "USERS.created_at"`)}
 	}
-	if _, ok := uc.mutation.DeletedAt(); !ok {
-		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "USERS.deleted_at"`)}
+	if _, ok := uc.mutation.IsDeleted(); !ok {
+		return &ValidationError{Name: "is_deleted", err: errors.New(`ent: missing required field "USERS.is_deleted"`)}
+	}
+	if _, ok := uc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "USERS.updated_at"`)}
+	}
+	if _, ok := uc.mutation.AccessToken(); !ok {
+		return &ValidationError{Name: "access_token", err: errors.New(`ent: missing required field "USERS.access_token"`)}
 	}
 	return nil
 }
@@ -229,6 +286,10 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 		_node = &USERS{config: uc.config}
 		_spec = sqlgraph.NewCreateSpec(users.Table, sqlgraph.NewFieldSpec(users.FieldID, field.TypeInt))
 	)
+	if value, ok := uc.mutation.UserID(); ok {
+		_spec.SetField(users.FieldUserID, field.TypeInt, value)
+		_node.UserID = value
+	}
 	if value, ok := uc.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 		_node.Username = value
@@ -236,10 +297,6 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Email(); ok {
 		_spec.SetField(users.FieldEmail, field.TypeString, value)
 		_node.Email = value
-	}
-	if value, ok := uc.mutation.HashedPassword(); ok {
-		_spec.SetField(users.FieldHashedPassword, field.TypeString, value)
-		_node.HashedPassword = value
 	}
 	if value, ok := uc.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
@@ -253,9 +310,17 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 		_spec.SetField(users.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := uc.mutation.DeletedAt(); ok {
-		_spec.SetField(users.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = value
+	if value, ok := uc.mutation.IsDeleted(); ok {
+		_spec.SetField(users.FieldIsDeleted, field.TypeBool, value)
+		_node.IsDeleted = value
+	}
+	if value, ok := uc.mutation.UpdatedAt(); ok {
+		_spec.SetField(users.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := uc.mutation.AccessToken(); ok {
+		_spec.SetField(users.FieldAccessToken, field.TypeString, value)
+		_node.AccessToken = value
 	}
 	if nodes := uc.mutation.ConnectsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -282,6 +347,22 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.PreparesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.PreparesTable,
+			Columns: []string{users.PreparesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
