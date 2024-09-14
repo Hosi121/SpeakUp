@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Box, Button, Typography, IconButton, Avatar, List, ListItem, ListItemAvatar, ListItemText, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import notifications from '../../mock/notifications.json'; // Import the JSON file directly
+import { useState, useEffect } from "react";
+import { Box, Button, Typography, IconButton, Avatar, List, ListItem, ListItemAvatar, ListItemText, Dialog, DialogTitle, DialogContent } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import notifications from "../../mock/notifications.json"; // Import the JSON file directly
 
 const NotificationModal = () => {
   // State to control the modal open/close
@@ -28,63 +28,64 @@ const NotificationModal = () => {
     <div>
       {/* Button or Icon to trigger the modal */}
       <IconButton onClick={handleOpen}>
-        <NotificationsIcon sx={{ fontSize: 40, color: '#1a1a1a' }} />
+        <NotificationsIcon sx={{ fontSize: 40, color: "#1a1a1a" }} />
       </IconButton>
 
       {/* Dialog (Modal) */}
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
-        <DialogTitle>
+      <Dialog open={open} onClose={handleClose} fullWidth PaperProps={{ sx: { padding: "10px", boxSizing: "border-box", maxHeight: "60vh" } }}>
+        <DialogTitle sx={{}}>
           {/* Header with Notification Icon and Settings */}
           <Box
             sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '100%',
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <NotificationsIcon sx={{ fontSize: 40, color: '#1a1a1a' }} />
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <NotificationsIcon sx={{ fontSize: 40, color: "#1a1a1a" }} />
               <Typography variant="h6" sx={{ ml: 1 }}>
                 通知
               </Typography>
             </Box>
             <IconButton>
-              <SettingsIcon sx={{ fontSize: 32, color: '#1a1a1a' }} />
+              <SettingsIcon sx={{ fontSize: 32, color: "#1a1a1a" }} />
             </IconButton>
           </Box>
         </DialogTitle>
 
         <DialogContent>
           {/* Notifications List */}
-          <List sx={{ width: '100%' }}>
+          <List sx={{ width: "100%" }}>
             {notificationsData.map((notification) => (
-              <ListItem key={notification.id} sx={{ mb: 2 }}>
-                <ListItemAvatar>
+              <ListItem key={notification.id} sx={{ mb: 2, flexWrap: "wrap", padding: "0" }}>
+                <ListItemAvatar sx={{ mr: 1, width: "fit-content", minWidth: "auto" }}>
                   <Avatar src={notification.profileIcon} alt={`${notification.user} icon`} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography variant="body1" sx={{ color: '#FF007F', mr: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+                      <Typography variant="body1" sx={{ color: "#FF007F", mr: 1 }}>
                         {notification.user}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#1a1a1a' }}>
+                      <Typography variant="body2" sx={{ color: "#1a1a1a" }}>
                         {notification.message}
                       </Typography>
                     </Box>
                   }
                   secondary={
-                    <Typography variant="caption" sx={{ color: '#1a1a1a' }}>
+                    <Typography variant="caption" sx={{ color: "#1a1a1a" }}>
                       {notification.time}
                     </Typography>
                   }
+                  sx={{ width: "70%" }}
                 />
-                {notification.type === 'friendRequest' && (
-                  <Box>
-                    <Button variant="contained" size="small" sx={{ backgroundColor: '#FF007F', color: 'white', mr: 1 }}>
+                {notification.type === "friendRequest" && (
+                  <Box sx={{ display: "flex", ml: "auto", width: "70%" }}>
+                    <Button variant="contained" size="small" sx={{ backgroundColor: "#FF007F", color: "white", mr: 1 }}>
                       承認
                     </Button>
-                    <Button variant="outlined" size="small" sx={{ color: '#1a1a1a' }}>
+                    <Button variant="outlined" size="small" sx={{ color: "#1a1a1a" }}>
                       拒否
                     </Button>
                   </Box>
