@@ -166,7 +166,7 @@ function prepareNewConnection(isOffer: boolean) {
   };
 
   // ICEのステータスが変更になったときの処理
-  peer.oniceconnectionstatechange = function () {
+  peer.oniceconnectionstatechange = function() {
     console.log(
       "ICE connection Status has changed to " + peer.iceConnectionState
     );
