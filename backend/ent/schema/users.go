@@ -22,8 +22,6 @@ func (USERS) Fields() []ent.Field {
 		field.String("email").
 			NotEmpty().
 			MaxLen(255),
-		field.Text("hashed_password").
-			NotEmpty(),
 		field.Text("avatar_url").
 			Optional(),
 		field.Enum("role").
@@ -32,6 +30,10 @@ func (USERS) Fields() []ent.Field {
 			Default(time.Now),
 		field.Time("deleted_at").
 			Default(time.Now),
+		field.Time("updated_at").
+			Default(time.Now),
+		field.Text("access_token").
+			Default(""),
 	}
 }
 
