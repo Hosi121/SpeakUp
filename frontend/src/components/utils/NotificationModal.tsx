@@ -28,12 +28,12 @@ const NotificationModal = () => {
     <div>
       {/* Button or Icon to trigger the modal */}
       <IconButton onClick={handleOpen}>
-        <NotificationsIcon sx={{ fontSize: 40, color: "#1a1a1a" }} />
+        <NotificationsIcon sx={{ fontSize: 40 }} />
       </IconButton>
 
       {/* Dialog (Modal) */}
       <Dialog open={open} onClose={handleClose} fullWidth PaperProps={{ sx: { padding: "10px", boxSizing: "border-box", maxHeight: "60vh" } }}>
-        <DialogTitle sx={{}}>
+        <DialogTitle>
           {/* Header with Notification Icon and Settings */}
           <Box
             sx={{
@@ -43,13 +43,13 @@ const NotificationModal = () => {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <NotificationsIcon sx={{ fontSize: 40, color: "#1a1a1a" }} />
+              <NotificationsIcon sx={{ fontSize: 40 }} />
               <Typography variant="h6" sx={{ ml: 1 }}>
                 通知
               </Typography>
             </Box>
             <IconButton>
-              <SettingsIcon sx={{ fontSize: 32, color: "#1a1a1a" }} />
+              <SettingsIcon sx={{ fontSize: 32 }} />
             </IconButton>
           </Box>
         </DialogTitle>
@@ -65,16 +65,16 @@ const NotificationModal = () => {
                 <ListItemText
                   primary={
                     <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-                      <Typography variant="body1" sx={{ color: "#FF007F", mr: 1 }}>
+                      <Typography variant="body1" sx={{ mr: 1 }}>
                         {notification.user}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "#1a1a1a" }}>
+                      <Typography variant="body2" sx={{}}>
                         {notification.message}
                       </Typography>
                     </Box>
                   }
                   secondary={
-                    <Typography variant="caption" sx={{ color: "#1a1a1a" }}>
+                    <Typography variant="caption" sx={{}}>
                       {notification.time}
                     </Typography>
                   }
@@ -82,10 +82,10 @@ const NotificationModal = () => {
                 />
                 {notification.type === "friendRequest" && (
                   <Box sx={{ display: "flex", ml: "auto", width: "70%" }}>
-                    <Button variant="contained" size="small" sx={{ backgroundColor: "#FF007F", color: "white", mr: 1 }}>
+                    <Button variant="contained" size="small" sx={{ mr: 1 }}>
                       承認
                     </Button>
-                    <Button variant="outlined" size="small" sx={{ color: "#1a1a1a" }}>
+                    <Button variant="outlined" size="small">
                       拒否
                     </Button>
                   </Box>
