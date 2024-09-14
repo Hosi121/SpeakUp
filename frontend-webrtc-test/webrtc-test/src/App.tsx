@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import { connect, hangUp, onSdpText, startLocalAudioStream } from "./webrtc";
+import { connect, hangUp, onSdpText, startLocalStream } from "./webrtc";
 import styles from "./App.module.css";
 
-export let remoteAudioRef: React.RefObject<HTMLAudioElement>;
+export let remoteVideoRef: React.RefObject<HTMLVideoElement>;
 export let textForSendSdpRef: React.RefObject<HTMLTextAreaElement>;
 export let textToReceiveSdpRef: React.RefObject<HTMLTextAreaElement>;
 
@@ -11,8 +11,8 @@ function App() {
   const [mediaDeviceStatus, setMediaDeviceStatus] = useState<
     "checking" | "available" | "unavailable" | "error"
   >("checking");
-  const [isCallActive, setIsCallActive] = useState(false);
-  remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  remoteVideoRef = useRef<HTMLVideoElement>(null);
   textForSendSdpRef = useRef<HTMLTextAreaElement>(null);
   textToReceiveSdpRef = useRef<HTMLTextAreaElement>(null);
 
@@ -26,13 +26,15 @@ function App() {
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
           audio: true,
         });
-        console.log("Audio device accessed successfully", stream);
+        console.log("Media devices accessed successfully", stream);
         setMediaDeviceStatus("available");
-        stream.getTracks().forEach((track) => track.stop());
+        // ストリームを停止 (必要に応じて)
+        // stream.getTracks().forEach(track => track.stop());
       } catch (error) {
-        console.error("Error accessing audio device:", error);
+        console.error("Error accessing media devices:", error);
         setMediaDeviceStatus("error");
       }
     }
@@ -40,20 +42,25 @@ function App() {
     initMediaDevices();
   }, []);
 
-  const handleStartCall = async () => {
+  const handleStartVideo = () => {
     if (mediaDeviceStatus === "available") {
-      await startLocalAudioStream();
-      connect(remoteAudioRef);
-      setIsCallActive(true);
+      startLocalStream(localVideoRef);
     } else {
-      console.warn("Audio device is not available");
+      console.warn("Media devices are not available");
+    }
+  };
+
+  const handleConnect = () => {
+    if (mediaDeviceStatus === "available") {
+      connect(remoteVideoRef);
+    } else {
+      console.warn("Media devices are not available for connection");
     }
   };
 
   const handleHangUp = () => {
     if (textForSendSdpRef.current && textToReceiveSdpRef.current) {
       hangUp(textForSendSdpRef.current, textToReceiveSdpRef.current);
-      setIsCallActive(false);
     }
   };
 
@@ -65,26 +72,37 @@ function App() {
 
   return (
     <div>
-      <h1>WebRTC Audio Call</h1>
-      {mediaDeviceStatus === "checking" && <p>Checking audio device...</p>}
+      <h1>WebRTC test</h1>
+      {mediaDeviceStatus === "checking" && <p>Checking media devices...</p>}
       {mediaDeviceStatus === "unavailable" && (
-        <p>Audio device is not available</p>
+        <p>Media devices are not available</p>
       )}
-      {mediaDeviceStatus === "error" && <p>Error accessing audio device</p>}
+      {mediaDeviceStatus === "error" && <p>Error accessing media devices</p>}
       {mediaDeviceStatus === "available" && (
         <>
-          <button
-            type="button"
-            onClick={handleStartCall}
-            disabled={isCallActive}
-          >
-            Start Call
+          <button type="button" onClick={handleStartVideo}>
+            Start Video
           </button>
-          <button type="button" onClick={handleHangUp} disabled={!isCallActive}>
+          <button type="button" onClick={handleConnect}>
+            Connect
+          </button>
+          <button type="button" onClick={handleHangUp}>
             Hang Up
           </button>
           <div>
-            <audio ref={remoteAudioRef} id="remote_audio" autoPlay />
+            <video
+              className={styles.video}
+              ref={localVideoRef}
+              id="local_video"
+              autoPlay
+              muted
+            />
+            <video
+              className={styles.video}
+              ref={remoteVideoRef}
+              id="remote_video"
+              autoPlay
+            />
           </div>
           <p>
             SDP to send:
