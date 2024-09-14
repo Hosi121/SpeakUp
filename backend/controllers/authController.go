@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -61,6 +62,7 @@ func SignUp(c *gin.Context) {
 	// DBのUSERテーブルに登録
 	user, err := db_client.USERS.
 		Create().
+		SetUserID(1).
 		SetUsername(request.UserName).
 		SetEmail(request.Email).
 		SetAvatarURL("https://example.com/avatar.png").
@@ -112,6 +114,7 @@ func SignIn(c *gin.Context) {
 	db_client, err := ent.Open("mysql", dsn)
 	if err != nil {
 		slog.Error("Failed to open connection to database: %v", err)
+		return
 	}
 	defer db_client.Close()
 
@@ -126,6 +129,8 @@ func SignIn(c *gin.Context) {
 		First(ctx)                             // 最初の1件を取得
 	if err != nil {
 		slog.Error("Not found this email: %v", err)
+		// fmt.Println("Not found this email: %v", err)
+		return
 	}
 
 	// アクセストークンを登録
@@ -135,6 +140,8 @@ func SignIn(c *gin.Context) {
 		Exec(ctx)
 	if err != nil {
 		slog.Error("Failed to update access token: %v", err)
+		// fmt.Println("Failed to update access token: %v", err)
+		return
 	}
 
 	// updated_atを更新
@@ -144,5 +151,8 @@ func SignIn(c *gin.Context) {
 		Exec(ctx)
 	if err != nil {
 		slog.Error("Failed to update created_at: %v", err)
+		// fmt.Println("Failed to update created_at: %v", err)
+		return
 	}
+	fmt.Println("success")
 }
