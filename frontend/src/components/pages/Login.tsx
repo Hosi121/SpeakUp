@@ -1,11 +1,14 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Button, Container, TextField, Typography, IconButton, InputAdornment } from "@mui/material";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Logo from "../../assets/logo.tsx";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, Container, TextField, Typography, IconButton, InputAdornment } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { signIn } from '../../services/authService';  // authServiceのログイン関数をインポート
+import Logo from "../../assets/logo.tsx";        
 
 const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
@@ -14,6 +17,20 @@ const Login = () => {
   // Function to handle navigation to the sign-up page
   const handleNavigateToSignup = () => {
     navigate("/signup");
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+
+  // ログイン処理
+  const handleLogin = async () => {
+    try {
+      const data = await signIn(email, password);  // authServiceの関数を使用
+      console.log('ログイン成功:', data);
+      navigate('/home');  // ログイン成功後にリダイレクト
+    } catch (err) {
+      setError((err as Error).message);  // エラーメッセージを設定
+    }
   };
 
   return (
@@ -30,7 +47,6 @@ const Login = () => {
         borderRadius: "16px",
       }}
     >
-      {/* Logo */}
       <Box
         sx={{
           backgroundColor: "white",
@@ -46,21 +62,36 @@ const Login = () => {
         <Logo style={{ width: "80%" }} />
       </Box>
 
-      {/* Sign In Title */}
       <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
         サインイン
       </Typography>
 
       {/* Email Field */}
       <TextField label="Email" type="email" fullWidth variant="outlined" margin="normal" />
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
 
-      {/* Password Field */}
+      <TextField
+        label="Email"
+        type="email"
+        fullWidth
+        variant="outlined"
+        margin="normal"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
       <TextField
         label="パスワード"
         type={showPassword ? "text" : "password"}
         fullWidth
         variant="outlined"
         margin="normal"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -70,7 +101,6 @@ const Login = () => {
         }}
       />
 
-      {/* Sign In Button */}
       <Button
         variant="contained"
         fullWidth
@@ -82,10 +112,10 @@ const Login = () => {
             backgroundColor: "#FF3399",
           },
         }}
+        onClick={handleLogin}  // ログイン処理を実行
       >
         サインイン
       </Button>
-
       {/* Forgot Password and Sign Up */}
       <Box
         sx={{

@@ -18,6 +18,8 @@ type CALLS struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// CallID holds the value of the "call_id" field.
+	CallID int `json:"call_id,omitempty"`
 	// SessionID holds the value of the "session_id" field.
 	SessionID int `json:"session_id,omitempty"`
 	// CallStart holds the value of the "call_start" field.
@@ -60,7 +62,7 @@ func (*CALLS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case calls.FieldID, calls.FieldSessionID, calls.FieldRating:
+		case calls.FieldID, calls.FieldCallID, calls.FieldSessionID, calls.FieldRating:
 			values[i] = new(sql.NullInt64)
 		case calls.FieldCallStart, calls.FieldCallEnd, calls.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -87,6 +89,12 @@ func (c *CALLS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
+		case calls.FieldCallID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field call_id", values[i])
+			} else if value.Valid {
+				c.CallID = int(value.Int64)
+			}
 		case calls.FieldSessionID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field session_id", values[i])
@@ -165,6 +173,9 @@ func (c *CALLS) String() string {
 	var builder strings.Builder
 	builder.WriteString("CALLS(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString("call_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.CallID))
+	builder.WriteString(", ")
 	builder.WriteString("session_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.SessionID))
 	builder.WriteString(", ")

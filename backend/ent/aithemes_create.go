@@ -21,6 +21,12 @@ type AITHEMESCreate struct {
 	hooks    []Hook
 }
 
+// SetThemeID sets the "theme_id" field.
+func (ac *AITHEMESCreate) SetThemeID(i int) *AITHEMESCreate {
+	ac.mutation.SetThemeID(i)
+	return ac
+}
+
 // SetThemeText sets the "theme_text" field.
 func (ac *AITHEMESCreate) SetThemeText(s string) *AITHEMESCreate {
 	ac.mutation.SetThemeText(s)
@@ -99,6 +105,9 @@ func (ac *AITHEMESCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ac *AITHEMESCreate) check() error {
+	if _, ok := ac.mutation.ThemeID(); !ok {
+		return &ValidationError{Name: "theme_id", err: errors.New(`ent: missing required field "AITHEMES.theme_id"`)}
+	}
 	if _, ok := ac.mutation.ThemeText(); !ok {
 		return &ValidationError{Name: "theme_text", err: errors.New(`ent: missing required field "AITHEMES.theme_text"`)}
 	}
@@ -131,6 +140,10 @@ func (ac *AITHEMESCreate) createSpec() (*AITHEMES, *sqlgraph.CreateSpec) {
 		_node = &AITHEMES{config: ac.config}
 		_spec = sqlgraph.NewCreateSpec(aithemes.Table, sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt))
 	)
+	if value, ok := ac.mutation.ThemeID(); ok {
+		_spec.SetField(aithemes.FieldThemeID, field.TypeInt, value)
+		_node.ThemeID = value
+	}
 	if value, ok := ac.mutation.ThemeText(); ok {
 		_spec.SetField(aithemes.FieldThemeText, field.TypeString, value)
 		_node.ThemeText = value

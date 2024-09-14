@@ -299,12 +299,12 @@ func (aq *AITHEMESQuery) WithUsed(opts ...func(*SESSIONSQuery)) *AITHEMESQuery {
 // Example:
 //
 //	var v []struct {
-//		ThemeText string `json:"theme_text,omitempty"`
+//		ThemeID int `json:"theme_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.AITHEMES.Query().
-//		GroupBy(aithemes.FieldThemeText).
+//		GroupBy(aithemes.FieldThemeID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (aq *AITHEMESQuery) GroupBy(field string, fields ...string) *AITHEMESGroupBy {
@@ -322,11 +322,11 @@ func (aq *AITHEMESQuery) GroupBy(field string, fields ...string) *AITHEMESGroupB
 // Example:
 //
 //	var v []struct {
-//		ThemeText string `json:"theme_text,omitempty"`
+//		ThemeID int `json:"theme_id,omitempty"`
 //	}
 //
 //	client.AITHEMES.Query().
-//		Select(aithemes.FieldThemeText).
+//		Select(aithemes.FieldThemeID).
 //		Scan(ctx, &v)
 func (aq *AITHEMESQuery) Select(fields ...string) *AITHEMESSelect {
 	aq.ctx.Fields = append(aq.ctx.Fields, fields...)

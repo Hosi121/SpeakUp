@@ -14,6 +14,8 @@ const (
 	Label = "calls"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCallID holds the string denoting the call_id field in the database.
+	FieldCallID = "call_id"
 	// FieldSessionID holds the string denoting the session_id field in the database.
 	FieldSessionID = "session_id"
 	// FieldCallStart holds the string denoting the call_start field in the database.
@@ -40,6 +42,7 @@ const (
 // Columns holds all SQL columns for calls fields.
 var Columns = []string{
 	FieldID,
+	FieldCallID,
 	FieldSessionID,
 	FieldCallStart,
 	FieldCallEnd,
@@ -83,6 +86,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCallID orders the results by the call_id field.
+func ByCallID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCallID, opts...).ToFunc()
 }
 
 // BySessionID orders the results by the session_id field.

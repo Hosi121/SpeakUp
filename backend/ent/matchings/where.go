@@ -55,6 +55,11 @@ func IDLTE(id int) predicate.MATCHINGS {
 	return predicate.MATCHINGS(sql.FieldLTE(FieldID, id))
 }
 
+// MatchID applies equality check predicate on the "match_id" field. It's identical to MatchIDEQ.
+func MatchID(v int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldEQ(FieldMatchID, v))
+}
+
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int) predicate.MATCHINGS {
 	return predicate.MATCHINGS(sql.FieldEQ(FieldUserID, v))
@@ -73,6 +78,46 @@ func SessionID(v int) predicate.MATCHINGS {
 // MatchedAt applies equality check predicate on the "matched_at" field. It's identical to MatchedAtEQ.
 func MatchedAt(v time.Time) predicate.MATCHINGS {
 	return predicate.MATCHINGS(sql.FieldEQ(FieldMatchedAt, v))
+}
+
+// MatchIDEQ applies the EQ predicate on the "match_id" field.
+func MatchIDEQ(v int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldEQ(FieldMatchID, v))
+}
+
+// MatchIDNEQ applies the NEQ predicate on the "match_id" field.
+func MatchIDNEQ(v int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldNEQ(FieldMatchID, v))
+}
+
+// MatchIDIn applies the In predicate on the "match_id" field.
+func MatchIDIn(vs ...int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldIn(FieldMatchID, vs...))
+}
+
+// MatchIDNotIn applies the NotIn predicate on the "match_id" field.
+func MatchIDNotIn(vs ...int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldNotIn(FieldMatchID, vs...))
+}
+
+// MatchIDGT applies the GT predicate on the "match_id" field.
+func MatchIDGT(v int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldGT(FieldMatchID, v))
+}
+
+// MatchIDGTE applies the GTE predicate on the "match_id" field.
+func MatchIDGTE(v int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldGTE(FieldMatchID, v))
+}
+
+// MatchIDLT applies the LT predicate on the "match_id" field.
+func MatchIDLT(v int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldLT(FieldMatchID, v))
+}
+
+// MatchIDLTE applies the LTE predicate on the "match_id" field.
+func MatchIDLTE(v int) predicate.MATCHINGS {
+	return predicate.MATCHINGS(sql.FieldLTE(FieldMatchID, v))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.

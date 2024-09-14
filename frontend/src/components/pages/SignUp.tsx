@@ -1,28 +1,47 @@
-import { Box, Button, Container, TextField, Typography, Link } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, Container, TextField, Typography, Link } from '@mui/material';
+import { signUp } from '../../services/authService';  // authServiceのサインアップ関数をインポート
 import Logo from "../../assets/logo.tsx";
 
 const SignUp = () => {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');  // パスワードの状態
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleNavigateToLogin = () => {
     navigate("/login");
+  const handleSignUp = async () => {
+    if (password.length < 8) {
+      setError('パスワードは8文字以上である必要があります。');
+      return;
+    }
+
+    try {
+      const data = await signUp(username, email, password);  // authServiceの関数を使用
+      console.log('サインアップ成功:', data);
+      navigate('/login');  // サインアップ後、ログインページにリダイレクト
+    } catch (err) {
+      setError((err as Error).message);
+    }
   };
 
   return (
     <Container
       maxWidth="md"
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        backgroundColor: "#FFDD66", // Matches the yellow background color
-        padding: "10%",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        backgroundColor: '#FFDD66',
+        padding: '16px',
+        borderRadius: '16px',
       }}
     >
-      {/* Logo */}
       <Box
         sx={{
           backgroundColor: "white",
@@ -38,18 +57,40 @@ const SignUp = () => {
         <Logo style={{ width: "80%" }} />
       </Box>
 
-      {/* Sign Up Title */}
       <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
         サインアップ
       </Typography>
 
-      {/* Username Field */}
-      <TextField label="ユーザー名(セッション時の表示名)" type="text" fullWidth variant="outlined" margin="normal" />
+      <TextField
+        label="ユーザー名(セッション時の表示名)"
+        type="text"
+        fullWidth
+        variant="outlined"
+        margin="normal"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
 
-      {/* Email Field */}
-      <TextField label="Email" type="email" fullWidth variant="outlined" margin="normal" />
+      <TextField
+        label="Email"
+        type="email"
+        fullWidth
+        variant="outlined"
+        margin="normal"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-      {/* Submit Button */}
+      <TextField
+        label="パスワード"
+        type="password"
+        fullWidth
+        variant="outlined"
+        margin="normal"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
       <Button
         variant="contained"
         fullWidth
@@ -61,12 +102,16 @@ const SignUp = () => {
             backgroundColor: "#FF3399",
           },
         }}
+        onClick={handleSignUp}
       >
         メールを送信して仮登録
       </Button>
-
-      {/* Navigate to Login */}
-      <Link component="button" variant="body2" sx={{ mt: 2, cursor: "pointer", textDecoration: "underline" }} onClick={handleNavigateToLogin}>
+      <Link
+        component="button"
+        variant="body2"
+        sx={{ mt: 2, cursor: 'pointer', textDecoration: 'underline' }}
+        onClick={() => navigate('/login')}
+      >
         ログインページに戻る
       </Link>
     </Container>

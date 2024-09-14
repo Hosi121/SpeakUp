@@ -57,6 +57,18 @@ func (f MATCHINGSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MATCHINGSMutation", m)
 }
 
+// The MEMOSFunc type is an adapter to allow the use of ordinary
+// function as MEMOS mutator.
+type MEMOSFunc func(context.Context, *ent.MEMOSMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MEMOSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MEMOSMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MEMOSMutation", m)
+}
+
 // The SESSIONSFunc type is an adapter to allow the use of ordinary
 // function as SESSIONS mutator.
 type SESSIONSFunc func(context.Context, *ent.SESSIONSMutation) (ent.Value, error)
