@@ -42,5 +42,7 @@ func (USERS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("connects", FRIENDS.Type),
 		edge.To("participates", MATCHINGS.Type),
+		edge.To("has", MEMOS.Type).
+			Unique(),
 	}
 }
