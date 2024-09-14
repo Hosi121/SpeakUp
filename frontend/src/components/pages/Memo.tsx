@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextField } from '@mui/material';
 import { Box } from '@mui/system';
 
-const InputComponent = () => {
+const Memo = () => {
   const [text, setText] = useState('');
   const maxLength = 500;
 
@@ -31,4 +31,4 @@ const InputComponent = () => {
   );
 };
 
-export default InputComponent;
+export default Memo;
