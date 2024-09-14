@@ -16,6 +16,8 @@ type CALLS struct {
 // Fields of the CALLS.
 func (CALLS) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int("call_id").
+			Unique(),
 		field.Int("session_id"),
 		field.Time("call_start").
 			Default(time.Now),
