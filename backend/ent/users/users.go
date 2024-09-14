@@ -15,24 +15,30 @@ const (
 	Label = "users"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
-	// FieldHashedPassword holds the string denoting the hashed_password field in the database.
-	FieldHashedPassword = "hashed_password"
 	// FieldAvatarURL holds the string denoting the avatar_url field in the database.
 	FieldAvatarURL = "avatar_url"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
+	// FieldIsDeleted holds the string denoting the is_deleted field in the database.
+	FieldIsDeleted = "is_deleted"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
+	// FieldAccessToken holds the string denoting the access_token field in the database.
+	FieldAccessToken = "access_token"
 	// EdgeConnects holds the string denoting the connects edge name in mutations.
 	EdgeConnects = "connects"
 	// EdgeParticipates holds the string denoting the participates edge name in mutations.
 	EdgeParticipates = "participates"
+	// EdgePrepares holds the string denoting the prepares edge name in mutations.
+	EdgePrepares = "prepares"
 	// Table holds the table name of the users in the database.
 	Table = "user_ss"
 	// ConnectsTable is the table that holds the connects relation/edge. The primary key declared below.
@@ -45,18 +51,27 @@ const (
 	// ParticipatesInverseTable is the table name for the MATCHINGS entity.
 	// It exists in this package in order to avoid circular dependency with the "matchings" package.
 	ParticipatesInverseTable = "matching_ss"
+	// PreparesTable is the table that holds the prepares relation/edge.
+	PreparesTable = "memo_ss"
+	// PreparesInverseTable is the table name for the MEMOS entity.
+	// It exists in this package in order to avoid circular dependency with the "memos" package.
+	PreparesInverseTable = "memo_ss"
+	// PreparesColumn is the table column denoting the prepares relation/edge.
+	PreparesColumn = "users_prepares"
 )
 
 // Columns holds all SQL columns for users fields.
 var Columns = []string{
 	FieldID,
+	FieldUserID,
 	FieldUsername,
 	FieldEmail,
-	FieldHashedPassword,
 	FieldAvatarURL,
 	FieldRole,
 	FieldCreatedAt,
-	FieldDeletedAt,
+	FieldIsDeleted,
+	FieldUpdatedAt,
+	FieldAccessToken,
 }
 
 var (
@@ -83,12 +98,14 @@ var (
 	UsernameValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator func(string) error
-	// HashedPasswordValidator is a validator for the "hashed_password" field. It is called by the builders before save.
-	HashedPasswordValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultDeletedAt holds the default value on creation for the "deleted_at" field.
-	DefaultDeletedAt func() time.Time
+	// DefaultIsDeleted holds the default value on creation for the "is_deleted" field.
+	DefaultIsDeleted bool
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// DefaultAccessToken holds the default value on creation for the "access_token" field.
+	DefaultAccessToken string
 )
 
 // Role defines the type for the "role" enum field.
@@ -123,6 +140,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+}
+
 // ByUsername orders the results by the username field.
 func ByUsername(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUsername, opts...).ToFunc()
@@ -131,11 +153,6 @@ func ByUsername(opts ...sql.OrderTermOption) OrderOption {
 // ByEmail orders the results by the email field.
 func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmail, opts...).ToFunc()
-}
-
-// ByHashedPassword orders the results by the hashed_password field.
-func ByHashedPassword(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHashedPassword, opts...).ToFunc()
 }
 
 // ByAvatarURL orders the results by the avatar_url field.
@@ -153,9 +170,19 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByIsDeleted orders the results by the is_deleted field.
+func ByIsDeleted(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsDeleted, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByAccessToken orders the results by the access_token field.
+func ByAccessToken(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAccessToken, opts...).ToFunc()
 }
 
 // ByConnectsCount orders the results by connects count.
@@ -185,6 +212,13 @@ func ByParticipates(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newParticipatesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByPreparesField orders the results by prepares field.
+func ByPreparesField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPreparesStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newConnectsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -197,5 +231,12 @@ func newParticipatesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ParticipatesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, ParticipatesTable, ParticipatesPrimaryKey...),
+	)
+}
+func newPreparesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PreparesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, PreparesTable, PreparesColumn),
 	)
 }

@@ -20,6 +20,8 @@ type Tx struct {
 	FRIENDS *FRIENDSClient
 	// MATCHINGS is the client for interacting with the MATCHINGS builders.
 	MATCHINGS *MATCHINGSClient
+	// MEMOS is the client for interacting with the MEMOS builders.
+	MEMOS *MEMOSClient
 	// SESSIONS is the client for interacting with the SESSIONS builders.
 	SESSIONS *SESSIONSClient
 	// USERS is the client for interacting with the USERS builders.
@@ -159,6 +161,7 @@ func (tx *Tx) init() {
 	tx.CALLS = NewCALLSClient(tx.config)
 	tx.FRIENDS = NewFRIENDSClient(tx.config)
 	tx.MATCHINGS = NewMATCHINGSClient(tx.config)
+	tx.MEMOS = NewMEMOSClient(tx.config)
 	tx.SESSIONS = NewSESSIONSClient(tx.config)
 	tx.USERS = NewUSERSClient(tx.config)
 }

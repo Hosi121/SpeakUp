@@ -55,6 +55,11 @@ func IDLTE(id int) predicate.USERS {
 	return predicate.USERS(sql.FieldLTE(FieldID, id))
 }
 
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldUserID, v))
+}
+
 // Username applies equality check predicate on the "username" field. It's identical to UsernameEQ.
 func Username(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldUsername, v))
@@ -63,11 +68,6 @@ func Username(v string) predicate.USERS {
 // Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
 func Email(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldEmail, v))
-}
-
-// HashedPassword applies equality check predicate on the "hashed_password" field. It's identical to HashedPasswordEQ.
-func HashedPassword(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldHashedPassword, v))
 }
 
 // AvatarURL applies equality check predicate on the "avatar_url" field. It's identical to AvatarURLEQ.
@@ -80,9 +80,59 @@ func CreatedAt(v time.Time) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldDeletedAt, v))
+// IsDeleted applies equality check predicate on the "is_deleted" field. It's identical to IsDeletedEQ.
+func IsDeleted(v bool) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldIsDeleted, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// AccessToken applies equality check predicate on the "access_token" field. It's identical to AccessTokenEQ.
+func AccessToken(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldAccessToken, v))
+}
+
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldUserID, v))
+}
+
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldNEQ(FieldUserID, v))
+}
+
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.USERS {
+	return predicate.USERS(sql.FieldIn(FieldUserID, vs...))
+}
+
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.USERS {
+	return predicate.USERS(sql.FieldNotIn(FieldUserID, vs...))
+}
+
+// UserIDGT applies the GT predicate on the "user_id" field.
+func UserIDGT(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldGT(FieldUserID, v))
+}
+
+// UserIDGTE applies the GTE predicate on the "user_id" field.
+func UserIDGTE(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldGTE(FieldUserID, v))
+}
+
+// UserIDLT applies the LT predicate on the "user_id" field.
+func UserIDLT(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldLT(FieldUserID, v))
+}
+
+// UserIDLTE applies the LTE predicate on the "user_id" field.
+func UserIDLTE(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldLTE(FieldUserID, v))
 }
 
 // UsernameEQ applies the EQ predicate on the "username" field.
@@ -213,71 +263,6 @@ func EmailEqualFold(v string) predicate.USERS {
 // EmailContainsFold applies the ContainsFold predicate on the "email" field.
 func EmailContainsFold(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldContainsFold(FieldEmail, v))
-}
-
-// HashedPasswordEQ applies the EQ predicate on the "hashed_password" field.
-func HashedPasswordEQ(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldHashedPassword, v))
-}
-
-// HashedPasswordNEQ applies the NEQ predicate on the "hashed_password" field.
-func HashedPasswordNEQ(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldNEQ(FieldHashedPassword, v))
-}
-
-// HashedPasswordIn applies the In predicate on the "hashed_password" field.
-func HashedPasswordIn(vs ...string) predicate.USERS {
-	return predicate.USERS(sql.FieldIn(FieldHashedPassword, vs...))
-}
-
-// HashedPasswordNotIn applies the NotIn predicate on the "hashed_password" field.
-func HashedPasswordNotIn(vs ...string) predicate.USERS {
-	return predicate.USERS(sql.FieldNotIn(FieldHashedPassword, vs...))
-}
-
-// HashedPasswordGT applies the GT predicate on the "hashed_password" field.
-func HashedPasswordGT(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldGT(FieldHashedPassword, v))
-}
-
-// HashedPasswordGTE applies the GTE predicate on the "hashed_password" field.
-func HashedPasswordGTE(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldGTE(FieldHashedPassword, v))
-}
-
-// HashedPasswordLT applies the LT predicate on the "hashed_password" field.
-func HashedPasswordLT(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldLT(FieldHashedPassword, v))
-}
-
-// HashedPasswordLTE applies the LTE predicate on the "hashed_password" field.
-func HashedPasswordLTE(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldLTE(FieldHashedPassword, v))
-}
-
-// HashedPasswordContains applies the Contains predicate on the "hashed_password" field.
-func HashedPasswordContains(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldContains(FieldHashedPassword, v))
-}
-
-// HashedPasswordHasPrefix applies the HasPrefix predicate on the "hashed_password" field.
-func HashedPasswordHasPrefix(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldHasPrefix(FieldHashedPassword, v))
-}
-
-// HashedPasswordHasSuffix applies the HasSuffix predicate on the "hashed_password" field.
-func HashedPasswordHasSuffix(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldHasSuffix(FieldHashedPassword, v))
-}
-
-// HashedPasswordEqualFold applies the EqualFold predicate on the "hashed_password" field.
-func HashedPasswordEqualFold(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEqualFold(FieldHashedPassword, v))
-}
-
-// HashedPasswordContainsFold applies the ContainsFold predicate on the "hashed_password" field.
-func HashedPasswordContainsFold(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldContainsFold(FieldHashedPassword, v))
 }
 
 // AvatarURLEQ applies the EQ predicate on the "avatar_url" field.
@@ -415,44 +400,119 @@ func CreatedAtLTE(v time.Time) predicate.USERS {
 	return predicate.USERS(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldDeletedAt, v))
+// IsDeletedEQ applies the EQ predicate on the "is_deleted" field.
+func IsDeletedEQ(v bool) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldIsDeleted, v))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldNEQ(FieldDeletedAt, v))
+// IsDeletedNEQ applies the NEQ predicate on the "is_deleted" field.
+func IsDeletedNEQ(v bool) predicate.USERS {
+	return predicate.USERS(sql.FieldNEQ(FieldIsDeleted, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldIn(FieldDeletedAt, vs...))
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldNotIn(FieldDeletedAt, vs...))
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldGT(FieldDeletedAt, v))
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldGTE(FieldDeletedAt, v))
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldLT(FieldDeletedAt, v))
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldGT(FieldUpdatedAt, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.USERS {
-	return predicate.USERS(sql.FieldLTE(FieldDeletedAt, v))
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.USERS {
+	return predicate.USERS(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// AccessTokenEQ applies the EQ predicate on the "access_token" field.
+func AccessTokenEQ(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldAccessToken, v))
+}
+
+// AccessTokenNEQ applies the NEQ predicate on the "access_token" field.
+func AccessTokenNEQ(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldNEQ(FieldAccessToken, v))
+}
+
+// AccessTokenIn applies the In predicate on the "access_token" field.
+func AccessTokenIn(vs ...string) predicate.USERS {
+	return predicate.USERS(sql.FieldIn(FieldAccessToken, vs...))
+}
+
+// AccessTokenNotIn applies the NotIn predicate on the "access_token" field.
+func AccessTokenNotIn(vs ...string) predicate.USERS {
+	return predicate.USERS(sql.FieldNotIn(FieldAccessToken, vs...))
+}
+
+// AccessTokenGT applies the GT predicate on the "access_token" field.
+func AccessTokenGT(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldGT(FieldAccessToken, v))
+}
+
+// AccessTokenGTE applies the GTE predicate on the "access_token" field.
+func AccessTokenGTE(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldGTE(FieldAccessToken, v))
+}
+
+// AccessTokenLT applies the LT predicate on the "access_token" field.
+func AccessTokenLT(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldLT(FieldAccessToken, v))
+}
+
+// AccessTokenLTE applies the LTE predicate on the "access_token" field.
+func AccessTokenLTE(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldLTE(FieldAccessToken, v))
+}
+
+// AccessTokenContains applies the Contains predicate on the "access_token" field.
+func AccessTokenContains(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldContains(FieldAccessToken, v))
+}
+
+// AccessTokenHasPrefix applies the HasPrefix predicate on the "access_token" field.
+func AccessTokenHasPrefix(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldHasPrefix(FieldAccessToken, v))
+}
+
+// AccessTokenHasSuffix applies the HasSuffix predicate on the "access_token" field.
+func AccessTokenHasSuffix(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldHasSuffix(FieldAccessToken, v))
+}
+
+// AccessTokenEqualFold applies the EqualFold predicate on the "access_token" field.
+func AccessTokenEqualFold(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldEqualFold(FieldAccessToken, v))
+}
+
+// AccessTokenContainsFold applies the ContainsFold predicate on the "access_token" field.
+func AccessTokenContainsFold(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldContainsFold(FieldAccessToken, v))
 }
 
 // HasConnects applies the HasEdge predicate on the "connects" edge.
@@ -493,6 +553,29 @@ func HasParticipates() predicate.USERS {
 func HasParticipatesWith(preds ...predicate.MATCHINGS) predicate.USERS {
 	return predicate.USERS(func(s *sql.Selector) {
 		step := newParticipatesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPrepares applies the HasEdge predicate on the "prepares" edge.
+func HasPrepares() predicate.USERS {
+	return predicate.USERS(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, PreparesTable, PreparesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPreparesWith applies the HasEdge predicate on the "prepares" edge with a given conditions (other predicates).
+func HasPreparesWith(preds ...predicate.MEMOS) predicate.USERS {
+	return predicate.USERS(func(s *sql.Selector) {
+		step := newPreparesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

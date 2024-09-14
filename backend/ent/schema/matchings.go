@@ -16,6 +16,8 @@ type MATCHINGS struct {
 // Fields of the MATCHINGS.
 func (MATCHINGS) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int("match_id").
+			Unique(),
 		field.Int("user_id"),
 		field.Int("matched_user_id"),
 		field.Int("session_id"),

@@ -15,6 +15,8 @@ const (
 	Label = "friends"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldFriendID holds the string denoting the friend_id field in the database.
+	FieldFriendID = "friend_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
 	// FieldTargetUserID holds the string denoting the target_user_id field in the database.
@@ -37,6 +39,7 @@ const (
 // Columns holds all SQL columns for friends fields.
 var Columns = []string{
 	FieldID,
+	FieldFriendID,
 	FieldUserID,
 	FieldTargetUserID,
 	FieldStatus,
@@ -94,6 +97,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByFriendID orders the results by the friend_id field.
+func ByFriendID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFriendID, opts...).ToFunc()
 }
 
 // ByUserID orders the results by the user_id field.

@@ -299,12 +299,12 @@ func (fq *FRIENDSQuery) WithConnects(opts ...func(*USERSQuery)) *FRIENDSQuery {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		FriendID int `json:"friend_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.FRIENDS.Query().
-//		GroupBy(friends.FieldUserID).
+//		GroupBy(friends.FieldFriendID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (fq *FRIENDSQuery) GroupBy(field string, fields ...string) *FRIENDSGroupBy {
@@ -322,11 +322,11 @@ func (fq *FRIENDSQuery) GroupBy(field string, fields ...string) *FRIENDSGroupBy 
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		FriendID int `json:"friend_id,omitempty"`
 //	}
 //
 //	client.FRIENDS.Query().
-//		Select(friends.FieldUserID).
+//		Select(friends.FieldFriendID).
 //		Scan(ctx, &v)
 func (fq *FRIENDSQuery) Select(fields ...string) *FRIENDSSelect {
 	fq.ctx.Fields = append(fq.ctx.Fields, fields...)

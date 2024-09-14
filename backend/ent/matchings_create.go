@@ -23,6 +23,12 @@ type MATCHINGSCreate struct {
 	hooks    []Hook
 }
 
+// SetMatchID sets the "match_id" field.
+func (mc *MATCHINGSCreate) SetMatchID(i int) *MATCHINGSCreate {
+	mc.mutation.SetMatchID(i)
+	return mc
+}
+
 // SetUserID sets the "user_id" field.
 func (mc *MATCHINGSCreate) SetUserID(i int) *MATCHINGSCreate {
 	mc.mutation.SetUserID(i)
@@ -157,6 +163,9 @@ func (mc *MATCHINGSCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *MATCHINGSCreate) check() error {
+	if _, ok := mc.mutation.MatchID(); !ok {
+		return &ValidationError{Name: "match_id", err: errors.New(`ent: missing required field "MATCHINGS.match_id"`)}
+	}
 	if _, ok := mc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "MATCHINGS.user_id"`)}
 	}
@@ -203,6 +212,10 @@ func (mc *MATCHINGSCreate) createSpec() (*MATCHINGS, *sqlgraph.CreateSpec) {
 		_node = &MATCHINGS{config: mc.config}
 		_spec = sqlgraph.NewCreateSpec(matchings.Table, sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt))
 	)
+	if value, ok := mc.mutation.MatchID(); ok {
+		_spec.SetField(matchings.FieldMatchID, field.TypeInt, value)
+		_node.MatchID = value
+	}
 	if value, ok := mc.mutation.UserID(); ok {
 		_spec.SetField(matchings.FieldUserID, field.TypeInt, value)
 		_node.UserID = value
