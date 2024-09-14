@@ -89,7 +89,7 @@ function App() {
       {mediaDeviceStatus === "error" && <p>Error accessing audio devices</p>}
       {mediaDeviceStatus === "available" && (
         <>
-          <button type="button" onClick={() => handleToggleMute}>
+          <button type="button" onClick={handleToggleMute}>
             {isMuted ? "Unmute" : "Mute"}
           </button>
           <button type="button" onClick={handleStartAudio}>
