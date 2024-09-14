@@ -12,10 +12,11 @@ import { SessionInterval } from './components/pages/SessionInterval.tsx';
 import { SessionFinished } from './components/pages/SessionFinished.tsx';
 import SignUp from './components/pages/SignUp.tsx';
 import { Record } from './components/pages/Record.tsx';
-import { Memo } from './components/pages/Memo.tsx';
+import Memo from './components/pages/Memo.tsx';
 import Message from './components/pages/Message.tsx';
 import Login from './components/pages/Login.tsx';
 import Stats from './components/pages/Stats.tsx';
+import ConversationHistory from './components/pages/ConversationHistory.tsx';
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
   {
     path: "stats",
     element: <Stats />,
+  },
+  {
+    path: "conversation_history",
+    element: <ConversationHistory />,
   }
 ]);
 
