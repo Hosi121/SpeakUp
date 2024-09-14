@@ -19,7 +19,7 @@ const Waiting = () => {
           <Memo />
         </Box>
 
-        <Button variant="contained" sx={{ mt: 4, color: "#000", bgcolor: "secondary.main", "&:hover": { bgcolor: "secondary.dark" }, width: "70%", maxWidth: "300px" }}>
+        <Button variant="contained" sx={{ mt: 4, color: "#000", bgcolor: "secondary.main", "&:hover": { bgcolor: "secondary.dark" }, width: "80%", maxWidth: "300px" }}>
           <CircularProgress size={24} sx={{ mr: 3 }} />
           セッション開始まで
           <br />
