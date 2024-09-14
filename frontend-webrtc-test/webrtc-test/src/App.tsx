@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import { connect, hangUp, onSdpText, startVideo } from "./webrtc";
+import { connect, hangUp, onSdpText, startLocalStream } from "./webrtc";
 import styles from "./App.module.css";
 
 export let remoteVideoRef: React.RefObject<HTMLVideoElement>;
@@ -44,7 +44,7 @@ function App() {
 
   const handleStartVideo = () => {
     if (mediaDeviceStatus === "available") {
-      startVideo(localVideoRef);
+      startLocalStream(localVideoRef);
     } else {
       console.warn("Media devices are not available");
     }
@@ -52,7 +52,7 @@ function App() {
 
   const handleConnect = () => {
     if (mediaDeviceStatus === "available") {
-      connect();
+      connect(remoteVideoRef);
     } else {
       console.warn("Media devices are not available for connection");
     }

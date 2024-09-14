@@ -6,7 +6,8 @@ let peerConnection: RTCPeerConnection | null;
 let negotiationneededCounter = 0;
 
 // シグナリングサーバへ接続する
-const wsUrl = "ws://localhost:3001/";
+//const wsUrl = "ws://localhost:3001/";
+const wsUrl = "ws://10.70.174.103:3001/";
 const ws = new WebSocket(wsUrl);
 ws.onopen = (evt) => {
   console.log("ws open()");
@@ -106,6 +107,23 @@ export async function startVideo(localVideo: RefObject<HTMLVideoElement>) {
   }
 }
 
+export async function startLocalStream(
+  localVideo: RefObject<HTMLVideoElement>
+) {
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+    if (localVideo.current) {
+      playVideo(localVideo.current, localStream);
+    }
+  } catch (err) {
+    console.error("mediaDevice.getUserMedia() error:", err);
+    throw err;
+  }
+}
+
 // Videoの再生を開始する
 export async function playVideo(
   element: HTMLVideoElement,
@@ -113,7 +131,6 @@ export async function playVideo(
 ) {
   element.srcObject = stream;
   try {
-    element.muted = true;
     await element.play();
   } catch (error) {
     console.log("error auto play:" + error);
@@ -121,29 +138,59 @@ export async function playVideo(
 }
 
 // WebRTCを利用する準備をする
-function prepareNewConnection(isOffer: boolean) {
+function prepareNewConnection(
+  isOffer: boolean,
+  remoteVideoRef: RefObject<HTMLVideoElement>
+) {
   const pc_config = {
-    iceServers: [{ urls: "stun:stun.webrtc.ecl.ntt.com:3478" }],
+    iceServers: [
+      { urls: "stun:stun.webrtc.ecl.ntt.com:3478" },
+      { urls: "stun:stun.l.google.com:19302" }, // バックアップとして Google の STUN サーバーを追加
+    ],
   };
   const peer = new RTCPeerConnection(pc_config);
 
-  // リモートのMediStreamTrackを受信した時
-  const remoteVideo = remoteVideoRef.current;
-  if (remoteVideo) {
-    peer.ontrack = (evt) => {
-      console.log("-- peer.ontrack()");
-      playVideo(remoteVideo, evt.streams[0]);
-    };
-  }
+  // リモートのMediaStreamTrackを受信した時
+  peer.ontrack = (evt) => {
+    console.log("-- peer.ontrack()", evt.track.kind);
+    if (evt.track.kind === "video") {
+      const remoteVideo = remoteVideoRef.current;
+      if (remoteVideo) {
+        if (remoteVideo.srcObject !== evt.streams[0]) {
+          remoteVideo.srcObject = evt.streams[0];
+          console.log("Received remote video stream");
+        }
+      }
+    } else if (evt.track.kind === "audio") {
+      // オーディオトラックの処理
+      const remoteAudio = new Audio();
+      remoteAudio.srcObject = evt.streams[0];
+      remoteAudio.play();
+      console.log("Remote audio playback started");
+    }
+  };
 
   // ICE Candidateを収集したときのイベント
   peer.onicecandidate = (evt) => {
     if (evt.candidate) {
-      console.log(evt.candidate);
+      console.log("New ICE candidate: ", evt.candidate);
       sendIceCandidate(evt.candidate);
     } else {
-      console.log("empty ice event");
-      // sendSdp(peer.localDescription);
+      console.log("ICE gathering completed");
+    }
+  };
+
+  // ICE接続状態が変化したときのイベント
+  peer.oniceconnectionstatechange = () => {
+    console.log("ICE connection state changed to: ", peer.iceConnectionState);
+    switch (peer.iceConnectionState) {
+      case "connected":
+        console.log("ICE connected successfully");
+        break;
+      case "failed":
+        console.log("ICE connection failed");
+        // ここで接続の再試行ロジックを実装できます
+        break;
     }
   };
 
@@ -152,49 +199,40 @@ function prepareNewConnection(isOffer: boolean) {
     try {
       if (isOffer) {
         if (negotiationneededCounter === 0) {
+          console.log("Creating offer");
           const offer = await peer.createOffer();
-          console.log("createOffer() succsess in promise");
+          console.log("createOffer() success in promise");
           await peer.setLocalDescription(offer);
-          console.log("setLocalDescription() succsess in promise");
+          console.log("setLocalDescription() success in promise");
           sendSdp(peer.localDescription);
           negotiationneededCounter++;
         }
       }
     } catch (err) {
-      console.error("setLocalDescription(offer) ERROR: ", err);
+      console.error("Error during negotiation: ", err);
     }
   };
 
-  // ICEのステータスが変更になったときの処理
-  peer.oniceconnectionstatechange = function() {
-    console.log(
-      "ICE connection Status has changed to " + peer.iceConnectionState
-    );
-    switch (peer.iceConnectionState) {
-      case "closed":
-      case "failed":
-        if (peerConnection) {
-          const textForSendSdp = textForSendSdpRef.current;
-          const textToReceiveSdp = textToReceiveSdpRef.current;
-          hangUp(textForSendSdp, textToReceiveSdp);
-        }
-        break;
-      case "disconnected":
-        break;
-    }
-  };
-
-  // ローカルのMediaStreamを利用できるようにする
-  if (localStream) {
-    console.log("Adding local stream...");
-    localStream
-      .getTracks()
-      .forEach((track) => peer.addTrack(track, localStream));
+  // データチャネルの作成 (オプション)
+  if (isOffer) {
+    const dataChannel = peer.createDataChannel("chat");
+    setupDataChannel(dataChannel);
   } else {
-    console.warn("no local stream, but continue.");
+    peer.ondatachannel = (event) => {
+      setupDataChannel(event.channel);
+    };
   }
 
   return peer;
+}
+
+function setupDataChannel(dataChannel: RTCDataChannel) {
+  dataChannel.onopen = () => {
+    console.log("Data channel is open");
+  };
+  dataChannel.onmessage = (event) => {
+    console.log("Received message:", event.data);
+  };
 }
 
 // 手動シグナリングのための処理を追加する
@@ -214,12 +252,21 @@ function sendSdp(sessionDescription: RTCSessionDescription | null) {
 }
 
 // Connectボタンが押されたらWebRTCのOffer処理を開始
-export function connect() {
+export function connect(remoteVideoRef: RefObject<HTMLVideoElement>) {
   if (!peerConnection) {
     console.log("make Offer");
-    peerConnection = prepareNewConnection(true);
+    peerConnection = prepareNewConnection(true, remoteVideoRef);
   } else {
     console.warn("peer already exist.");
+  }
+  if (localStream && peerConnection) {
+    localStream.getTracks().forEach((track) => {
+      if (peerConnection) {
+        peerConnection.addTrack(track, localStream!);
+      }
+    });
+  } else {
+    console.error("Local stream or peer connection is not available");
   }
 }
 
@@ -271,7 +318,7 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
   if (peerConnection) {
     console.error("peerConnection alreay exist!");
   }
-  peerConnection = prepareNewConnection(false);
+  peerConnection = prepareNewConnection(false, remoteVideoRef);
   try {
     await peerConnection.setRemoteDescription(sessionDescription);
     console.log("setRemoteDescription(answer) succsess in promise");
