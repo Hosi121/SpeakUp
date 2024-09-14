@@ -86,10 +86,10 @@ function addIceCandidate(candidate: RTCIceCandidate) {
 
 // ICE candidate生成時に送信する
 function sendIceCandidate(candidate: RTCIceCandidate) {
-  console.log("---sending ICE candidate ---");
+  console.log("Sending ICE candidate", candidate);
   const message = JSON.stringify({ type: "candidate", ice: candidate });
-  console.log("sending candidate=" + message);
   ws.send(message);
+  console.log("ICE candidate sent:", message);
 }
 
 // getUserMediaでカメラ、マイクにアクセス
@@ -144,8 +144,11 @@ function prepareNewConnection(
 ) {
   const pc_config = {
     iceServers: [
-      { urls: "stun:stun.webrtc.ecl.ntt.com:3478" },
-      { urls: "stun:stun.l.google.com:19302" }, // バックアップとして Google の STUN サーバーを追加
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "stun:stun2.l.google.com:19302" },
+      { urls: "stun:stun3.l.google.com:19302" },
+      { urls: "stun:stun4.l.google.com:19302" },
     ],
   };
   const peer = new RTCPeerConnection(pc_config);
@@ -235,20 +238,15 @@ function setupDataChannel(dataChannel: RTCDataChannel) {
   };
 }
 
-// 手動シグナリングのための処理を追加する
 function sendSdp(sessionDescription: RTCSessionDescription | null) {
-  console.log("---sending sdp ---");
+  console.log("Sending SDP", sessionDescription);
   const textForSendSdp = textForSendSdpRef.current;
   if (textForSendSdp && sessionDescription) {
     textForSendSdp.value = sessionDescription.sdp;
+    const message = JSON.stringify(sessionDescription);
+    ws.send(message);
+    console.log("SDP sent:", message);
   }
-  /*---
-   textForSendSdp.focus();
-   textForSendSdp.select();
-   ----*/
-  const message = JSON.stringify(sessionDescription);
-  console.log("sending SDP=" + message);
-  ws.send(message);
 }
 
 // Connectボタンが押されたらWebRTCのOffer処理を開始
