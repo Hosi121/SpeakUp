@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -21,16 +22,18 @@ type USERS struct {
 	Username string `json:"username,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
-	// HashedPassword holds the value of the "hashed_password" field.
-	HashedPassword string `json:"hashed_password,omitempty"`
 	// AvatarURL holds the value of the "avatar_url" field.
 	AvatarURL string `json:"avatar_url,omitempty"`
 	// Role holds the value of the "role" field.
 	Role users.Role `json:"role,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// DeletedAt holds the value of the "deleted_at" field.
-	DeletedAt time.Time `json:"deleted_at,omitempty"`
+	// IsDeleted holds the value of the "is_deleted" field.
+	IsDeleted bool `json:"is_deleted,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// AccessToken holds the value of the "access_token" field.
+	AccessToken string `json:"access_token,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the USERSQuery when eager-loading is set.
 	Edges        USERSEdges `json:"edges"`
@@ -43,9 +46,11 @@ type USERSEdges struct {
 	Connects []*FRIENDS `json:"connects,omitempty"`
 	// Participates holds the value of the participates edge.
 	Participates []*MATCHINGS `json:"participates,omitempty"`
+	// Prepares holds the value of the prepares edge.
+	Prepares *MEMOS `json:"prepares,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // ConnectsOrErr returns the Connects value or an error if the edge
@@ -66,16 +71,29 @@ func (e USERSEdges) ParticipatesOrErr() ([]*MATCHINGS, error) {
 	return nil, &NotLoadedError{edge: "participates"}
 }
 
+// PreparesOrErr returns the Prepares value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e USERSEdges) PreparesOrErr() (*MEMOS, error) {
+	if e.Prepares != nil {
+		return e.Prepares, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: memos.Label}
+	}
+	return nil, &NotLoadedError{edge: "prepares"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*USERS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case users.FieldIsDeleted:
+			values[i] = new(sql.NullBool)
 		case users.FieldID:
 			values[i] = new(sql.NullInt64)
-		case users.FieldUsername, users.FieldEmail, users.FieldHashedPassword, users.FieldAvatarURL, users.FieldRole:
+		case users.FieldUsername, users.FieldEmail, users.FieldAvatarURL, users.FieldRole, users.FieldAccessToken:
 			values[i] = new(sql.NullString)
-		case users.FieldCreatedAt, users.FieldDeletedAt:
+		case users.FieldCreatedAt, users.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -110,12 +128,6 @@ func (u *USERS) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Email = value.String
 			}
-		case users.FieldHashedPassword:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field hashed_password", values[i])
-			} else if value.Valid {
-				u.HashedPassword = value.String
-			}
 		case users.FieldAvatarURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field avatar_url", values[i])
@@ -134,11 +146,23 @@ func (u *USERS) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.CreatedAt = value.Time
 			}
-		case users.FieldDeletedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+		case users.FieldIsDeleted:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_deleted", values[i])
 			} else if value.Valid {
-				u.DeletedAt = value.Time
+				u.IsDeleted = value.Bool
+			}
+		case users.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				u.UpdatedAt = value.Time
+			}
+		case users.FieldAccessToken:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field access_token", values[i])
+			} else if value.Valid {
+				u.AccessToken = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -161,6 +185,11 @@ func (u *USERS) QueryConnects() *FRIENDSQuery {
 // QueryParticipates queries the "participates" edge of the USERS entity.
 func (u *USERS) QueryParticipates() *MATCHINGSQuery {
 	return NewUSERSClient(u.config).QueryParticipates(u)
+}
+
+// QueryPrepares queries the "prepares" edge of the USERS entity.
+func (u *USERS) QueryPrepares() *MEMOSQuery {
+	return NewUSERSClient(u.config).QueryPrepares(u)
 }
 
 // Update returns a builder for updating this USERS.
@@ -192,9 +221,6 @@ func (u *USERS) String() string {
 	builder.WriteString("email=")
 	builder.WriteString(u.Email)
 	builder.WriteString(", ")
-	builder.WriteString("hashed_password=")
-	builder.WriteString(u.HashedPassword)
-	builder.WriteString(", ")
 	builder.WriteString("avatar_url=")
 	builder.WriteString(u.AvatarURL)
 	builder.WriteString(", ")
@@ -204,8 +230,14 @@ func (u *USERS) String() string {
 	builder.WriteString("created_at=")
 	builder.WriteString(u.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("deleted_at=")
-	builder.WriteString(u.DeletedAt.Format(time.ANSIC))
+	builder.WriteString("is_deleted=")
+	builder.WriteString(fmt.Sprintf("%v", u.IsDeleted))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("access_token=")
+	builder.WriteString(u.AccessToken)
 	builder.WriteByte(')')
 	return builder.String()
 }

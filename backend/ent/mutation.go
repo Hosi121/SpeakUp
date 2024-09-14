@@ -15,6 +15,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent/calls"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 	"github.com/Hosi121/SpeakUp/ent/users"
@@ -33,6 +34,7 @@ const (
 	TypeCALLS     = "CALLS"
 	TypeFRIENDS   = "FRIENDS"
 	TypeMATCHINGS = "MATCHINGS"
+	TypeMEMOS     = "MEMOS"
 	TypeSESSIONS  = "SESSIONS"
 	TypeUSERS     = "USERS"
 )
@@ -2693,6 +2695,543 @@ func (m *MATCHINGSMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown MATCHINGS edge %s", name)
 }
 
+// MEMOSMutation represents an operation that mutates the MEMOS nodes in the graph.
+type MEMOSMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int
+	user_id         *int
+	adduser_id      *int
+	memo1           *string
+	memo2           *string
+	clearedFields   map[string]struct{}
+	prepared        *int
+	clearedprepared bool
+	done            bool
+	oldValue        func(context.Context) (*MEMOS, error)
+	predicates      []predicate.MEMOS
+}
+
+var _ ent.Mutation = (*MEMOSMutation)(nil)
+
+// memosOption allows management of the mutation configuration using functional options.
+type memosOption func(*MEMOSMutation)
+
+// newMEMOSMutation creates new mutation for the MEMOS entity.
+func newMEMOSMutation(c config, op Op, opts ...memosOption) *MEMOSMutation {
+	m := &MEMOSMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMEMOS,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMEMOSID sets the ID field of the mutation.
+func withMEMOSID(id int) memosOption {
+	return func(m *MEMOSMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MEMOS
+		)
+		m.oldValue = func(ctx context.Context) (*MEMOS, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MEMOS.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMEMOS sets the old MEMOS of the mutation.
+func withMEMOS(node *MEMOS) memosOption {
+	return func(m *MEMOSMutation) {
+		m.oldValue = func(context.Context) (*MEMOS, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MEMOSMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MEMOSMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MEMOSMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MEMOSMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MEMOS.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetUserID sets the "user_id" field.
+func (m *MEMOSMutation) SetUserID(i int) {
+	m.user_id = &i
+	m.adduser_id = nil
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *MEMOSMutation) UserID() (r int, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the MEMOS entity.
+// If the MEMOS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MEMOSMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// AddUserID adds i to the "user_id" field.
+func (m *MEMOSMutation) AddUserID(i int) {
+	if m.adduser_id != nil {
+		*m.adduser_id += i
+	} else {
+		m.adduser_id = &i
+	}
+}
+
+// AddedUserID returns the value that was added to the "user_id" field in this mutation.
+func (m *MEMOSMutation) AddedUserID() (r int, exists bool) {
+	v := m.adduser_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *MEMOSMutation) ResetUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
+}
+
+// SetMemo1 sets the "memo1" field.
+func (m *MEMOSMutation) SetMemo1(s string) {
+	m.memo1 = &s
+}
+
+// Memo1 returns the value of the "memo1" field in the mutation.
+func (m *MEMOSMutation) Memo1() (r string, exists bool) {
+	v := m.memo1
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemo1 returns the old "memo1" field's value of the MEMOS entity.
+// If the MEMOS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MEMOSMutation) OldMemo1(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemo1 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemo1 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemo1: %w", err)
+	}
+	return oldValue.Memo1, nil
+}
+
+// ResetMemo1 resets all changes to the "memo1" field.
+func (m *MEMOSMutation) ResetMemo1() {
+	m.memo1 = nil
+}
+
+// SetMemo2 sets the "memo2" field.
+func (m *MEMOSMutation) SetMemo2(s string) {
+	m.memo2 = &s
+}
+
+// Memo2 returns the value of the "memo2" field in the mutation.
+func (m *MEMOSMutation) Memo2() (r string, exists bool) {
+	v := m.memo2
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemo2 returns the old "memo2" field's value of the MEMOS entity.
+// If the MEMOS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MEMOSMutation) OldMemo2(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemo2 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemo2 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemo2: %w", err)
+	}
+	return oldValue.Memo2, nil
+}
+
+// ResetMemo2 resets all changes to the "memo2" field.
+func (m *MEMOSMutation) ResetMemo2() {
+	m.memo2 = nil
+}
+
+// SetPreparedID sets the "prepared" edge to the USERS entity by id.
+func (m *MEMOSMutation) SetPreparedID(id int) {
+	m.prepared = &id
+}
+
+// ClearPrepared clears the "prepared" edge to the USERS entity.
+func (m *MEMOSMutation) ClearPrepared() {
+	m.clearedprepared = true
+}
+
+// PreparedCleared reports if the "prepared" edge to the USERS entity was cleared.
+func (m *MEMOSMutation) PreparedCleared() bool {
+	return m.clearedprepared
+}
+
+// PreparedID returns the "prepared" edge ID in the mutation.
+func (m *MEMOSMutation) PreparedID() (id int, exists bool) {
+	if m.prepared != nil {
+		return *m.prepared, true
+	}
+	return
+}
+
+// PreparedIDs returns the "prepared" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PreparedID instead. It exists only for internal usage by the builders.
+func (m *MEMOSMutation) PreparedIDs() (ids []int) {
+	if id := m.prepared; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPrepared resets all changes to the "prepared" edge.
+func (m *MEMOSMutation) ResetPrepared() {
+	m.prepared = nil
+	m.clearedprepared = false
+}
+
+// Where appends a list predicates to the MEMOSMutation builder.
+func (m *MEMOSMutation) Where(ps ...predicate.MEMOS) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MEMOSMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MEMOSMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MEMOS, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MEMOSMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MEMOSMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MEMOS).
+func (m *MEMOSMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MEMOSMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.user_id != nil {
+		fields = append(fields, memos.FieldUserID)
+	}
+	if m.memo1 != nil {
+		fields = append(fields, memos.FieldMemo1)
+	}
+	if m.memo2 != nil {
+		fields = append(fields, memos.FieldMemo2)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MEMOSMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case memos.FieldUserID:
+		return m.UserID()
+	case memos.FieldMemo1:
+		return m.Memo1()
+	case memos.FieldMemo2:
+		return m.Memo2()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MEMOSMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case memos.FieldUserID:
+		return m.OldUserID(ctx)
+	case memos.FieldMemo1:
+		return m.OldMemo1(ctx)
+	case memos.FieldMemo2:
+		return m.OldMemo2(ctx)
+	}
+	return nil, fmt.Errorf("unknown MEMOS field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MEMOSMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case memos.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case memos.FieldMemo1:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemo1(v)
+		return nil
+	case memos.FieldMemo2:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemo2(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MEMOS field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MEMOSMutation) AddedFields() []string {
+	var fields []string
+	if m.adduser_id != nil {
+		fields = append(fields, memos.FieldUserID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MEMOSMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case memos.FieldUserID:
+		return m.AddedUserID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MEMOSMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case memos.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MEMOS numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MEMOSMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MEMOSMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MEMOSMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown MEMOS nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MEMOSMutation) ResetField(name string) error {
+	switch name {
+	case memos.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case memos.FieldMemo1:
+		m.ResetMemo1()
+		return nil
+	case memos.FieldMemo2:
+		m.ResetMemo2()
+		return nil
+	}
+	return fmt.Errorf("unknown MEMOS field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MEMOSMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.prepared != nil {
+		edges = append(edges, memos.EdgePrepared)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MEMOSMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case memos.EdgePrepared:
+		if id := m.prepared; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MEMOSMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MEMOSMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MEMOSMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedprepared {
+		edges = append(edges, memos.EdgePrepared)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MEMOSMutation) EdgeCleared(name string) bool {
+	switch name {
+	case memos.EdgePrepared:
+		return m.clearedprepared
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MEMOSMutation) ClearEdge(name string) error {
+	switch name {
+	case memos.EdgePrepared:
+		m.ClearPrepared()
+		return nil
+	}
+	return fmt.Errorf("unknown MEMOS unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MEMOSMutation) ResetEdge(name string) error {
+	switch name {
+	case memos.EdgePrepared:
+		m.ResetPrepared()
+		return nil
+	}
+	return fmt.Errorf("unknown MEMOS edge %s", name)
+}
+
 // SESSIONSMutation represents an operation that mutates the SESSIONS nodes in the graph.
 type SESSIONSMutation struct {
 	config
@@ -3377,11 +3916,12 @@ type USERSMutation struct {
 	id                  *int
 	username            *string
 	email               *string
-	hashed_password     *string
 	avatar_url          *string
 	role                *users.Role
 	created_at          *time.Time
-	deleted_at          *time.Time
+	is_deleted          *bool
+	updated_at          *time.Time
+	access_token        *string
 	clearedFields       map[string]struct{}
 	connects            map[int]struct{}
 	removedconnects     map[int]struct{}
@@ -3389,6 +3929,8 @@ type USERSMutation struct {
 	participates        map[int]struct{}
 	removedparticipates map[int]struct{}
 	clearedparticipates bool
+	prepares            *int
+	clearedprepares     bool
 	done                bool
 	oldValue            func(context.Context) (*USERS, error)
 	predicates          []predicate.USERS
@@ -3564,42 +4106,6 @@ func (m *USERSMutation) ResetEmail() {
 	m.email = nil
 }
 
-// SetHashedPassword sets the "hashed_password" field.
-func (m *USERSMutation) SetHashedPassword(s string) {
-	m.hashed_password = &s
-}
-
-// HashedPassword returns the value of the "hashed_password" field in the mutation.
-func (m *USERSMutation) HashedPassword() (r string, exists bool) {
-	v := m.hashed_password
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHashedPassword returns the old "hashed_password" field's value of the USERS entity.
-// If the USERS object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *USERSMutation) OldHashedPassword(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHashedPassword is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHashedPassword requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHashedPassword: %w", err)
-	}
-	return oldValue.HashedPassword, nil
-}
-
-// ResetHashedPassword resets all changes to the "hashed_password" field.
-func (m *USERSMutation) ResetHashedPassword() {
-	m.hashed_password = nil
-}
-
 // SetAvatarURL sets the "avatar_url" field.
 func (m *USERSMutation) SetAvatarURL(s string) {
 	m.avatar_url = &s
@@ -3721,40 +4227,112 @@ func (m *USERSMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (m *USERSMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
+// SetIsDeleted sets the "is_deleted" field.
+func (m *USERSMutation) SetIsDeleted(b bool) {
+	m.is_deleted = &b
 }
 
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *USERSMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
+// IsDeleted returns the value of the "is_deleted" field in the mutation.
+func (m *USERSMutation) IsDeleted() (r bool, exists bool) {
+	v := m.is_deleted
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDeletedAt returns the old "deleted_at" field's value of the USERS entity.
+// OldIsDeleted returns the old "is_deleted" field's value of the USERS entity.
 // If the USERS object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *USERSMutation) OldDeletedAt(ctx context.Context) (v time.Time, err error) {
+func (m *USERSMutation) OldIsDeleted(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsDeleted is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+		return v, errors.New("OldIsDeleted requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsDeleted: %w", err)
 	}
-	return oldValue.DeletedAt, nil
+	return oldValue.IsDeleted, nil
 }
 
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *USERSMutation) ResetDeletedAt() {
-	m.deleted_at = nil
+// ResetIsDeleted resets all changes to the "is_deleted" field.
+func (m *USERSMutation) ResetIsDeleted() {
+	m.is_deleted = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *USERSMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *USERSMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the USERS entity.
+// If the USERS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *USERSMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *USERSMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetAccessToken sets the "access_token" field.
+func (m *USERSMutation) SetAccessToken(s string) {
+	m.access_token = &s
+}
+
+// AccessToken returns the value of the "access_token" field in the mutation.
+func (m *USERSMutation) AccessToken() (r string, exists bool) {
+	v := m.access_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccessToken returns the old "access_token" field's value of the USERS entity.
+// If the USERS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *USERSMutation) OldAccessToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccessToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccessToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccessToken: %w", err)
+	}
+	return oldValue.AccessToken, nil
+}
+
+// ResetAccessToken resets all changes to the "access_token" field.
+func (m *USERSMutation) ResetAccessToken() {
+	m.access_token = nil
 }
 
 // AddConnectIDs adds the "connects" edge to the FRIENDS entity by ids.
@@ -3865,6 +4443,45 @@ func (m *USERSMutation) ResetParticipates() {
 	m.removedparticipates = nil
 }
 
+// SetPreparesID sets the "prepares" edge to the MEMOS entity by id.
+func (m *USERSMutation) SetPreparesID(id int) {
+	m.prepares = &id
+}
+
+// ClearPrepares clears the "prepares" edge to the MEMOS entity.
+func (m *USERSMutation) ClearPrepares() {
+	m.clearedprepares = true
+}
+
+// PreparesCleared reports if the "prepares" edge to the MEMOS entity was cleared.
+func (m *USERSMutation) PreparesCleared() bool {
+	return m.clearedprepares
+}
+
+// PreparesID returns the "prepares" edge ID in the mutation.
+func (m *USERSMutation) PreparesID() (id int, exists bool) {
+	if m.prepares != nil {
+		return *m.prepares, true
+	}
+	return
+}
+
+// PreparesIDs returns the "prepares" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PreparesID instead. It exists only for internal usage by the builders.
+func (m *USERSMutation) PreparesIDs() (ids []int) {
+	if id := m.prepares; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPrepares resets all changes to the "prepares" edge.
+func (m *USERSMutation) ResetPrepares() {
+	m.prepares = nil
+	m.clearedprepares = false
+}
+
 // Where appends a list predicates to the USERSMutation builder.
 func (m *USERSMutation) Where(ps ...predicate.USERS) {
 	m.predicates = append(m.predicates, ps...)
@@ -3899,15 +4516,12 @@ func (m *USERSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *USERSMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.username != nil {
 		fields = append(fields, users.FieldUsername)
 	}
 	if m.email != nil {
 		fields = append(fields, users.FieldEmail)
-	}
-	if m.hashed_password != nil {
-		fields = append(fields, users.FieldHashedPassword)
 	}
 	if m.avatar_url != nil {
 		fields = append(fields, users.FieldAvatarURL)
@@ -3918,8 +4532,14 @@ func (m *USERSMutation) Fields() []string {
 	if m.created_at != nil {
 		fields = append(fields, users.FieldCreatedAt)
 	}
-	if m.deleted_at != nil {
-		fields = append(fields, users.FieldDeletedAt)
+	if m.is_deleted != nil {
+		fields = append(fields, users.FieldIsDeleted)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, users.FieldUpdatedAt)
+	}
+	if m.access_token != nil {
+		fields = append(fields, users.FieldAccessToken)
 	}
 	return fields
 }
@@ -3933,16 +4553,18 @@ func (m *USERSMutation) Field(name string) (ent.Value, bool) {
 		return m.Username()
 	case users.FieldEmail:
 		return m.Email()
-	case users.FieldHashedPassword:
-		return m.HashedPassword()
 	case users.FieldAvatarURL:
 		return m.AvatarURL()
 	case users.FieldRole:
 		return m.Role()
 	case users.FieldCreatedAt:
 		return m.CreatedAt()
-	case users.FieldDeletedAt:
-		return m.DeletedAt()
+	case users.FieldIsDeleted:
+		return m.IsDeleted()
+	case users.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case users.FieldAccessToken:
+		return m.AccessToken()
 	}
 	return nil, false
 }
@@ -3956,16 +4578,18 @@ func (m *USERSMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldUsername(ctx)
 	case users.FieldEmail:
 		return m.OldEmail(ctx)
-	case users.FieldHashedPassword:
-		return m.OldHashedPassword(ctx)
 	case users.FieldAvatarURL:
 		return m.OldAvatarURL(ctx)
 	case users.FieldRole:
 		return m.OldRole(ctx)
 	case users.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case users.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
+	case users.FieldIsDeleted:
+		return m.OldIsDeleted(ctx)
+	case users.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case users.FieldAccessToken:
+		return m.OldAccessToken(ctx)
 	}
 	return nil, fmt.Errorf("unknown USERS field %s", name)
 }
@@ -3989,13 +4613,6 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEmail(v)
 		return nil
-	case users.FieldHashedPassword:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHashedPassword(v)
-		return nil
 	case users.FieldAvatarURL:
 		v, ok := value.(string)
 		if !ok {
@@ -4017,12 +4634,26 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCreatedAt(v)
 		return nil
-	case users.FieldDeletedAt:
+	case users.FieldIsDeleted:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsDeleted(v)
+		return nil
+	case users.FieldUpdatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetDeletedAt(v)
+		m.SetUpdatedAt(v)
+		return nil
+	case users.FieldAccessToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccessToken(v)
 		return nil
 	}
 	return fmt.Errorf("unknown USERS field %s", name)
@@ -4088,9 +4719,6 @@ func (m *USERSMutation) ResetField(name string) error {
 	case users.FieldEmail:
 		m.ResetEmail()
 		return nil
-	case users.FieldHashedPassword:
-		m.ResetHashedPassword()
-		return nil
 	case users.FieldAvatarURL:
 		m.ResetAvatarURL()
 		return nil
@@ -4100,8 +4728,14 @@ func (m *USERSMutation) ResetField(name string) error {
 	case users.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
-	case users.FieldDeletedAt:
-		m.ResetDeletedAt()
+	case users.FieldIsDeleted:
+		m.ResetIsDeleted()
+		return nil
+	case users.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case users.FieldAccessToken:
+		m.ResetAccessToken()
 		return nil
 	}
 	return fmt.Errorf("unknown USERS field %s", name)
@@ -4109,12 +4743,15 @@ func (m *USERSMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *USERSMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.connects != nil {
 		edges = append(edges, users.EdgeConnects)
 	}
 	if m.participates != nil {
 		edges = append(edges, users.EdgeParticipates)
+	}
+	if m.prepares != nil {
+		edges = append(edges, users.EdgePrepares)
 	}
 	return edges
 }
@@ -4135,13 +4772,17 @@ func (m *USERSMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case users.EdgePrepares:
+		if id := m.prepares; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *USERSMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedconnects != nil {
 		edges = append(edges, users.EdgeConnects)
 	}
@@ -4173,12 +4814,15 @@ func (m *USERSMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *USERSMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedconnects {
 		edges = append(edges, users.EdgeConnects)
 	}
 	if m.clearedparticipates {
 		edges = append(edges, users.EdgeParticipates)
+	}
+	if m.clearedprepares {
+		edges = append(edges, users.EdgePrepares)
 	}
 	return edges
 }
@@ -4191,6 +4835,8 @@ func (m *USERSMutation) EdgeCleared(name string) bool {
 		return m.clearedconnects
 	case users.EdgeParticipates:
 		return m.clearedparticipates
+	case users.EdgePrepares:
+		return m.clearedprepares
 	}
 	return false
 }
@@ -4199,6 +4845,9 @@ func (m *USERSMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *USERSMutation) ClearEdge(name string) error {
 	switch name {
+	case users.EdgePrepares:
+		m.ClearPrepares()
+		return nil
 	}
 	return fmt.Errorf("unknown USERS unique edge %s", name)
 }
@@ -4212,6 +4861,9 @@ func (m *USERSMutation) ResetEdge(name string) error {
 		return nil
 	case users.EdgeParticipates:
 		m.ResetParticipates()
+		return nil
+	case users.EdgePrepares:
+		m.ResetPrepares()
 		return nil
 	}
 	return fmt.Errorf("unknown USERS edge %s", name)

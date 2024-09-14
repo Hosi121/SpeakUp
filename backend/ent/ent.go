@@ -16,6 +16,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent/calls"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
@@ -82,6 +83,7 @@ func checkColumn(table, column string) error {
 			calls.Table:     calls.ValidColumn,
 			friends.Table:   friends.ValidColumn,
 			matchings.Table: matchings.ValidColumn,
+			memos.Table:     memos.ValidColumn,
 			sessions.Table:  sessions.ValidColumn,
 			users.Table:     users.ValidColumn,
 		})

@@ -18,6 +18,9 @@ type FRIENDS func(*sql.Selector)
 // MATCHINGS is the predicate function for matchings builders.
 type MATCHINGS func(*sql.Selector)
 
+// MEMOS is the predicate function for memos builders.
+type MEMOS func(*sql.Selector)
+
 // SESSIONS is the predicate function for sessions builders.
 type SESSIONS func(*sql.Selector)
 

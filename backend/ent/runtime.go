@@ -9,6 +9,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent/calls"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/schema"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 	"github.com/Hosi121/SpeakUp/ent/users"
@@ -50,6 +51,20 @@ func init() {
 	matchingsDescMatchedAt := matchingsFields[3].Descriptor()
 	// matchings.DefaultMatchedAt holds the default value on creation for the matched_at field.
 	matchings.DefaultMatchedAt = matchingsDescMatchedAt.Default.(time.Time)
+	memosFields := schema.MEMOS{}.Fields()
+	_ = memosFields
+	// memosDescMemo1 is the schema descriptor for memo1 field.
+	memosDescMemo1 := memosFields[1].Descriptor()
+	// memos.DefaultMemo1 holds the default value on creation for the memo1 field.
+	memos.DefaultMemo1 = memosDescMemo1.Default.(string)
+	// memos.Memo1Validator is a validator for the "memo1" field. It is called by the builders before save.
+	memos.Memo1Validator = memosDescMemo1.Validators[0].(func(string) error)
+	// memosDescMemo2 is the schema descriptor for memo2 field.
+	memosDescMemo2 := memosFields[2].Descriptor()
+	// memos.DefaultMemo2 holds the default value on creation for the memo2 field.
+	memos.DefaultMemo2 = memosDescMemo2.Default.(string)
+	// memos.Memo2Validator is a validator for the "memo2" field. It is called by the builders before save.
+	memos.Memo2Validator = memosDescMemo2.Validators[0].(func(string) error)
 	sessionsFields := schema.SESSIONS{}.Fields()
 	_ = sessionsFields
 	// sessionsDescCreatedAt is the schema descriptor for created_at field.
@@ -94,16 +109,20 @@ func init() {
 			return nil
 		}
 	}()
-	// usersDescHashedPassword is the schema descriptor for hashed_password field.
-	usersDescHashedPassword := usersFields[2].Descriptor()
-	// users.HashedPasswordValidator is a validator for the "hashed_password" field. It is called by the builders before save.
-	users.HashedPasswordValidator = usersDescHashedPassword.Validators[0].(func(string) error)
 	// usersDescCreatedAt is the schema descriptor for created_at field.
-	usersDescCreatedAt := usersFields[5].Descriptor()
+	usersDescCreatedAt := usersFields[4].Descriptor()
 	// users.DefaultCreatedAt holds the default value on creation for the created_at field.
 	users.DefaultCreatedAt = usersDescCreatedAt.Default.(func() time.Time)
-	// usersDescDeletedAt is the schema descriptor for deleted_at field.
-	usersDescDeletedAt := usersFields[6].Descriptor()
-	// users.DefaultDeletedAt holds the default value on creation for the deleted_at field.
-	users.DefaultDeletedAt = usersDescDeletedAt.Default.(func() time.Time)
+	// usersDescIsDeleted is the schema descriptor for is_deleted field.
+	usersDescIsDeleted := usersFields[5].Descriptor()
+	// users.DefaultIsDeleted holds the default value on creation for the is_deleted field.
+	users.DefaultIsDeleted = usersDescIsDeleted.Default.(bool)
+	// usersDescUpdatedAt is the schema descriptor for updated_at field.
+	usersDescUpdatedAt := usersFields[6].Descriptor()
+	// users.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	users.DefaultUpdatedAt = usersDescUpdatedAt.Default.(func() time.Time)
+	// usersDescAccessToken is the schema descriptor for access_token field.
+	usersDescAccessToken := usersFields[7].Descriptor()
+	// users.DefaultAccessToken holds the default value on creation for the access_token field.
+	users.DefaultAccessToken = usersDescAccessToken.Default.(string)
 }

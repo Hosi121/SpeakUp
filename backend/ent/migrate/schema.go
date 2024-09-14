@@ -82,6 +82,28 @@ var (
 			},
 		},
 	}
+	// MemoSsColumns holds the columns for the "memo_ss" table.
+	MemoSsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeInt, Unique: true},
+		{Name: "memo1", Type: field.TypeString, Size: 255, Default: ""},
+		{Name: "memo2", Type: field.TypeString, Size: 255, Default: ""},
+		{Name: "users_prepares", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// MemoSsTable holds the schema information for the "memo_ss" table.
+	MemoSsTable = &schema.Table{
+		Name:       "memo_ss",
+		Columns:    MemoSsColumns,
+		PrimaryKey: []*schema.Column{MemoSsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "memo_ss_user_ss_prepares",
+				Columns:    []*schema.Column{MemoSsColumns[4]},
+				RefColumns: []*schema.Column{UserSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// SessionSsColumns holds the columns for the "session_ss" table.
 	SessionSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -110,11 +132,12 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "username", Type: field.TypeString, Size: 255},
 		{Name: "email", Type: field.TypeString, Size: 255},
-		{Name: "hashed_password", Type: field.TypeString, Size: 2147483647},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPERUSER", "ADMIN", "USER"}},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime},
+		{Name: "is_deleted", Type: field.TypeBool, Default: false},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "access_token", Type: field.TypeString, Size: 2147483647, Default: ""},
 	}
 	// UserSsTable holds the schema information for the "user_ss" table.
 	UserSsTable = &schema.Table{
@@ -178,6 +201,7 @@ var (
 		CallSsTable,
 		FriendSsTable,
 		MatchingSsTable,
+		MemoSsTable,
 		SessionSsTable,
 		UserSsTable,
 		UsersConnectsTable,
@@ -188,6 +212,7 @@ var (
 func init() {
 	CallSsTable.ForeignKeys[0].RefTable = MatchingSsTable
 	MatchingSsTable.ForeignKeys[0].RefTable = SessionSsTable
+	MemoSsTable.ForeignKeys[0].RefTable = UserSsTable
 	SessionSsTable.ForeignKeys[0].RefTable = AithemeSsTable
 	UsersConnectsTable.ForeignKeys[0].RefTable = UserSsTable
 	UsersConnectsTable.ForeignKeys[1].RefTable = FriendSsTable

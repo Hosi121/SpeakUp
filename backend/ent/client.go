@@ -19,6 +19,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent/calls"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
@@ -36,6 +37,8 @@ type Client struct {
 	FRIENDS *FRIENDSClient
 	// MATCHINGS is the client for interacting with the MATCHINGS builders.
 	MATCHINGS *MATCHINGSClient
+	// MEMOS is the client for interacting with the MEMOS builders.
+	MEMOS *MEMOSClient
 	// SESSIONS is the client for interacting with the SESSIONS builders.
 	SESSIONS *SESSIONSClient
 	// USERS is the client for interacting with the USERS builders.
@@ -55,6 +58,7 @@ func (c *Client) init() {
 	c.CALLS = NewCALLSClient(c.config)
 	c.FRIENDS = NewFRIENDSClient(c.config)
 	c.MATCHINGS = NewMATCHINGSClient(c.config)
+	c.MEMOS = NewMEMOSClient(c.config)
 	c.SESSIONS = NewSESSIONSClient(c.config)
 	c.USERS = NewUSERSClient(c.config)
 }
@@ -153,6 +157,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CALLS:     NewCALLSClient(cfg),
 		FRIENDS:   NewFRIENDSClient(cfg),
 		MATCHINGS: NewMATCHINGSClient(cfg),
+		MEMOS:     NewMEMOSClient(cfg),
 		SESSIONS:  NewSESSIONSClient(cfg),
 		USERS:     NewUSERSClient(cfg),
 	}, nil
@@ -178,6 +183,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CALLS:     NewCALLSClient(cfg),
 		FRIENDS:   NewFRIENDSClient(cfg),
 		MATCHINGS: NewMATCHINGSClient(cfg),
+		MEMOS:     NewMEMOSClient(cfg),
 		SESSIONS:  NewSESSIONSClient(cfg),
 		USERS:     NewUSERSClient(cfg),
 	}, nil
@@ -209,7 +215,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.SESSIONS, c.USERS,
+		c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS, c.SESSIONS, c.USERS,
 	} {
 		n.Use(hooks...)
 	}
@@ -219,7 +225,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.SESSIONS, c.USERS,
+		c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS, c.SESSIONS, c.USERS,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -236,6 +242,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.FRIENDS.mutate(ctx, m)
 	case *MATCHINGSMutation:
 		return c.MATCHINGS.mutate(ctx, m)
+	case *MEMOSMutation:
+		return c.MEMOS.mutate(ctx, m)
 	case *SESSIONSMutation:
 		return c.SESSIONS.mutate(ctx, m)
 	case *USERSMutation:
@@ -873,6 +881,155 @@ func (c *MATCHINGSClient) mutate(ctx context.Context, m *MATCHINGSMutation) (Val
 	}
 }
 
+// MEMOSClient is a client for the MEMOS schema.
+type MEMOSClient struct {
+	config
+}
+
+// NewMEMOSClient returns a client for the MEMOS from the given config.
+func NewMEMOSClient(c config) *MEMOSClient {
+	return &MEMOSClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `memos.Hooks(f(g(h())))`.
+func (c *MEMOSClient) Use(hooks ...Hook) {
+	c.hooks.MEMOS = append(c.hooks.MEMOS, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `memos.Intercept(f(g(h())))`.
+func (c *MEMOSClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MEMOS = append(c.inters.MEMOS, interceptors...)
+}
+
+// Create returns a builder for creating a MEMOS entity.
+func (c *MEMOSClient) Create() *MEMOSCreate {
+	mutation := newMEMOSMutation(c.config, OpCreate)
+	return &MEMOSCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MEMOS entities.
+func (c *MEMOSClient) CreateBulk(builders ...*MEMOSCreate) *MEMOSCreateBulk {
+	return &MEMOSCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MEMOSClient) MapCreateBulk(slice any, setFunc func(*MEMOSCreate, int)) *MEMOSCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MEMOSCreateBulk{err: fmt.Errorf("calling to MEMOSClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MEMOSCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MEMOSCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MEMOS.
+func (c *MEMOSClient) Update() *MEMOSUpdate {
+	mutation := newMEMOSMutation(c.config, OpUpdate)
+	return &MEMOSUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MEMOSClient) UpdateOne(m *MEMOS) *MEMOSUpdateOne {
+	mutation := newMEMOSMutation(c.config, OpUpdateOne, withMEMOS(m))
+	return &MEMOSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MEMOSClient) UpdateOneID(id int) *MEMOSUpdateOne {
+	mutation := newMEMOSMutation(c.config, OpUpdateOne, withMEMOSID(id))
+	return &MEMOSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MEMOS.
+func (c *MEMOSClient) Delete() *MEMOSDelete {
+	mutation := newMEMOSMutation(c.config, OpDelete)
+	return &MEMOSDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MEMOSClient) DeleteOne(m *MEMOS) *MEMOSDeleteOne {
+	return c.DeleteOneID(m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MEMOSClient) DeleteOneID(id int) *MEMOSDeleteOne {
+	builder := c.Delete().Where(memos.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MEMOSDeleteOne{builder}
+}
+
+// Query returns a query builder for MEMOS.
+func (c *MEMOSClient) Query() *MEMOSQuery {
+	return &MEMOSQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMEMOS},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MEMOS entity by its id.
+func (c *MEMOSClient) Get(ctx context.Context, id int) (*MEMOS, error) {
+	return c.Query().Where(memos.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MEMOSClient) GetX(ctx context.Context, id int) *MEMOS {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryPrepared queries the prepared edge of a MEMOS.
+func (c *MEMOSClient) QueryPrepared(m *MEMOS) *USERSQuery {
+	query := (&USERSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(memos.Table, memos.FieldID, id),
+			sqlgraph.To(users.Table, users.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, memos.PreparedTable, memos.PreparedColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MEMOSClient) Hooks() []Hook {
+	return c.hooks.MEMOS
+}
+
+// Interceptors returns the client interceptors.
+func (c *MEMOSClient) Interceptors() []Interceptor {
+	return c.inters.MEMOS
+}
+
+func (c *MEMOSClient) mutate(ctx context.Context, m *MEMOSMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MEMOSCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MEMOSUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MEMOSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MEMOSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MEMOS mutation op: %q", m.Op())
+	}
+}
+
 // SESSIONSClient is a client for the SESSIONS schema.
 type SESSIONSClient struct {
 	config
@@ -1178,6 +1335,22 @@ func (c *USERSClient) QueryParticipates(u *USERS) *MATCHINGSQuery {
 	return query
 }
 
+// QueryPrepares queries the prepares edge of a USERS.
+func (c *USERSClient) QueryPrepares(u *USERS) *MEMOSQuery {
+	query := (&MEMOSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(users.Table, users.FieldID, id),
+			sqlgraph.To(memos.Table, memos.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, users.PreparesTable, users.PreparesColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *USERSClient) Hooks() []Hook {
 	return c.hooks.USERS
@@ -1206,9 +1379,9 @@ func (c *USERSClient) mutate(ctx context.Context, m *USERSMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AITHEMES, CALLS, FRIENDS, MATCHINGS, SESSIONS, USERS []ent.Hook
+		AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, USERS []ent.Hook
 	}
 	inters struct {
-		AITHEMES, CALLS, FRIENDS, MATCHINGS, SESSIONS, USERS []ent.Interceptor
+		AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, USERS []ent.Interceptor
 	}
 )
