@@ -28,8 +28,8 @@ func (MEMOS) Fields() []ent.Field {
 // Edges of the USERS.
 func (MEMOS) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("had", FRIENDS.Type).
-			Ref("has").
+		edge.From("prepared", USERS.Type).
+			Ref("prepares").
 			Unique(),
 	}
 }
