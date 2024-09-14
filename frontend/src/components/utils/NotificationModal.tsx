@@ -32,7 +32,7 @@ const NotificationModal = () => {
       </IconButton>
 
       {/* Dialog (Modal) */}
-      <Dialog open={open} onClose={handleClose} fullWidth PaperProps={{ sx: { padding: "10px", boxSizing: "border-box", maxHeight: "60vh" } }}>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs" PaperProps={{ sx: { padding: "10px", boxSizing: "border-box", maxHeight: "60vh" } }}>
         <DialogTitle>
           {/* Header with Notification Icon and Settings */}
           <Box
