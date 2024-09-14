@@ -269,7 +269,6 @@ export function connect(remoteVideoRef: RefObject<HTMLVideoElement>) {
     } else {
       console.error("Local stream is not available");
     }
-    // 明示的にOfferを作成して送信
     createAndSendOffer();
   } else {
     console.warn("Peer connection already exists");
@@ -339,6 +338,13 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
     peerConnection.close();
   }
   peerConnection = prepareNewConnection(false, remoteVideoRef);
+
+  if (localStream) {
+    localStream.getTracks().forEach((track) => {
+      peerConnection!.addTrack(track, localStream);
+    });
+  }
+
   try {
     await peerConnection.setRemoteDescription(sessionDescription);
     console.log("Remote description set successfully");
