@@ -1,5 +1,5 @@
 import { RefObject } from "react";
-import { remoteVideoRef, textForSendSdpRef, textToReceiveSdpRef } from "./App";
+import { textForSendSdpRef, textToReceiveSdpRef } from "./App";
 
 let localStream: MediaStream;
 let peerConnection: RTCPeerConnection | null;
@@ -113,17 +113,12 @@ export async function startVideo(localVideo: RefObject<HTMLVideoElement>) {
   }
 }
 
-export async function startLocalStream(
-  localVideo: RefObject<HTMLVideoElement>
-) {
+export async function startLocalAudioStream() {
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
       audio: true,
     });
-    if (localVideo.current) {
-      playVideo(localVideo.current, localStream);
-    }
+    console.log("Local audio stream started");
   } catch (err) {
     console.error("mediaDevice.getUserMedia() error:", err);
     throw err;
@@ -146,7 +141,7 @@ export async function playVideo(
 // WebRTCを利用する準備をする
 function prepareNewConnection(
   isOffer: boolean,
-  remoteVideoRef: RefObject<HTMLVideoElement>
+  remoteAudioRef: RefObject<HTMLAudioElement>
 ) {
   const pc_config = {
     iceServers: [
@@ -159,20 +154,14 @@ function prepareNewConnection(
   // リモートのMediaStreamTrackを受信した時
   peer.ontrack = (evt) => {
     console.log("-- peer.ontrack()", evt.track.kind);
-    if (evt.track.kind === "video") {
-      const remoteVideo = remoteVideoRef.current;
-      if (remoteVideo) {
-        if (remoteVideo.srcObject !== evt.streams[0]) {
-          remoteVideo.srcObject = evt.streams[0];
-          console.log("Received remote video stream");
+    if (evt.track.kind === "audio") {
+      const remoteAudio = remoteAudioRef.current;
+      if (remoteAudio) {
+        if (remoteAudio.srcObject !== evt.streams[0]) {
+          remoteAudio.srcObject = evt.streams[0];
+          console.log("Received remote audio stream");
         }
       }
-    } else if (evt.track.kind === "audio") {
-      // オーディオトラックの処理
-      const remoteAudio = new Audio();
-      remoteAudio.srcObject = evt.streams[0];
-      remoteAudio.play();
-      console.log("Remote audio playback started");
     }
   };
 
@@ -258,10 +247,10 @@ function sendSdp(sessionDescription: RTCSessionDescription | null) {
 }
 
 // Connectボタンが押されたらWebRTCのOffer処理を開始
-export function connect(remoteVideoRef: RefObject<HTMLVideoElement>) {
+export function connect(remoteAudioRef: RefObject<HTMLAudioElement>) {
   if (!peerConnection) {
     console.log("Creating new peer connection");
-    peerConnection = prepareNewConnection(true, remoteVideoRef);
+    peerConnection = prepareNewConnection(true, remoteAudioRef);
     if (localStream) {
       localStream.getTracks().forEach((track) => {
         peerConnection!.addTrack(track, localStream);
@@ -337,7 +326,7 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
     console.warn("PeerConnection already exists, closing existing connection");
     peerConnection.close();
   }
-  peerConnection = prepareNewConnection(false, remoteVideoRef);
+  peerConnection = prepareNewConnection(false, remoteAudioRef);
 
   if (localStream) {
     localStream.getTracks().forEach((track) => {
@@ -381,8 +370,10 @@ export function hangUp(
       const message = JSON.stringify({ type: "close" });
       console.log("sending close message");
       ws.send(message);
-      const remoteVideo = remoteVideoRef.current;
-      cleanupVideoElement(remoteVideo);
+
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
 
       if (textForSendSdp) {
         textForSendSdp.value = "";
@@ -394,12 +385,4 @@ export function hangUp(
     }
   }
   console.log("peerConnection is closed.");
-}
-
-// ビデオエレメントを初期化する
-function cleanupVideoElement(element: HTMLVideoElement | null) {
-  if (element) {
-    element.pause();
-    element.srcObject = null;
-  }
 }
