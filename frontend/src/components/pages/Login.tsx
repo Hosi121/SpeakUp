@@ -3,24 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, IconButton, InputAdornment } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { signIn } from '../../services/authService';  // authServiceのログイン関数をインポート
+import { signIn } from '../../services/authService';
 import Logo from "../../assets/logo.tsx";        
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   // Function to handle navigation to the sign-up page
   const handleNavigateToSignup = () => {
     navigate("/signup");
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
-
-  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  };
 
   // ログイン処理
   const handleLogin = async () => {
@@ -42,7 +40,7 @@ const Login = () => {
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        backgroundColor: "#FFDD66", // Matches the yellow background color
+        backgroundColor: "#FFDD66",
         padding: "16px",
         borderRadius: "16px",
       }}
@@ -67,23 +65,24 @@ const Login = () => {
       </Typography>
 
       {/* Email Field */}
-      <TextField label="Email" type="email" fullWidth variant="outlined" margin="normal" />
+      <TextField 
+        label="Email" 
+        type="email" 
+        fullWidth 
+        variant="outlined" 
+        margin="normal"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      {/* Error message */}
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
 
-      <TextField
-        label="Email"
-        type="email"
-        fullWidth
-        variant="outlined"
-        margin="normal"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
+      {/* Password Field */}
       <TextField
         label="パスワード"
         type={showPassword ? "text" : "password"}
@@ -95,7 +94,9 @@ const Login = () => {
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={handleClickShowPassword}>{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton>
+              <IconButton onClick={handleClickShowPassword}>
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
             </InputAdornment>
           ),
         }}
@@ -116,6 +117,7 @@ const Login = () => {
       >
         サインイン
       </Button>
+
       {/* Forgot Password and Sign Up */}
       <Box
         sx={{
