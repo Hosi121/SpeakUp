@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, Link } from '@mui/material';
 import { signUp } from '../../services/authService';  // authServiceのサインアップ関数をインポート
+import Logo from "../../assets/logo.tsx";
 
 const SignUp = () => {
   const [username, setUsername] = useState('');
@@ -10,6 +11,8 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const handleNavigateToLogin = () => {
+    navigate("/login");
   const handleSignUp = async () => {
     if (password.length < 8) {
       setError('パスワードは8文字以上である必要があります。');
@@ -41,30 +44,22 @@ const SignUp = () => {
     >
       <Box
         sx={{
-          backgroundColor: 'white',
-          width: 100,
-          height: 100,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          backgroundColor: "white",
+          width: 150,
+          height: 150,
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           mb: 4,
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#FF007F' }}>
-          SPEAK UP!
-        </Typography>
+        <Logo style={{ width: "80%" }} />
       </Box>
 
       <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
         サインアップ
       </Typography>
-
-      {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {error}
-        </Typography>
-      )}
 
       <TextField
         label="ユーザー名(セッション時の表示名)"
@@ -100,18 +95,17 @@ const SignUp = () => {
         variant="contained"
         fullWidth
         sx={{
-          backgroundColor: '#FF007F',
-          color: 'white',
+          backgroundColor: "#FF007F",
+          color: "white",
           marginY: 2,
-          '&:hover': {
-            backgroundColor: '#FF3399',
+          "&:hover": {
+            backgroundColor: "#FF3399",
           },
         }}
         onClick={handleSignUp}
       >
         メールを送信して仮登録
       </Button>
-
       <Link
         component="button"
         variant="body2"
