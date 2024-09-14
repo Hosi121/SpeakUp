@@ -7,14 +7,16 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import { IconButton } from "../utils/IconButton";
 import TopSection from "../utils/TopSection";
 import { MainBottomNavigation } from "../utils/MainBottomNavigation";
+import { LibraryBooks } from "@mui/icons-material";
 
 export const Record = () => {
   return (
     <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
-      <Container sx={{ p: 3 }}>
+      <Container sx={{ pt: 3 }}>
         <TopSection />
         <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
-          <Typography align="left" sx={{ marginBottom: "30px", fontSize: "2rem", color: "primary.main" }}>
+          <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
+            <LibraryBooks sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
             記録
           </Typography>
           <Box sx={{ display: "flex", placeContent: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
