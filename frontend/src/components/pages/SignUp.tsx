@@ -10,9 +10,6 @@ const SignUp = () => {
   const [password, setPassword] = useState('');  // パスワードの状態
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  const handleNavigateToLogin = () => {
-    navigate("/login");
   const handleSignUp = async () => {
     if (password.length < 8) {
       setError('パスワードは8文字以上である必要があります。');
@@ -23,8 +20,8 @@ const SignUp = () => {
       const data = await signUp(username, email, password);  // authServiceの関数を使用
       console.log('サインアップ成功:', data);
       navigate('/login');  // サインアップ後、ログインページにリダイレクト
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (error) {
+      setError((error as Error).message);
     }
   };
 

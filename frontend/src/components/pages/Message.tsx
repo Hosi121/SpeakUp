@@ -6,8 +6,8 @@ import { MainBottomNavigation } from "../utils/MainBottomNavigation";
 import TopSection from "../utils/TopSection";  // Import TopSection component
 
 const Message = () => {
-  const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [messages, setMessages] = useState<string[]>([]);
+  const [inputMessage, setInputMessage] = useState<string>('');
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Function to handle sending the message
