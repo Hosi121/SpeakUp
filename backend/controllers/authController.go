@@ -1,9 +1,15 @@
 package controllers
 
 import (
+	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
+	"github.com/Hosi121/SpeakUp/config"
+	"github.com/Hosi121/SpeakUp/ent"
+	"github.com/Hosi121/SpeakUp/ent/users"
 	supabaseAPI "github.com/Hosi121/SpeakUp/supaseAPI"
 	"github.com/gin-gonic/gin"
 	"github.com/supabase-community/auth-go/types"
@@ -13,6 +19,7 @@ import (
 func SignUp(c *gin.Context) {
 	// リクエストボディからemailとpasswordを取得
 	var request struct {
+		UserName string `json:"username"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -42,6 +49,29 @@ func SignUp(c *gin.Context) {
 	// 成功レスポンス
 	slog.Info("User signed up successfully", slog.String("email", request.Email))
 	c.JSON(http.StatusOK, gin.H{"message": "User signed up successfully", "user": resp})
+
+	// DBの用意
+	dsn := config.GetDSN()
+	db_client, err := ent.Open("mysql", dsn)
+	if err != nil {
+		slog.Error("Failed to open connection to database: %v", err)
+	}
+	defer db_client.Close()
+
+	ctx := context.Background()
+	// DBのUSERテーブルに登録
+	user, err := db_client.USERS.
+		Create().
+		SetUserID(1).
+		SetUsername(request.UserName).
+		SetEmail(request.Email).
+		SetAvatarURL("https://example.com/avatar.png").
+		SetRole("USER").
+		Save(ctx)
+	if err != nil {
+		slog.Error("Failed creating user: %v", err)
+	}
+	slog.Info("Created user: %v", user)
 }
 
 // SignIn ハンドラ関数
@@ -78,4 +108,51 @@ func SignIn(c *gin.Context) {
 	// 成功レスポンス
 	slog.Info("User signed in successfully", slog.String("email", request.Email))
 	c.JSON(http.StatusOK, gin.H{"message": "User signed in successfully", "accessToken": resp.AccessToken})
+
+	// DBの用意
+	dsn := config.GetDSN()
+	db_client, err := ent.Open("mysql", dsn)
+	if err != nil {
+		slog.Error("Failed to open connection to database: %v", err)
+		return
+	}
+	defer db_client.Close()
+
+	ctx := context.Background()
+	// emailが一致するユーザを取得
+	user, err := db_client.USERS.
+		Query().
+		Where(
+			users.EmailEQ(request.Email), // Emailが一致する行を検索
+		).
+		Order(ent.Desc(users.FieldCreatedAt)). // created_atで結果を降順ソート
+		First(ctx)                             // 最初の1件を取得
+	if err != nil {
+		slog.Error("Not found this email: %v", err)
+		// fmt.Println("Not found this email: %v", err)
+		return
+	}
+
+	// アクセストークンを登録
+	err = db_client.USERS.
+		UpdateOneID(user.UserID).
+		SetAccessToken(resp.AccessToken).
+		Exec(ctx)
+	if err != nil {
+		slog.Error("Failed to update access token: %v", err)
+		// fmt.Println("Failed to update access token: %v", err)
+		return
+	}
+
+	// updated_atを更新
+	err = db_client.USERS.
+		UpdateOneID(user.UserID).
+		SetUpdatedAt(time.Now()).
+		Exec(ctx)
+	if err != nil {
+		slog.Error("Failed to update created_at: %v", err)
+		// fmt.Println("Failed to update created_at: %v", err)
+		return
+	}
+	fmt.Println("success")
 }
