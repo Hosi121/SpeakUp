@@ -1,6 +1,6 @@
 import { Box, Button, Container, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import Memo from './Memo';  // Memoコンポーネントをインポート
+import Memo from './Memo';
 
 const Waiting = () => {
   return (
@@ -13,7 +13,6 @@ const Waiting = () => {
         <Typography variant="subtitle1" gutterBottom component="div">
           持ち込みメモ
         </Typography>
-        {/* TextareaAutosizeをMemoコンポーネントに置き換える */}
         <Memo />
       </Box>
 
