@@ -15,18 +15,17 @@ const Stats = () => {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", p: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", p: 3, boxSizing: "border-box" }}>
         {/* Top Section */}
         <TopSection />
 
         {/* Participation Data */}
         <Box sx={{ mt: 3, mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <EmojiEventsIcon sx={{ fontSize: 40, color: "#1E00A1" }} />
-            <Typography variant="h6" sx={{ ml: 1 }}>
-              参加データ
-            </Typography>
-          </Box>
+          <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
+            <EmojiEventsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
+            参加データ
+          </Typography>
+
           <Paper sx={{ m: "0 auto", p: 4, width: "90%", backgroundColor: "secondary.main", borderRadius: "16px" }}>
             <Box sx={{ display: "flex", justifyContent: "space-around", alignItems: "center" }}>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
