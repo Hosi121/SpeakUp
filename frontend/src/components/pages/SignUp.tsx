@@ -1,43 +1,28 @@
-import { Box, Button, Container, TextField, Typography, Link } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';  // api インスタンスをインポート
+import { Box, Button, Container, TextField, Typography, Link } from '@mui/material';
+import { signUp } from '../../services/authService';  // authServiceのサインアップ関数をインポート
 
 const SignUp = () => {
-  const navigate = useNavigate();
-
-  // フォームの状態を管理
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');  // パスワードの状態
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  // サインアップのPOSTリクエスト
   const handleSignUp = async () => {
-    // パスワードが8文字以上か確認
     if (password.length < 8) {
       setError('パスワードは8文字以上である必要があります。');
       return;
     }
 
     try {
-      const response = await api.post('/signup', {
-        username,  // ユーザー名
-        email,     // メールアドレス
-        password,  // パスワード
-      });
-
-      // 成功した場合、リダイレクトまたはメッセージ表示
-      console.log('サインアップ成功:', response.data);
-      navigate('/login'); // サインアップ後、ログインページにリダイレクト
+      const data = await signUp(username, email, password);  // authServiceの関数を使用
+      console.log('サインアップ成功:', data);
+      navigate('/login');  // サインアップ後、ログインページにリダイレクト
     } catch (err) {
-      console.error('サインアップエラー:', err);
-      setError('サインアップに失敗しました。もう一度お試しください。');
+      setError(err.message);
     }
-  };
-
-  const handleNavigateToLogin = () => {
-    navigate('/login');
   };
 
   return (
@@ -54,7 +39,6 @@ const SignUp = () => {
         borderRadius: '16px',
       }}
     >
-      {/* Logo */}
       <Box
         sx={{
           backgroundColor: 'white',
@@ -72,19 +56,16 @@ const SignUp = () => {
         </Typography>
       </Box>
 
-      {/* Sign Up Title */}
       <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
         サインアップ
       </Typography>
 
-      {/* Error Message */}
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
 
-      {/* Username Field */}
       <TextField
         label="ユーザー名(セッション時の表示名)"
         type="text"
@@ -92,10 +73,9 @@ const SignUp = () => {
         variant="outlined"
         margin="normal"
         value={username}
-        onChange={(e) => setUsername(e.target.value)} // ユーザー名の状態を更新
+        onChange={(e) => setUsername(e.target.value)}
       />
 
-      {/* Email Field */}
       <TextField
         label="Email"
         type="email"
@@ -103,10 +83,9 @@ const SignUp = () => {
         variant="outlined"
         margin="normal"
         value={email}
-        onChange={(e) => setEmail(e.target.value)} // メールアドレスの状態を更新
+        onChange={(e) => setEmail(e.target.value)}
       />
 
-      {/* Password Field */}
       <TextField
         label="パスワード"
         type="password"
@@ -114,10 +93,9 @@ const SignUp = () => {
         variant="outlined"
         margin="normal"
         value={password}
-        onChange={(e) => setPassword(e.target.value)} // パスワードの状態を更新
+        onChange={(e) => setPassword(e.target.value)}
       />
 
-      {/* Submit Button */}
       <Button
         variant="contained"
         fullWidth
@@ -129,17 +107,16 @@ const SignUp = () => {
             backgroundColor: '#FF3399',
           },
         }}
-        onClick={handleSignUp}  // ボタンクリックでサインアップリクエスト
+        onClick={handleSignUp}
       >
         メールを送信して仮登録
       </Button>
 
-      {/* Navigate to Login */}
       <Link
         component="button"
         variant="body2"
         sx={{ mt: 2, cursor: 'pointer', textDecoration: 'underline' }}
-        onClick={handleNavigateToLogin}
+        onClick={() => navigate('/login')}
       >
         ログインページに戻る
       </Link>
