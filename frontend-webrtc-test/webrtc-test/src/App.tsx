@@ -1,12 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import { connect, hangUp, onSdpText, startLocalStream } from "./webrtc";
+import {
+  connect,
+  hangUp,
+  onSdpText,
+  startLocalStream,
+  toggleMute,
+} from "./webrtc";
 import styles from "./App.module.css";
 
 export let textForSendSdpRef: React.RefObject<HTMLTextAreaElement>;
 export let textToReceiveSdpRef: React.RefObject<HTMLTextAreaElement>;
 
 function App() {
+  const [isMuted, setIsMuted] = useState(false);
   const [mediaDeviceStatus, setMediaDeviceStatus] = useState<
     "checking" | "available" | "unavailable" | "error"
   >("checking");
@@ -29,8 +36,6 @@ function App() {
         });
         console.log("Audio devices accessed successfully", stream);
         setMediaDeviceStatus("available");
-        // ストリームを停止 (必要に応じて)
-        // stream.getTracks().forEach(track => track.stop());
       } catch (error) {
         console.error("Error accessing audio devices:", error);
         setMediaDeviceStatus("error");
@@ -68,6 +73,12 @@ function App() {
     }
   };
 
+  const handleToggleMute = () => {
+    const newState = !isMuted;
+    setIsMuted(newState);
+    toggleMute(newState);
+  };
+
   return (
     <div>
       <h1>WebRTC Audio-only Test</h1>
@@ -78,6 +89,9 @@ function App() {
       {mediaDeviceStatus === "error" && <p>Error accessing audio devices</p>}
       {mediaDeviceStatus === "available" && (
         <>
+          <button type="button" onClick={() => handleToggleMute}>
+            {isMuted ? "Unmute" : "Mute"}
+          </button>
           <button type="button" onClick={handleStartAudio}>
             Start Audio
           </button>

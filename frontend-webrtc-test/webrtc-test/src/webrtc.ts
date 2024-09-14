@@ -1,7 +1,7 @@
 import { RefObject } from "react";
 import { textForSendSdpRef, textToReceiveSdpRef } from "./App";
 
-let localStream: MediaStream;
+let localStream: MediaStream | null = null;
 let peerConnection: RTCPeerConnection | null;
 let negotiationneededCounter = 0;
 const iceCandidateQueue: RTCIceCandidate[] = [];
@@ -114,6 +114,18 @@ export async function startLocalStream(
   }
 }
 
+export function toggleMute(isMuted: boolean) {
+  if (localStream) {
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      isMuted = !isMuted;
+      audioTrack.enabled = !isMuted;
+      console.log(isMuted ? "Muted" : "Unmuted");
+    }
+  }
+  return isMuted;
+}
+
 function prepareNewConnection(isOffer: boolean) {
   const pc_config = {
     iceServers: [
@@ -224,11 +236,12 @@ export function connect() {
     peerConnection = prepareNewConnection(true);
     if (localStream) {
       localStream.getTracks().forEach((track) => {
-        peerConnection!.addTrack(track, localStream);
+        if (peerConnection && localStream) {
+          peerConnection.addTrack(track, localStream);
+        }
       });
     } else {
-      console.error("Local stream is not available");
-      return;
+      console.log("No local stream available, connecting without audio");
     }
     createAndSendOffer();
   } else {
@@ -322,11 +335,12 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
 
   if (localStream) {
     localStream.getTracks().forEach((track) => {
-      peerConnection!.addTrack(track, localStream);
+      if (peerConnection && localStream) {
+        peerConnection.addTrack(track, localStream);
+      }
     });
   } else {
-    console.error("Local stream is not available for answer");
-    return;
+    console.log("No local stream available, connecting without audio");
   }
 
   await setRemoteDescription(sessionDescription);
