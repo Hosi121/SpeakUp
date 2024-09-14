@@ -21,8 +21,8 @@ export const IconButton = ({ icon, text, url }: IconButtonProps) => {
         flexDirection: "column",
         gap: "10px",
         borderRadius: "10px",
-        backgroundColor: "#f2d66f",
-        color: "#da0063",
+        backgroundColor: "secondary.main",
+        color: "primary.main",
         fontSize: "1rem",
       }}
       onClick={() => navigate("/" + url)}
