@@ -2,16 +2,25 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
 )
 
-type TROPHY struct {
+type TROPHIES struct {
 	ent.Schema
 }
 
-func (TROPHY) Fields() []ent.Field {
-	return []ent.Field{}
+func (TROPHIES) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("title"),
+		field.String("contents"),
+		field.String("requirement"),
+	}
 }
 
-func (TROPHY) Edges() []ent.Edge {
-	return []ent.Edge{}
+func (TROPHIES) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("refered", ACHIEVEMENTS.Type).
+			Ref("refers"),
+	}
 }
