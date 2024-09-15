@@ -62,7 +62,6 @@ func SignUp(c *gin.Context) {
 	// DBのUSERテーブルに登録
 	user, err := db_client.USERS.
 		Create().
-		SetUserID(1).
 		SetUsername(request.UserName).
 		SetEmail(request.Email).
 		SetAvatarURL("https://example.com/avatar.png").
@@ -135,7 +134,7 @@ func SignIn(c *gin.Context) {
 
 	// アクセストークンを登録
 	err = db_client.USERS.
-		UpdateOneID(user.UserID).
+		UpdateOneID(user.ID).
 		SetAccessToken(resp.AccessToken).
 		Exec(ctx)
 	if err != nil {
@@ -146,7 +145,7 @@ func SignIn(c *gin.Context) {
 
 	// updated_atを更新
 	err = db_client.USERS.
-		UpdateOneID(user.UserID).
+		UpdateOneID(user.ID).
 		SetUpdatedAt(time.Now()).
 		Exec(ctx)
 	if err != nil {

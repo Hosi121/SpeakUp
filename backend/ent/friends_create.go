@@ -21,12 +21,6 @@ type FRIENDSCreate struct {
 	hooks    []Hook
 }
 
-// SetFriendID sets the "friend_id" field.
-func (fc *FRIENDSCreate) SetFriendID(i int) *FRIENDSCreate {
-	fc.mutation.SetFriendID(i)
-	return fc
-}
-
 // SetUserID sets the "user_id" field.
 func (fc *FRIENDSCreate) SetUserID(i int) *FRIENDSCreate {
 	fc.mutation.SetUserID(i)
@@ -117,9 +111,6 @@ func (fc *FRIENDSCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (fc *FRIENDSCreate) check() error {
-	if _, ok := fc.mutation.FriendID(); !ok {
-		return &ValidationError{Name: "friend_id", err: errors.New(`ent: missing required field "FRIENDS.friend_id"`)}
-	}
 	if _, ok := fc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "FRIENDS.user_id"`)}
 	}
@@ -163,10 +154,6 @@ func (fc *FRIENDSCreate) createSpec() (*FRIENDS, *sqlgraph.CreateSpec) {
 		_node = &FRIENDS{config: fc.config}
 		_spec = sqlgraph.NewCreateSpec(friends.Table, sqlgraph.NewFieldSpec(friends.FieldID, field.TypeInt))
 	)
-	if value, ok := fc.mutation.FriendID(); ok {
-		_spec.SetField(friends.FieldFriendID, field.TypeInt, value)
-		_node.FriendID = value
-	}
 	if value, ok := fc.mutation.UserID(); ok {
 		_spec.SetField(friends.FieldUserID, field.TypeInt, value)
 		_node.UserID = value

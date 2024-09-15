@@ -21,12 +21,6 @@ type CALLSCreate struct {
 	hooks    []Hook
 }
 
-// SetCallID sets the "call_id" field.
-func (cc *CALLSCreate) SetCallID(i int) *CALLSCreate {
-	cc.mutation.SetCallID(i)
-	return cc
-}
-
 // SetSessionID sets the "session_id" field.
 func (cc *CALLSCreate) SetSessionID(i int) *CALLSCreate {
 	cc.mutation.SetSessionID(i)
@@ -151,9 +145,6 @@ func (cc *CALLSCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CALLSCreate) check() error {
-	if _, ok := cc.mutation.CallID(); !ok {
-		return &ValidationError{Name: "call_id", err: errors.New(`ent: missing required field "CALLS.call_id"`)}
-	}
 	if _, ok := cc.mutation.SessionID(); !ok {
 		return &ValidationError{Name: "session_id", err: errors.New(`ent: missing required field "CALLS.session_id"`)}
 	}
@@ -195,10 +186,6 @@ func (cc *CALLSCreate) createSpec() (*CALLS, *sqlgraph.CreateSpec) {
 		_node = &CALLS{config: cc.config}
 		_spec = sqlgraph.NewCreateSpec(calls.Table, sqlgraph.NewFieldSpec(calls.FieldID, field.TypeInt))
 	)
-	if value, ok := cc.mutation.CallID(); ok {
-		_spec.SetField(calls.FieldCallID, field.TypeInt, value)
-		_node.CallID = value
-	}
 	if value, ok := cc.mutation.SessionID(); ok {
 		_spec.SetField(calls.FieldSessionID, field.TypeInt, value)
 		_node.SessionID = value

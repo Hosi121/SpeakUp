@@ -28,27 +28,6 @@ func (mu *MEMOSUpdate) Where(ps ...predicate.MEMOS) *MEMOSUpdate {
 	return mu
 }
 
-// SetMemoID sets the "memo_id" field.
-func (mu *MEMOSUpdate) SetMemoID(i int) *MEMOSUpdate {
-	mu.mutation.ResetMemoID()
-	mu.mutation.SetMemoID(i)
-	return mu
-}
-
-// SetNillableMemoID sets the "memo_id" field if the given value is not nil.
-func (mu *MEMOSUpdate) SetNillableMemoID(i *int) *MEMOSUpdate {
-	if i != nil {
-		mu.SetMemoID(*i)
-	}
-	return mu
-}
-
-// AddMemoID adds i to the "memo_id" field.
-func (mu *MEMOSUpdate) AddMemoID(i int) *MEMOSUpdate {
-	mu.mutation.AddMemoID(i)
-	return mu
-}
-
 // SetUserID sets the "user_id" field.
 func (mu *MEMOSUpdate) SetUserID(i int) *MEMOSUpdate {
 	mu.mutation.ResetUserID()
@@ -182,12 +161,6 @@ func (mu *MEMOSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := mu.mutation.MemoID(); ok {
-		_spec.SetField(memos.FieldMemoID, field.TypeInt, value)
-	}
-	if value, ok := mu.mutation.AddedMemoID(); ok {
-		_spec.AddField(memos.FieldMemoID, field.TypeInt, value)
-	}
 	if value, ok := mu.mutation.UserID(); ok {
 		_spec.SetField(memos.FieldUserID, field.TypeInt, value)
 	}
@@ -247,27 +220,6 @@ type MEMOSUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *MEMOSMutation
-}
-
-// SetMemoID sets the "memo_id" field.
-func (muo *MEMOSUpdateOne) SetMemoID(i int) *MEMOSUpdateOne {
-	muo.mutation.ResetMemoID()
-	muo.mutation.SetMemoID(i)
-	return muo
-}
-
-// SetNillableMemoID sets the "memo_id" field if the given value is not nil.
-func (muo *MEMOSUpdateOne) SetNillableMemoID(i *int) *MEMOSUpdateOne {
-	if i != nil {
-		muo.SetMemoID(*i)
-	}
-	return muo
-}
-
-// AddMemoID adds i to the "memo_id" field.
-func (muo *MEMOSUpdateOne) AddMemoID(i int) *MEMOSUpdateOne {
-	muo.mutation.AddMemoID(i)
-	return muo
 }
 
 // SetUserID sets the "user_id" field.
@@ -432,12 +384,6 @@ func (muo *MEMOSUpdateOne) sqlSave(ctx context.Context) (_node *MEMOS, err error
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := muo.mutation.MemoID(); ok {
-		_spec.SetField(memos.FieldMemoID, field.TypeInt, value)
-	}
-	if value, ok := muo.mutation.AddedMemoID(); ok {
-		_spec.AddField(memos.FieldMemoID, field.TypeInt, value)
 	}
 	if value, ok := muo.mutation.UserID(); ok {
 		_spec.SetField(memos.FieldUserID, field.TypeInt, value)

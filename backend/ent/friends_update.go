@@ -29,27 +29,6 @@ func (fu *FRIENDSUpdate) Where(ps ...predicate.FRIENDS) *FRIENDSUpdate {
 	return fu
 }
 
-// SetFriendID sets the "friend_id" field.
-func (fu *FRIENDSUpdate) SetFriendID(i int) *FRIENDSUpdate {
-	fu.mutation.ResetFriendID()
-	fu.mutation.SetFriendID(i)
-	return fu
-}
-
-// SetNillableFriendID sets the "friend_id" field if the given value is not nil.
-func (fu *FRIENDSUpdate) SetNillableFriendID(i *int) *FRIENDSUpdate {
-	if i != nil {
-		fu.SetFriendID(*i)
-	}
-	return fu
-}
-
-// AddFriendID adds i to the "friend_id" field.
-func (fu *FRIENDSUpdate) AddFriendID(i int) *FRIENDSUpdate {
-	fu.mutation.AddFriendID(i)
-	return fu
-}
-
 // SetUserID sets the "user_id" field.
 func (fu *FRIENDSUpdate) SetUserID(i int) *FRIENDSUpdate {
 	fu.mutation.ResetUserID()
@@ -210,12 +189,6 @@ func (fu *FRIENDSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := fu.mutation.FriendID(); ok {
-		_spec.SetField(friends.FieldFriendID, field.TypeInt, value)
-	}
-	if value, ok := fu.mutation.AddedFriendID(); ok {
-		_spec.AddField(friends.FieldFriendID, field.TypeInt, value)
-	}
 	if value, ok := fu.mutation.UserID(); ok {
 		_spec.SetField(friends.FieldUserID, field.TypeInt, value)
 	}
@@ -297,27 +270,6 @@ type FRIENDSUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *FRIENDSMutation
-}
-
-// SetFriendID sets the "friend_id" field.
-func (fuo *FRIENDSUpdateOne) SetFriendID(i int) *FRIENDSUpdateOne {
-	fuo.mutation.ResetFriendID()
-	fuo.mutation.SetFriendID(i)
-	return fuo
-}
-
-// SetNillableFriendID sets the "friend_id" field if the given value is not nil.
-func (fuo *FRIENDSUpdateOne) SetNillableFriendID(i *int) *FRIENDSUpdateOne {
-	if i != nil {
-		fuo.SetFriendID(*i)
-	}
-	return fuo
-}
-
-// AddFriendID adds i to the "friend_id" field.
-func (fuo *FRIENDSUpdateOne) AddFriendID(i int) *FRIENDSUpdateOne {
-	fuo.mutation.AddFriendID(i)
-	return fuo
 }
 
 // SetUserID sets the "user_id" field.
@@ -509,12 +461,6 @@ func (fuo *FRIENDSUpdateOne) sqlSave(ctx context.Context) (_node *FRIENDS, err e
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := fuo.mutation.FriendID(); ok {
-		_spec.SetField(friends.FieldFriendID, field.TypeInt, value)
-	}
-	if value, ok := fuo.mutation.AddedFriendID(); ok {
-		_spec.AddField(friends.FieldFriendID, field.TypeInt, value)
 	}
 	if value, ok := fuo.mutation.UserID(); ok {
 		_spec.SetField(friends.FieldUserID, field.TypeInt, value)

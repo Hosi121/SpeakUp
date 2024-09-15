@@ -336,12 +336,12 @@ func (sq *SESSIONSQuery) WithUses(opts ...func(*AITHEMESQuery)) *SESSIONSQuery {
 // Example:
 //
 //	var v []struct {
-//		SessionID int `json:"session_id,omitempty"`
+//		SessionStart time.Time `json:"session_start,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.SESSIONS.Query().
-//		GroupBy(sessions.FieldSessionID).
+//		GroupBy(sessions.FieldSessionStart).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (sq *SESSIONSQuery) GroupBy(field string, fields ...string) *SESSIONSGroupBy {
@@ -359,11 +359,11 @@ func (sq *SESSIONSQuery) GroupBy(field string, fields ...string) *SESSIONSGroupB
 // Example:
 //
 //	var v []struct {
-//		SessionID int `json:"session_id,omitempty"`
+//		SessionStart time.Time `json:"session_start,omitempty"`
 //	}
 //
 //	client.SESSIONS.Query().
-//		Select(sessions.FieldSessionID).
+//		Select(sessions.FieldSessionStart).
 //		Scan(ctx, &v)
 func (sq *SESSIONSQuery) Select(fields ...string) *SESSIONSSelect {
 	sq.ctx.Fields = append(sq.ctx.Fields, fields...)

@@ -20,12 +20,6 @@ type MEMOSCreate struct {
 	hooks    []Hook
 }
 
-// SetMemoID sets the "memo_id" field.
-func (mc *MEMOSCreate) SetMemoID(i int) *MEMOSCreate {
-	mc.mutation.SetMemoID(i)
-	return mc
-}
-
 // SetUserID sets the "user_id" field.
 func (mc *MEMOSCreate) SetUserID(i int) *MEMOSCreate {
 	mc.mutation.SetUserID(i)
@@ -126,9 +120,6 @@ func (mc *MEMOSCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *MEMOSCreate) check() error {
-	if _, ok := mc.mutation.MemoID(); !ok {
-		return &ValidationError{Name: "memo_id", err: errors.New(`ent: missing required field "MEMOS.memo_id"`)}
-	}
 	if _, ok := mc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "MEMOS.user_id"`)}
 	}
@@ -174,10 +165,6 @@ func (mc *MEMOSCreate) createSpec() (*MEMOS, *sqlgraph.CreateSpec) {
 		_node = &MEMOS{config: mc.config}
 		_spec = sqlgraph.NewCreateSpec(memos.Table, sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt))
 	)
-	if value, ok := mc.mutation.MemoID(); ok {
-		_spec.SetField(memos.FieldMemoID, field.TypeInt, value)
-		_node.MemoID = value
-	}
 	if value, ok := mc.mutation.UserID(); ok {
 		_spec.SetField(memos.FieldUserID, field.TypeInt, value)
 		_node.UserID = value

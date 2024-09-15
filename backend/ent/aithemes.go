@@ -17,8 +17,6 @@ type AITHEMES struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// ThemeID holds the value of the "theme_id" field.
-	ThemeID int `json:"theme_id,omitempty"`
 	// ThemeText holds the value of the "theme_text" field.
 	ThemeText string `json:"theme_text,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -52,7 +50,7 @@ func (*AITHEMES) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case aithemes.FieldID, aithemes.FieldThemeID:
+		case aithemes.FieldID:
 			values[i] = new(sql.NullInt64)
 		case aithemes.FieldThemeText:
 			values[i] = new(sql.NullString)
@@ -79,12 +77,6 @@ func (a *AITHEMES) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int(value.Int64)
-		case aithemes.FieldThemeID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field theme_id", values[i])
-			} else if value.Valid {
-				a.ThemeID = int(value.Int64)
-			}
 		case aithemes.FieldThemeText:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field theme_text", values[i])
@@ -138,9 +130,6 @@ func (a *AITHEMES) String() string {
 	var builder strings.Builder
 	builder.WriteString("AITHEMES(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
-	builder.WriteString("theme_id=")
-	builder.WriteString(fmt.Sprintf("%v", a.ThemeID))
-	builder.WriteString(", ")
 	builder.WriteString("theme_text=")
 	builder.WriteString(a.ThemeText)
 	builder.WriteString(", ")

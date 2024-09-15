@@ -17,8 +17,6 @@ type MEMOS struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// MemoID holds the value of the "memo_id" field.
-	MemoID int `json:"memo_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
 	// Memo1 holds the value of the "memo1" field.
@@ -57,7 +55,7 @@ func (*MEMOS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case memos.FieldID, memos.FieldMemoID, memos.FieldUserID:
+		case memos.FieldID, memos.FieldUserID:
 			values[i] = new(sql.NullInt64)
 		case memos.FieldMemo1, memos.FieldMemo2:
 			values[i] = new(sql.NullString)
@@ -84,12 +82,6 @@ func (m *MEMOS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			m.ID = int(value.Int64)
-		case memos.FieldMemoID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field memo_id", values[i])
-			} else if value.Valid {
-				m.MemoID = int(value.Int64)
-			}
 		case memos.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
@@ -156,9 +148,6 @@ func (m *MEMOS) String() string {
 	var builder strings.Builder
 	builder.WriteString("MEMOS(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
-	builder.WriteString("memo_id=")
-	builder.WriteString(fmt.Sprintf("%v", m.MemoID))
-	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", m.UserID))
 	builder.WriteString(", ")

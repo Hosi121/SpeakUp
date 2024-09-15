@@ -371,12 +371,12 @@ func (uq *USERSQuery) WithPrepares(opts ...func(*MEMOSQuery)) *USERSQuery {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		Username string `json:"username,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.USERS.Query().
-//		GroupBy(users.FieldUserID).
+//		GroupBy(users.FieldUsername).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (uq *USERSQuery) GroupBy(field string, fields ...string) *USERSGroupBy {
@@ -394,11 +394,11 @@ func (uq *USERSQuery) GroupBy(field string, fields ...string) *USERSGroupBy {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		Username string `json:"username,omitempty"`
 //	}
 //
 //	client.USERS.Query().
-//		Select(users.FieldUserID).
+//		Select(users.FieldUsername).
 //		Scan(ctx, &v)
 func (uq *USERSQuery) Select(fields ...string) *USERSSelect {
 	uq.ctx.Fields = append(uq.ctx.Fields, fields...)

@@ -18,8 +18,6 @@ type SESSIONS struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// SessionID holds the value of the "session_id" field.
-	SessionID int `json:"session_id,omitempty"`
 	// SessionStart holds the value of the "session_start" field.
 	SessionStart time.Time `json:"session_start,omitempty"`
 	// SessionEnd holds the value of the "session_end" field.
@@ -71,7 +69,7 @@ func (*SESSIONS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case sessions.FieldID, sessions.FieldSessionID, sessions.FieldThemeID:
+		case sessions.FieldID, sessions.FieldThemeID:
 			values[i] = new(sql.NullInt64)
 		case sessions.FieldSessionStart, sessions.FieldSessionEnd, sessions.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -98,12 +96,6 @@ func (s *SESSIONS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			s.ID = int(value.Int64)
-		case sessions.FieldSessionID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field session_id", values[i])
-			} else if value.Valid {
-				s.SessionID = int(value.Int64)
-			}
 		case sessions.FieldSessionStart:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field session_start", values[i])
@@ -181,9 +173,6 @@ func (s *SESSIONS) String() string {
 	var builder strings.Builder
 	builder.WriteString("SESSIONS(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
-	builder.WriteString("session_id=")
-	builder.WriteString(fmt.Sprintf("%v", s.SessionID))
-	builder.WriteString(", ")
 	builder.WriteString("session_start=")
 	builder.WriteString(s.SessionStart.Format(time.ANSIC))
 	builder.WriteString(", ")

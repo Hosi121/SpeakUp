@@ -16,8 +16,6 @@ type USERS struct {
 // Fields of the USERS.
 func (USERS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("user_id").
-			Unique(),
 		field.String("username").
 			NotEmpty().
 			MaxLen(255),
