@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
@@ -158,6 +159,21 @@ func (uc *USERSCreate) SetNillablePreparesID(id *int) *USERSCreate {
 // SetPrepares sets the "prepares" edge to the MEMOS entity.
 func (uc *USERSCreate) SetPrepares(m *MEMOS) *USERSCreate {
 	return uc.SetPreparesID(m.ID)
+}
+
+// AddAcquireIDs adds the "acquires" edge to the ACHIEVEMENTS entity by IDs.
+func (uc *USERSCreate) AddAcquireIDs(ids ...int) *USERSCreate {
+	uc.mutation.AddAcquireIDs(ids...)
+	return uc
+}
+
+// AddAcquires adds the "acquires" edges to the ACHIEVEMENTS entity.
+func (uc *USERSCreate) AddAcquires(a ...*ACHIEVEMENTS) *USERSCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return uc.AddAcquireIDs(ids...)
 }
 
 // Mutation returns the USERSMutation object of the builder.
@@ -350,6 +366,22 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.AcquiresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   users.AcquiresTable,
+			Columns: []string{users.AcquiresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

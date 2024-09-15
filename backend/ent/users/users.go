@@ -37,6 +37,8 @@ const (
 	EdgeParticipates = "participates"
 	// EdgePrepares holds the string denoting the prepares edge name in mutations.
 	EdgePrepares = "prepares"
+	// EdgeAcquires holds the string denoting the acquires edge name in mutations.
+	EdgeAcquires = "acquires"
 	// Table holds the table name of the users in the database.
 	Table = "user_ss"
 	// ConnectsTable is the table that holds the connects relation/edge. The primary key declared below.
@@ -56,6 +58,13 @@ const (
 	PreparesInverseTable = "memo_ss"
 	// PreparesColumn is the table column denoting the prepares relation/edge.
 	PreparesColumn = "users_prepares"
+	// AcquiresTable is the table that holds the acquires relation/edge.
+	AcquiresTable = "achievement_ss"
+	// AcquiresInverseTable is the table name for the ACHIEVEMENTS entity.
+	// It exists in this package in order to avoid circular dependency with the "achievements" package.
+	AcquiresInverseTable = "achievement_ss"
+	// AcquiresColumn is the table column denoting the acquires relation/edge.
+	AcquiresColumn = "users_acquires"
 )
 
 // Columns holds all SQL columns for users fields.
@@ -211,6 +220,20 @@ func ByPreparesField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newPreparesStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByAcquiresCount orders the results by acquires count.
+func ByAcquiresCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAcquiresStep(), opts...)
+	}
+}
+
+// ByAcquires orders the results by acquires terms.
+func ByAcquires(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAcquiresStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newConnectsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -230,5 +253,12 @@ func newPreparesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PreparesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, PreparesTable, PreparesColumn),
+	)
+}
+func newAcquiresStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AcquiresInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AcquiresTable, AcquiresColumn),
 	)
 }

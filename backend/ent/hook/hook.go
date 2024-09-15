@@ -9,6 +9,18 @@ import (
 	"github.com/Hosi121/SpeakUp/ent"
 )
 
+// The ACHIEVEMENTSFunc type is an adapter to allow the use of ordinary
+// function as ACHIEVEMENTS mutator.
+type ACHIEVEMENTSFunc func(context.Context, *ent.ACHIEVEMENTSMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ACHIEVEMENTSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ACHIEVEMENTSMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ACHIEVEMENTSMutation", m)
+}
+
 // The AITHEMESFunc type is an adapter to allow the use of ordinary
 // function as AITHEMES mutator.
 type AITHEMESFunc func(context.Context, *ent.AITHEMESMutation) (ent.Value, error)
@@ -79,6 +91,18 @@ func (f SESSIONSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SESSIONSMutation", m)
+}
+
+// The TROPHIESFunc type is an adapter to allow the use of ordinary
+// function as TROPHIES mutator.
+type TROPHIESFunc func(context.Context, *ent.TROPHIESMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TROPHIESFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TROPHIESMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TROPHIESMutation", m)
 }
 
 // The USERSFunc type is an adapter to allow the use of ordinary
