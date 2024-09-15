@@ -55,11 +55,6 @@ func IDLTE(id int) predicate.AITHEMES {
 	return predicate.AITHEMES(sql.FieldLTE(FieldID, id))
 }
 
-// ThemeID applies equality check predicate on the "theme_id" field. It's identical to ThemeIDEQ.
-func ThemeID(v int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldEQ(FieldThemeID, v))
-}
-
 // ThemeText applies equality check predicate on the "theme_text" field. It's identical to ThemeTextEQ.
 func ThemeText(v string) predicate.AITHEMES {
 	return predicate.AITHEMES(sql.FieldEQ(FieldThemeText, v))
@@ -68,46 +63,6 @@ func ThemeText(v string) predicate.AITHEMES {
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.AITHEMES {
 	return predicate.AITHEMES(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// ThemeIDEQ applies the EQ predicate on the "theme_id" field.
-func ThemeIDEQ(v int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldEQ(FieldThemeID, v))
-}
-
-// ThemeIDNEQ applies the NEQ predicate on the "theme_id" field.
-func ThemeIDNEQ(v int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldNEQ(FieldThemeID, v))
-}
-
-// ThemeIDIn applies the In predicate on the "theme_id" field.
-func ThemeIDIn(vs ...int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldIn(FieldThemeID, vs...))
-}
-
-// ThemeIDNotIn applies the NotIn predicate on the "theme_id" field.
-func ThemeIDNotIn(vs ...int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldNotIn(FieldThemeID, vs...))
-}
-
-// ThemeIDGT applies the GT predicate on the "theme_id" field.
-func ThemeIDGT(v int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldGT(FieldThemeID, v))
-}
-
-// ThemeIDGTE applies the GTE predicate on the "theme_id" field.
-func ThemeIDGTE(v int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldGTE(FieldThemeID, v))
-}
-
-// ThemeIDLT applies the LT predicate on the "theme_id" field.
-func ThemeIDLT(v int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldLT(FieldThemeID, v))
-}
-
-// ThemeIDLTE applies the LTE predicate on the "theme_id" field.
-func ThemeIDLTE(v int) predicate.AITHEMES {
-	return predicate.AITHEMES(sql.FieldLTE(FieldThemeID, v))
 }
 
 // ThemeTextEQ applies the EQ predicate on the "theme_text" field.

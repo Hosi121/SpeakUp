@@ -31,27 +31,6 @@ func (mu *MATCHINGSUpdate) Where(ps ...predicate.MATCHINGS) *MATCHINGSUpdate {
 	return mu
 }
 
-// SetMatchID sets the "match_id" field.
-func (mu *MATCHINGSUpdate) SetMatchID(i int) *MATCHINGSUpdate {
-	mu.mutation.ResetMatchID()
-	mu.mutation.SetMatchID(i)
-	return mu
-}
-
-// SetNillableMatchID sets the "match_id" field if the given value is not nil.
-func (mu *MATCHINGSUpdate) SetNillableMatchID(i *int) *MATCHINGSUpdate {
-	if i != nil {
-		mu.SetMatchID(*i)
-	}
-	return mu
-}
-
-// AddMatchID adds i to the "match_id" field.
-func (mu *MATCHINGSUpdate) AddMatchID(i int) *MATCHINGSUpdate {
-	mu.mutation.AddMatchID(i)
-	return mu
-}
-
 // SetUserID sets the "user_id" field.
 func (mu *MATCHINGSUpdate) SetUserID(i int) *MATCHINGSUpdate {
 	mu.mutation.ResetUserID()
@@ -283,12 +262,6 @@ func (mu *MATCHINGSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := mu.mutation.MatchID(); ok {
-		_spec.SetField(matchings.FieldMatchID, field.TypeInt, value)
-	}
-	if value, ok := mu.mutation.AddedMatchID(); ok {
-		_spec.AddField(matchings.FieldMatchID, field.TypeInt, value)
-	}
 	if value, ok := mu.mutation.UserID(); ok {
 		_spec.SetField(matchings.FieldUserID, field.TypeInt, value)
 	}
@@ -434,27 +407,6 @@ type MATCHINGSUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *MATCHINGSMutation
-}
-
-// SetMatchID sets the "match_id" field.
-func (muo *MATCHINGSUpdateOne) SetMatchID(i int) *MATCHINGSUpdateOne {
-	muo.mutation.ResetMatchID()
-	muo.mutation.SetMatchID(i)
-	return muo
-}
-
-// SetNillableMatchID sets the "match_id" field if the given value is not nil.
-func (muo *MATCHINGSUpdateOne) SetNillableMatchID(i *int) *MATCHINGSUpdateOne {
-	if i != nil {
-		muo.SetMatchID(*i)
-	}
-	return muo
-}
-
-// AddMatchID adds i to the "match_id" field.
-func (muo *MATCHINGSUpdateOne) AddMatchID(i int) *MATCHINGSUpdateOne {
-	muo.mutation.AddMatchID(i)
-	return muo
 }
 
 // SetUserID sets the "user_id" field.
@@ -717,12 +669,6 @@ func (muo *MATCHINGSUpdateOne) sqlSave(ctx context.Context) (_node *MATCHINGS, e
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := muo.mutation.MatchID(); ok {
-		_spec.SetField(matchings.FieldMatchID, field.TypeInt, value)
-	}
-	if value, ok := muo.mutation.AddedMatchID(); ok {
-		_spec.AddField(matchings.FieldMatchID, field.TypeInt, value)
 	}
 	if value, ok := muo.mutation.UserID(); ok {
 		_spec.SetField(matchings.FieldUserID, field.TypeInt, value)

@@ -53,11 +53,6 @@ func IDLTE(id int) predicate.MEMOS {
 	return predicate.MEMOS(sql.FieldLTE(FieldID, id))
 }
 
-// MemoID applies equality check predicate on the "memo_id" field. It's identical to MemoIDEQ.
-func MemoID(v int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldEQ(FieldMemoID, v))
-}
-
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int) predicate.MEMOS {
 	return predicate.MEMOS(sql.FieldEQ(FieldUserID, v))
@@ -71,46 +66,6 @@ func Memo1(v string) predicate.MEMOS {
 // Memo2 applies equality check predicate on the "memo2" field. It's identical to Memo2EQ.
 func Memo2(v string) predicate.MEMOS {
 	return predicate.MEMOS(sql.FieldEQ(FieldMemo2, v))
-}
-
-// MemoIDEQ applies the EQ predicate on the "memo_id" field.
-func MemoIDEQ(v int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldEQ(FieldMemoID, v))
-}
-
-// MemoIDNEQ applies the NEQ predicate on the "memo_id" field.
-func MemoIDNEQ(v int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldNEQ(FieldMemoID, v))
-}
-
-// MemoIDIn applies the In predicate on the "memo_id" field.
-func MemoIDIn(vs ...int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldIn(FieldMemoID, vs...))
-}
-
-// MemoIDNotIn applies the NotIn predicate on the "memo_id" field.
-func MemoIDNotIn(vs ...int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldNotIn(FieldMemoID, vs...))
-}
-
-// MemoIDGT applies the GT predicate on the "memo_id" field.
-func MemoIDGT(v int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldGT(FieldMemoID, v))
-}
-
-// MemoIDGTE applies the GTE predicate on the "memo_id" field.
-func MemoIDGTE(v int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldGTE(FieldMemoID, v))
-}
-
-// MemoIDLT applies the LT predicate on the "memo_id" field.
-func MemoIDLT(v int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldLT(FieldMemoID, v))
-}
-
-// MemoIDLTE applies the LTE predicate on the "memo_id" field.
-func MemoIDLTE(v int) predicate.MEMOS {
-	return predicate.MEMOS(sql.FieldLTE(FieldMemoID, v))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.

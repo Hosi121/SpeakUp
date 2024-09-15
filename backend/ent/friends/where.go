@@ -55,11 +55,6 @@ func IDLTE(id int) predicate.FRIENDS {
 	return predicate.FRIENDS(sql.FieldLTE(FieldID, id))
 }
 
-// FriendID applies equality check predicate on the "friend_id" field. It's identical to FriendIDEQ.
-func FriendID(v int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldEQ(FieldFriendID, v))
-}
-
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int) predicate.FRIENDS {
 	return predicate.FRIENDS(sql.FieldEQ(FieldUserID, v))
@@ -73,46 +68,6 @@ func TargetUserID(v int) predicate.FRIENDS {
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.FRIENDS {
 	return predicate.FRIENDS(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// FriendIDEQ applies the EQ predicate on the "friend_id" field.
-func FriendIDEQ(v int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldEQ(FieldFriendID, v))
-}
-
-// FriendIDNEQ applies the NEQ predicate on the "friend_id" field.
-func FriendIDNEQ(v int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldNEQ(FieldFriendID, v))
-}
-
-// FriendIDIn applies the In predicate on the "friend_id" field.
-func FriendIDIn(vs ...int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldIn(FieldFriendID, vs...))
-}
-
-// FriendIDNotIn applies the NotIn predicate on the "friend_id" field.
-func FriendIDNotIn(vs ...int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldNotIn(FieldFriendID, vs...))
-}
-
-// FriendIDGT applies the GT predicate on the "friend_id" field.
-func FriendIDGT(v int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldGT(FieldFriendID, v))
-}
-
-// FriendIDGTE applies the GTE predicate on the "friend_id" field.
-func FriendIDGTE(v int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldGTE(FieldFriendID, v))
-}
-
-// FriendIDLT applies the LT predicate on the "friend_id" field.
-func FriendIDLT(v int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldLT(FieldFriendID, v))
-}
-
-// FriendIDLTE applies the LTE predicate on the "friend_id" field.
-func FriendIDLTE(v int) predicate.FRIENDS {
-	return predicate.FRIENDS(sql.FieldLTE(FieldFriendID, v))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.

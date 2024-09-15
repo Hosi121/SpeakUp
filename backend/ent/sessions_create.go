@@ -22,12 +22,6 @@ type SESSIONSCreate struct {
 	hooks    []Hook
 }
 
-// SetSessionID sets the "session_id" field.
-func (sc *SESSIONSCreate) SetSessionID(i int) *SESSIONSCreate {
-	sc.mutation.SetSessionID(i)
-	return sc
-}
-
 // SetSessionStart sets the "session_start" field.
 func (sc *SESSIONSCreate) SetSessionStart(t time.Time) *SESSIONSCreate {
 	sc.mutation.SetSessionStart(t)
@@ -137,9 +131,6 @@ func (sc *SESSIONSCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *SESSIONSCreate) check() error {
-	if _, ok := sc.mutation.SessionID(); !ok {
-		return &ValidationError{Name: "session_id", err: errors.New(`ent: missing required field "SESSIONS.session_id"`)}
-	}
 	if _, ok := sc.mutation.SessionStart(); !ok {
 		return &ValidationError{Name: "session_start", err: errors.New(`ent: missing required field "SESSIONS.session_start"`)}
 	}
@@ -178,10 +169,6 @@ func (sc *SESSIONSCreate) createSpec() (*SESSIONS, *sqlgraph.CreateSpec) {
 		_node = &SESSIONS{config: sc.config}
 		_spec = sqlgraph.NewCreateSpec(sessions.Table, sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt))
 	)
-	if value, ok := sc.mutation.SessionID(); ok {
-		_spec.SetField(sessions.FieldSessionID, field.TypeInt, value)
-		_node.SessionID = value
-	}
 	if value, ok := sc.mutation.SessionStart(); ok {
 		_spec.SetField(sessions.FieldSessionStart, field.TypeTime, value)
 		_node.SessionStart = value

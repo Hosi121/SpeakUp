@@ -19,8 +19,6 @@ type MATCHINGS struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// MatchID holds the value of the "match_id" field.
-	MatchID int `json:"match_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
 	// MatchedUserID holds the value of the "matched_user_id" field.
@@ -87,7 +85,7 @@ func (*MATCHINGS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case matchings.FieldID, matchings.FieldMatchID, matchings.FieldUserID, matchings.FieldMatchedUserID, matchings.FieldSessionID:
+		case matchings.FieldID, matchings.FieldUserID, matchings.FieldMatchedUserID, matchings.FieldSessionID:
 			values[i] = new(sql.NullInt64)
 		case matchings.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -116,12 +114,6 @@ func (m *MATCHINGS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			m.ID = int(value.Int64)
-		case matchings.FieldMatchID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field match_id", values[i])
-			} else if value.Valid {
-				m.MatchID = int(value.Int64)
-			}
 		case matchings.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
@@ -210,9 +202,6 @@ func (m *MATCHINGS) String() string {
 	var builder strings.Builder
 	builder.WriteString("MATCHINGS(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
-	builder.WriteString("match_id=")
-	builder.WriteString(fmt.Sprintf("%v", m.MatchID))
-	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", m.UserID))
 	builder.WriteString(", ")

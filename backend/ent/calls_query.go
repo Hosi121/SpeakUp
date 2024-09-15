@@ -299,12 +299,12 @@ func (cq *CALLSQuery) WithMade(opts ...func(*MATCHINGSQuery)) *CALLSQuery {
 // Example:
 //
 //	var v []struct {
-//		CallID int `json:"call_id,omitempty"`
+//		SessionID int `json:"session_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CALLS.Query().
-//		GroupBy(calls.FieldCallID).
+//		GroupBy(calls.FieldSessionID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CALLSQuery) GroupBy(field string, fields ...string) *CALLSGroupBy {
@@ -322,11 +322,11 @@ func (cq *CALLSQuery) GroupBy(field string, fields ...string) *CALLSGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CallID int `json:"call_id,omitempty"`
+//		SessionID int `json:"session_id,omitempty"`
 //	}
 //
 //	client.CALLS.Query().
-//		Select(calls.FieldCallID).
+//		Select(calls.FieldSessionID).
 //		Scan(ctx, &v)
 func (cq *CALLSQuery) Select(fields ...string) *CALLSSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)

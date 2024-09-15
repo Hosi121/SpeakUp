@@ -372,12 +372,12 @@ func (mq *MATCHINGSQuery) WithMakes(opts ...func(*CALLSQuery)) *MATCHINGSQuery {
 // Example:
 //
 //	var v []struct {
-//		MatchID int `json:"match_id,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MATCHINGS.Query().
-//		GroupBy(matchings.FieldMatchID).
+//		GroupBy(matchings.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (mq *MATCHINGSQuery) GroupBy(field string, fields ...string) *MATCHINGSGroupBy {
@@ -395,11 +395,11 @@ func (mq *MATCHINGSQuery) GroupBy(field string, fields ...string) *MATCHINGSGrou
 // Example:
 //
 //	var v []struct {
-//		MatchID int `json:"match_id,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //	}
 //
 //	client.MATCHINGS.Query().
-//		Select(matchings.FieldMatchID).
+//		Select(matchings.FieldUserID).
 //		Scan(ctx, &v)
 func (mq *MATCHINGSQuery) Select(fields ...string) *MATCHINGSSelect {
 	mq.ctx.Fields = append(mq.ctx.Fields, fields...)

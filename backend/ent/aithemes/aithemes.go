@@ -14,8 +14,6 @@ const (
 	Label = "aithemes"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldThemeID holds the string denoting the theme_id field in the database.
-	FieldThemeID = "theme_id"
 	// FieldThemeText holds the string denoting the theme_text field in the database.
 	FieldThemeText = "theme_text"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -36,7 +34,6 @@ const (
 // Columns holds all SQL columns for aithemes fields.
 var Columns = []string{
 	FieldID,
-	FieldThemeID,
 	FieldThemeText,
 	FieldCreatedAt,
 }
@@ -62,11 +59,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByThemeID orders the results by the theme_id field.
-func ByThemeID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThemeID, opts...).ToFunc()
 }
 
 // ByThemeText orders the results by the theme_text field.

@@ -29,27 +29,6 @@ func (cu *CALLSUpdate) Where(ps ...predicate.CALLS) *CALLSUpdate {
 	return cu
 }
 
-// SetCallID sets the "call_id" field.
-func (cu *CALLSUpdate) SetCallID(i int) *CALLSUpdate {
-	cu.mutation.ResetCallID()
-	cu.mutation.SetCallID(i)
-	return cu
-}
-
-// SetNillableCallID sets the "call_id" field if the given value is not nil.
-func (cu *CALLSUpdate) SetNillableCallID(i *int) *CALLSUpdate {
-	if i != nil {
-		cu.SetCallID(*i)
-	}
-	return cu
-}
-
-// AddCallID adds i to the "call_id" field.
-func (cu *CALLSUpdate) AddCallID(i int) *CALLSUpdate {
-	cu.mutation.AddCallID(i)
-	return cu
-}
-
 // SetSessionID sets the "session_id" field.
 func (cu *CALLSUpdate) SetSessionID(i int) *CALLSUpdate {
 	cu.mutation.ResetSessionID()
@@ -200,12 +179,6 @@ func (cu *CALLSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.CallID(); ok {
-		_spec.SetField(calls.FieldCallID, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.AddedCallID(); ok {
-		_spec.AddField(calls.FieldCallID, field.TypeInt, value)
-	}
 	if value, ok := cu.mutation.SessionID(); ok {
 		_spec.SetField(calls.FieldSessionID, field.TypeInt, value)
 	}
@@ -274,27 +247,6 @@ type CALLSUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *CALLSMutation
-}
-
-// SetCallID sets the "call_id" field.
-func (cuo *CALLSUpdateOne) SetCallID(i int) *CALLSUpdateOne {
-	cuo.mutation.ResetCallID()
-	cuo.mutation.SetCallID(i)
-	return cuo
-}
-
-// SetNillableCallID sets the "call_id" field if the given value is not nil.
-func (cuo *CALLSUpdateOne) SetNillableCallID(i *int) *CALLSUpdateOne {
-	if i != nil {
-		cuo.SetCallID(*i)
-	}
-	return cuo
-}
-
-// AddCallID adds i to the "call_id" field.
-func (cuo *CALLSUpdateOne) AddCallID(i int) *CALLSUpdateOne {
-	cuo.mutation.AddCallID(i)
-	return cuo
 }
 
 // SetSessionID sets the "session_id" field.
@@ -476,12 +428,6 @@ func (cuo *CALLSUpdateOne) sqlSave(ctx context.Context) (_node *CALLS, err error
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := cuo.mutation.CallID(); ok {
-		_spec.SetField(calls.FieldCallID, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.AddedCallID(); ok {
-		_spec.AddField(calls.FieldCallID, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.SessionID(); ok {
 		_spec.SetField(calls.FieldSessionID, field.TypeInt, value)

@@ -29,27 +29,6 @@ func (au *AITHEMESUpdate) Where(ps ...predicate.AITHEMES) *AITHEMESUpdate {
 	return au
 }
 
-// SetThemeID sets the "theme_id" field.
-func (au *AITHEMESUpdate) SetThemeID(i int) *AITHEMESUpdate {
-	au.mutation.ResetThemeID()
-	au.mutation.SetThemeID(i)
-	return au
-}
-
-// SetNillableThemeID sets the "theme_id" field if the given value is not nil.
-func (au *AITHEMESUpdate) SetNillableThemeID(i *int) *AITHEMESUpdate {
-	if i != nil {
-		au.SetThemeID(*i)
-	}
-	return au
-}
-
-// AddThemeID adds i to the "theme_id" field.
-func (au *AITHEMESUpdate) AddThemeID(i int) *AITHEMESUpdate {
-	au.mutation.AddThemeID(i)
-	return au
-}
-
 // SetThemeText sets the "theme_text" field.
 func (au *AITHEMESUpdate) SetThemeText(s string) *AITHEMESUpdate {
 	au.mutation.SetThemeText(s)
@@ -155,12 +134,6 @@ func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := au.mutation.ThemeID(); ok {
-		_spec.SetField(aithemes.FieldThemeID, field.TypeInt, value)
-	}
-	if value, ok := au.mutation.AddedThemeID(); ok {
-		_spec.AddField(aithemes.FieldThemeID, field.TypeInt, value)
-	}
 	if value, ok := au.mutation.ThemeText(); ok {
 		_spec.SetField(aithemes.FieldThemeText, field.TypeString, value)
 	}
@@ -230,27 +203,6 @@ type AITHEMESUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *AITHEMESMutation
-}
-
-// SetThemeID sets the "theme_id" field.
-func (auo *AITHEMESUpdateOne) SetThemeID(i int) *AITHEMESUpdateOne {
-	auo.mutation.ResetThemeID()
-	auo.mutation.SetThemeID(i)
-	return auo
-}
-
-// SetNillableThemeID sets the "theme_id" field if the given value is not nil.
-func (auo *AITHEMESUpdateOne) SetNillableThemeID(i *int) *AITHEMESUpdateOne {
-	if i != nil {
-		auo.SetThemeID(*i)
-	}
-	return auo
-}
-
-// AddThemeID adds i to the "theme_id" field.
-func (auo *AITHEMESUpdateOne) AddThemeID(i int) *AITHEMESUpdateOne {
-	auo.mutation.AddThemeID(i)
-	return auo
 }
 
 // SetThemeText sets the "theme_text" field.
@@ -387,12 +339,6 @@ func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AITHEMES, err
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := auo.mutation.ThemeID(); ok {
-		_spec.SetField(aithemes.FieldThemeID, field.TypeInt, value)
-	}
-	if value, ok := auo.mutation.AddedThemeID(); ok {
-		_spec.AddField(aithemes.FieldThemeID, field.TypeInt, value)
 	}
 	if value, ok := auo.mutation.ThemeText(); ok {
 		_spec.SetField(aithemes.FieldThemeText, field.TypeString, value)

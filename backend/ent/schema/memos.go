@@ -14,8 +14,6 @@ type MEMOS struct {
 // Fields of the USERS.
 func (MEMOS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("memo_id").
-			Unique(),
 		field.Int("user_id").
 			Unique(),
 		field.String("memo1").

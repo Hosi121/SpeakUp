@@ -11,7 +11,6 @@ var (
 	// AithemeSsColumns holds the columns for the "aitheme_ss" table.
 	AithemeSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "theme_id", Type: field.TypeInt, Unique: true},
 		{Name: "theme_text", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 	}
@@ -24,7 +23,6 @@ var (
 	// CallSsColumns holds the columns for the "call_ss" table.
 	CallSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "call_id", Type: field.TypeInt, Unique: true},
 		{Name: "session_id", Type: field.TypeInt},
 		{Name: "call_start", Type: field.TypeTime},
 		{Name: "call_end", Type: field.TypeTime},
@@ -40,7 +38,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "call_ss_matching_ss_makes",
-				Columns:    []*schema.Column{CallSsColumns[7]},
+				Columns:    []*schema.Column{CallSsColumns[6]},
 				RefColumns: []*schema.Column{MatchingSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -49,7 +47,6 @@ var (
 	// FriendSsColumns holds the columns for the "friend_ss" table.
 	FriendSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "friend_id", Type: field.TypeInt, Unique: true},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "target_user_id", Type: field.TypeInt},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"PENDING", "FRIEND", "BLOCKED"}},
@@ -64,7 +61,6 @@ var (
 	// MatchingSsColumns holds the columns for the "matching_ss" table.
 	MatchingSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "match_id", Type: field.TypeInt, Unique: true},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "matched_user_id", Type: field.TypeInt},
 		{Name: "session_id", Type: field.TypeInt},
@@ -80,7 +76,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "matching_ss_session_ss_has",
-				Columns:    []*schema.Column{MatchingSsColumns[7]},
+				Columns:    []*schema.Column{MatchingSsColumns[6]},
 				RefColumns: []*schema.Column{SessionSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -89,7 +85,6 @@ var (
 	// MemoSsColumns holds the columns for the "memo_ss" table.
 	MemoSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "memo_id", Type: field.TypeInt, Unique: true},
 		{Name: "user_id", Type: field.TypeInt, Unique: true},
 		{Name: "memo1", Type: field.TypeString, Size: 255, Default: ""},
 		{Name: "memo2", Type: field.TypeString, Size: 255, Default: ""},
@@ -103,7 +98,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "memo_ss_user_ss_prepares",
-				Columns:    []*schema.Column{MemoSsColumns[5]},
+				Columns:    []*schema.Column{MemoSsColumns[4]},
 				RefColumns: []*schema.Column{UserSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -112,7 +107,6 @@ var (
 	// SessionSsColumns holds the columns for the "session_ss" table.
 	SessionSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "session_id", Type: field.TypeInt, Unique: true},
 		{Name: "session_start", Type: field.TypeTime},
 		{Name: "session_end", Type: field.TypeTime},
 		{Name: "theme_id", Type: field.TypeInt},
@@ -127,7 +121,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "session_ss_aitheme_ss_uses",
-				Columns:    []*schema.Column{SessionSsColumns[6]},
+				Columns:    []*schema.Column{SessionSsColumns[5]},
 				RefColumns: []*schema.Column{AithemeSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -136,7 +130,6 @@ var (
 	// UserSsColumns holds the columns for the "user_ss" table.
 	UserSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "user_id", Type: field.TypeInt, Unique: true},
 		{Name: "username", Type: field.TypeString, Size: 255},
 		{Name: "email", Type: field.TypeString, Size: 255},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true, Size: 2147483647},

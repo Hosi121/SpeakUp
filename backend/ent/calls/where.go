@@ -55,11 +55,6 @@ func IDLTE(id int) predicate.CALLS {
 	return predicate.CALLS(sql.FieldLTE(FieldID, id))
 }
 
-// CallID applies equality check predicate on the "call_id" field. It's identical to CallIDEQ.
-func CallID(v int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldEQ(FieldCallID, v))
-}
-
 // SessionID applies equality check predicate on the "session_id" field. It's identical to SessionIDEQ.
 func SessionID(v int) predicate.CALLS {
 	return predicate.CALLS(sql.FieldEQ(FieldSessionID, v))
@@ -83,46 +78,6 @@ func Rating(v int) predicate.CALLS {
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.CALLS {
 	return predicate.CALLS(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// CallIDEQ applies the EQ predicate on the "call_id" field.
-func CallIDEQ(v int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldEQ(FieldCallID, v))
-}
-
-// CallIDNEQ applies the NEQ predicate on the "call_id" field.
-func CallIDNEQ(v int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldNEQ(FieldCallID, v))
-}
-
-// CallIDIn applies the In predicate on the "call_id" field.
-func CallIDIn(vs ...int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldIn(FieldCallID, vs...))
-}
-
-// CallIDNotIn applies the NotIn predicate on the "call_id" field.
-func CallIDNotIn(vs ...int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldNotIn(FieldCallID, vs...))
-}
-
-// CallIDGT applies the GT predicate on the "call_id" field.
-func CallIDGT(v int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldGT(FieldCallID, v))
-}
-
-// CallIDGTE applies the GTE predicate on the "call_id" field.
-func CallIDGTE(v int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldGTE(FieldCallID, v))
-}
-
-// CallIDLT applies the LT predicate on the "call_id" field.
-func CallIDLT(v int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldLT(FieldCallID, v))
-}
-
-// CallIDLTE applies the LTE predicate on the "call_id" field.
-func CallIDLTE(v int) predicate.CALLS {
-	return predicate.CALLS(sql.FieldLTE(FieldCallID, v))
 }
 
 // SessionIDEQ applies the EQ predicate on the "session_id" field.

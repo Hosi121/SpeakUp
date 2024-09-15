@@ -23,12 +23,6 @@ type USERSCreate struct {
 	hooks    []Hook
 }
 
-// SetUserID sets the "user_id" field.
-func (uc *USERSCreate) SetUserID(i int) *USERSCreate {
-	uc.mutation.SetUserID(i)
-	return uc
-}
-
 // SetUsername sets the "username" field.
 func (uc *USERSCreate) SetUsername(s string) *USERSCreate {
 	uc.mutation.SetUsername(s)
@@ -221,9 +215,6 @@ func (uc *USERSCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *USERSCreate) check() error {
-	if _, ok := uc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "USERS.user_id"`)}
-	}
 	if _, ok := uc.mutation.Username(); !ok {
 		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "USERS.username"`)}
 	}
@@ -286,10 +277,6 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 		_node = &USERS{config: uc.config}
 		_spec = sqlgraph.NewCreateSpec(users.Table, sqlgraph.NewFieldSpec(users.FieldID, field.TypeInt))
 	)
-	if value, ok := uc.mutation.UserID(); ok {
-		_spec.SetField(users.FieldUserID, field.TypeInt, value)
-		_node.UserID = value
-	}
 	if value, ok := uc.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 		_node.Username = value

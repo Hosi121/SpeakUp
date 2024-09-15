@@ -15,8 +15,6 @@ const (
 	Label = "matchings"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldMatchID holds the string denoting the match_id field in the database.
-	FieldMatchID = "match_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
 	// FieldMatchedUserID holds the string denoting the matched_user_id field in the database.
@@ -59,7 +57,6 @@ const (
 // Columns holds all SQL columns for matchings fields.
 var Columns = []string{
 	FieldID,
-	FieldMatchID,
 	FieldUserID,
 	FieldMatchedUserID,
 	FieldSessionID,
@@ -129,11 +126,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByMatchID orders the results by the match_id field.
-func ByMatchID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMatchID, opts...).ToFunc()
 }
 
 // ByUserID orders the results by the user_id field.
