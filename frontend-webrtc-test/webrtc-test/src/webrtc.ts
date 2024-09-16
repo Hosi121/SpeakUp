@@ -73,7 +73,7 @@ ws.onmessage = async (evt) => {
   }
 };
 
-function addIceCandidate(candidate: RTCIceCandidate) {
+const addIceCandidate = (candidate: RTCIceCandidate) => {
   if (
     peerConnection &&
     peerConnection.remoteDescription &&
@@ -89,18 +89,18 @@ function addIceCandidate(candidate: RTCIceCandidate) {
     iceCandidateQueue.push(candidate);
     console.log("ICE candidate added to queue");
   }
-}
+};
 
-function sendIceCandidate(candidate: RTCIceCandidate) {
+const sendIceCandidate = (candidate: RTCIceCandidate) => {
   console.log("---sending ICE candidate ---");
   const message = JSON.stringify({ type: "candidate", ice: candidate });
   console.log("sending candidate=" + message);
   ws.send(message);
-}
+};
 
-export async function startLocalStream(
+export const startLocalStream = async (
   localAudio: RefObject<HTMLAudioElement>
-) {
+) => {
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -112,9 +112,9 @@ export async function startLocalStream(
     console.error("mediaDevice.getUserMedia() error:", err);
     throw err;
   }
-}
+};
 
-export function setLocalStreamMute(isMuted: boolean) {
+export const setLocalStreamMute = (isMuted: boolean) => {
   if (localStream) {
     const audioTrack = localStream.getAudioTracks()[0];
     if (audioTrack) {
@@ -123,9 +123,9 @@ export function setLocalStreamMute(isMuted: boolean) {
     }
   }
   return isMuted;
-}
+};
 
-function prepareNewConnection(isOffer: boolean) {
+const prepareNewConnection = (isOffer: boolean) => {
   const pc_config = {
     iceServers: [
       { urls: "stun:stun.webrtc.ecl.ntt.com:3478" },
@@ -170,14 +170,14 @@ function prepareNewConnection(isOffer: boolean) {
     }
   };
 
-  function retryConnection() {
+  const retryConnection = () => {
     if (peerConnection) {
       peerConnection.restartIce();
       if (peerConnection.iceConnectionState === "failed") {
         createAndSendOffer();
       }
     }
-  }
+  };
 
   peer.onnegotiationneeded = async () => {
     try {
@@ -207,18 +207,18 @@ function prepareNewConnection(isOffer: boolean) {
   }
 
   return peer;
-}
+};
 
-function setupDataChannel(dataChannel: RTCDataChannel) {
+const setupDataChannel = (dataChannel: RTCDataChannel) => {
   dataChannel.onopen = () => {
     console.log("Data channel is open");
   };
   dataChannel.onmessage = (event) => {
     console.log("Received message:", event.data);
   };
-}
+};
 
-function sendSdp(sessionDescription: RTCSessionDescription | null) {
+const sendSdp = (sessionDescription: RTCSessionDescription | null) => {
   console.log("---sending sdp ---");
   const textForSendSdp = textForSendSdpRef.current;
   if (textForSendSdp && sessionDescription) {
@@ -227,9 +227,9 @@ function sendSdp(sessionDescription: RTCSessionDescription | null) {
   const message = JSON.stringify(sessionDescription);
   console.log("sending SDP=" + message);
   ws.send(message);
-}
+};
 
-export function connect() {
+export const connect = () => {
   if (!peerConnection) {
     console.log("Creating new peer connection");
     peerConnection = prepareNewConnection(true);
@@ -246,9 +246,9 @@ export function connect() {
   } else {
     console.warn("Peer connection already exists");
   }
-}
+};
 
-async function createAndSendOffer() {
+const createAndSendOffer = async () => {
   if (!peerConnection) {
     console.error("PeerConnection does not exist!");
     return;
@@ -261,9 +261,9 @@ async function createAndSendOffer() {
   } catch (err) {
     console.error("Error creating offer:", err);
   }
-}
+};
 
-async function makeAnswer() {
+const makeAnswer = async () => {
   if (!peerConnection) {
     console.error("PeerConnection does not exist!");
     return;
@@ -276,9 +276,9 @@ async function makeAnswer() {
   } catch (err) {
     console.error("Error creating answer:", err);
   }
-}
+};
 
-export function onSdpText(textToReceiveSdp: HTMLTextAreaElement | null) {
+export const onSdpText = (textToReceiveSdp: HTMLTextAreaElement | null) => {
   if (textToReceiveSdp === null) {
     console.error("textToReceiveSdp NOT exist!");
     return;
@@ -300,9 +300,11 @@ export function onSdpText(textToReceiveSdp: HTMLTextAreaElement | null) {
     setOffer(offer);
   }
   textToReceiveSdp.value = "";
-}
+};
 
-async function setRemoteDescription(sessionDescription: RTCSessionDescription) {
+const setRemoteDescription = async (
+  sessionDescription: RTCSessionDescription
+) => {
   if (!peerConnection) {
     console.error("PeerConnection does not exist!");
     return;
@@ -323,9 +325,9 @@ async function setRemoteDescription(sessionDescription: RTCSessionDescription) {
   } catch (err) {
     console.error("Error setting remote description:", err);
   }
-}
+};
 
-async function setOffer(sessionDescription: RTCSessionDescription) {
+const setOffer = async (sessionDescription: RTCSessionDescription) => {
   if (peerConnection) {
     console.warn("PeerConnection already exists, closing existing connection");
     peerConnection.close();
@@ -343,20 +345,20 @@ async function setOffer(sessionDescription: RTCSessionDescription) {
   }
 
   await setRemoteDescription(sessionDescription);
-}
+};
 
-async function setAnswer(sessionDescription: RTCSessionDescription) {
+const setAnswer = async (sessionDescription: RTCSessionDescription) => {
   if (!peerConnection) {
     console.error("peerConnection NOT exist!");
     return;
   }
   await setRemoteDescription(sessionDescription);
-}
+};
 
-export function hangUp(
+export const hangUp = (
   textForSendSdp: HTMLTextAreaElement | null,
   textToReceiveSdp: HTMLTextAreaElement | null
-) {
+) => {
   if (peerConnection) {
     if (peerConnection.iceConnectionState !== "closed") {
       peerConnection.close();
@@ -376,4 +378,4 @@ export function hangUp(
     }
   }
   console.log("peerConnection is closed.");
-}
+};
