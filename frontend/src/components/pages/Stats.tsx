@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Paper, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import { MainBottomNavigation } from "../utils/MainBottomNavigation";
 import trophyData from "../../assets/trophy.json";
 import TopSection from "../utils/TopSection"; // Import the new TopSection component
+import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
-const Stats = () => {
+const StatsContainer = () => {
   const [trophies, setTrophies] = useState([]);
 
   // Fetch the trophy data from trophy.json
@@ -20,7 +20,7 @@ const Stats = () => {
         <TopSection />
 
         {/* Participation Data */}
-        <Box sx={{ mt: 3, mb: 3 }}>
+        <Box sx={{ pt: 3 }}>
           <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
             <EmojiEventsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
             参加データ
@@ -63,9 +63,14 @@ const Stats = () => {
 
         {/* Footer Navigation */}
       </Box>
-      <MainBottomNavigation value="stats" />
     </Box>
   );
 };
 
-export default Stats;
+export const Stats = () => {
+  return (
+    <BottomNavigationTemplate value="other">
+      <StatsContainer />
+    </BottomNavigationTemplate>
+  );
+};

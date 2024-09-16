@@ -1,9 +1,14 @@
 import { Stack } from "@mui/system";
+import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
+
+const HomeContainer = () => {
+  return <Stack>home</Stack>;
+};
 
 export const Home = () => {
-    return (
-        <Stack>
-            home
-        </Stack>
-    )
-}
+  return (
+    <BottomNavigationTemplate value="home">
+      <HomeContainer />
+    </BottomNavigationTemplate>
+  );
+};

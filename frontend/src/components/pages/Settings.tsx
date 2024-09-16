@@ -6,11 +6,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
 // Mock data files
 import userData from "../../mock/user.json";
 import creditData from "../../assets/credit.json";
-import { MainBottomNavigation } from "../utils/MainBottomNavigation";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -42,7 +42,7 @@ const UploadButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const Settings = () => {
+const SettingsContainer = () => {
   const theme = useTheme();
   const [user, setUser] = useState({ name: "", email: "", avatar: "" });
   const [creditInfo, setCreditInfo] = useState("");
@@ -82,7 +82,7 @@ const Settings = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
-      <Box sx={{ padding: theme.spacing(3), boxSizing: "border-box" }}>
+      <Box sx={{ pt: 3 }}>
         <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
           <SettingsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
           設定
@@ -182,9 +182,13 @@ const Settings = () => {
           </Button>
         </Box>
       </Box>
-      <MainBottomNavigation value="home" />
     </Box>
   );
 };
-
-export default Settings;
+export const Settings = () => {
+  return (
+    <BottomNavigationTemplate value="other">
+      <SettingsContainer />
+    </BottomNavigationTemplate>
+  );
+};

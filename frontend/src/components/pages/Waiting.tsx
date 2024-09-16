@@ -1,9 +1,10 @@
 import { Box, Button, Container, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import Memo from "./Memo";
+import { Memo } from "./Memo";
 import TopSection from "../utils/TopSection";
+import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
-const Waiting = () => {
+const WaitingCotainer = () => {
   return (
     <Container sx={{ height: "100vh", padding: 3 }}>
       <TopSection />
@@ -30,4 +31,10 @@ const Waiting = () => {
   );
 };
 
-export default Waiting;
+export const Waiting = () => {
+  return (
+    <BottomNavigationTemplate value="session">
+      <WaitingCotainer />
+    </BottomNavigationTemplate>
+  );
+};

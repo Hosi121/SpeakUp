@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React, { useState, useEffect } from "react";
+import { Accordion, AccordionSummary, AccordionDetails, Typography } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
 type SessionData = {
   date: string;
@@ -11,12 +12,12 @@ type SessionData = {
   examples: string[];
 };
 
-const ConversationHistory = () => {
+const ConversationHistoryContainer = () => {
   const [data, setData] = useState<SessionData[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('../../conversation_history.json');  // JSONファイルの場所を指定
+      const response = await fetch("../../conversation_history.json"); // JSONファイルの場所を指定
       const newData = await response.json();
       setData(newData);
     };
@@ -36,7 +37,7 @@ const ConversationHistory = () => {
             <Typography variant="body2">セッション数: {item.sessions}</Typography>
             <Typography variant="body2">達成率: {item.completionRate}</Typography>
             <Typography variant="body2">{item.comment}</Typography>
-            <Typography variant="body2">参照可能な例: {item.examples.join(', ')}</Typography>
+            <Typography variant="body2">参照可能な例: {item.examples.join(", ")}</Typography>
           </AccordionDetails>
         </Accordion>
       ))}
@@ -44,4 +45,10 @@ const ConversationHistory = () => {
   );
 };
 
-export default ConversationHistory;
+export const ConversationHistory = () => {
+  return (
+    <BottomNavigationTemplate value="other">
+      <ConversationHistoryContainer />
+    </BottomNavigationTemplate>
+  );
+};
