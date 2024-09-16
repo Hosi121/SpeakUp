@@ -4548,7 +4548,7 @@ type TROPHIESMutation struct {
 	typ            string
 	id             *int
 	title          *string
-	contents       *string
+	description    *string
 	requirement    *string
 	clearedFields  map[string]struct{}
 	refered        map[int]struct{}
@@ -4693,40 +4693,40 @@ func (m *TROPHIESMutation) ResetTitle() {
 	m.title = nil
 }
 
-// SetContents sets the "contents" field.
-func (m *TROPHIESMutation) SetContents(s string) {
-	m.contents = &s
+// SetDescription sets the "description" field.
+func (m *TROPHIESMutation) SetDescription(s string) {
+	m.description = &s
 }
 
-// Contents returns the value of the "contents" field in the mutation.
-func (m *TROPHIESMutation) Contents() (r string, exists bool) {
-	v := m.contents
+// Description returns the value of the "description" field in the mutation.
+func (m *TROPHIESMutation) Description() (r string, exists bool) {
+	v := m.description
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldContents returns the old "contents" field's value of the TROPHIES entity.
+// OldDescription returns the old "description" field's value of the TROPHIES entity.
 // If the TROPHIES object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TROPHIESMutation) OldContents(ctx context.Context) (v string, err error) {
+func (m *TROPHIESMutation) OldDescription(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldContents is only allowed on UpdateOne operations")
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldContents requires an ID field in the mutation")
+		return v, errors.New("OldDescription requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldContents: %w", err)
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
 	}
-	return oldValue.Contents, nil
+	return oldValue.Description, nil
 }
 
-// ResetContents resets all changes to the "contents" field.
-func (m *TROPHIESMutation) ResetContents() {
-	m.contents = nil
+// ResetDescription resets all changes to the "description" field.
+func (m *TROPHIESMutation) ResetDescription() {
+	m.description = nil
 }
 
 // SetRequirement sets the "requirement" field.
@@ -4857,8 +4857,8 @@ func (m *TROPHIESMutation) Fields() []string {
 	if m.title != nil {
 		fields = append(fields, trophies.FieldTitle)
 	}
-	if m.contents != nil {
-		fields = append(fields, trophies.FieldContents)
+	if m.description != nil {
+		fields = append(fields, trophies.FieldDescription)
 	}
 	if m.requirement != nil {
 		fields = append(fields, trophies.FieldRequirement)
@@ -4873,8 +4873,8 @@ func (m *TROPHIESMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case trophies.FieldTitle:
 		return m.Title()
-	case trophies.FieldContents:
-		return m.Contents()
+	case trophies.FieldDescription:
+		return m.Description()
 	case trophies.FieldRequirement:
 		return m.Requirement()
 	}
@@ -4888,8 +4888,8 @@ func (m *TROPHIESMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case trophies.FieldTitle:
 		return m.OldTitle(ctx)
-	case trophies.FieldContents:
-		return m.OldContents(ctx)
+	case trophies.FieldDescription:
+		return m.OldDescription(ctx)
 	case trophies.FieldRequirement:
 		return m.OldRequirement(ctx)
 	}
@@ -4908,12 +4908,12 @@ func (m *TROPHIESMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTitle(v)
 		return nil
-	case trophies.FieldContents:
+	case trophies.FieldDescription:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetContents(v)
+		m.SetDescription(v)
 		return nil
 	case trophies.FieldRequirement:
 		v, ok := value.(string)
@@ -4974,8 +4974,8 @@ func (m *TROPHIESMutation) ResetField(name string) error {
 	case trophies.FieldTitle:
 		m.ResetTitle()
 		return nil
-	case trophies.FieldContents:
-		m.ResetContents()
+	case trophies.FieldDescription:
+		m.ResetDescription()
 		return nil
 	case trophies.FieldRequirement:
 		m.ResetRequirement()

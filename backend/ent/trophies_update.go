@@ -42,16 +42,16 @@ func (tu *TROPHIESUpdate) SetNillableTitle(s *string) *TROPHIESUpdate {
 	return tu
 }
 
-// SetContents sets the "contents" field.
-func (tu *TROPHIESUpdate) SetContents(s string) *TROPHIESUpdate {
-	tu.mutation.SetContents(s)
+// SetDescription sets the "description" field.
+func (tu *TROPHIESUpdate) SetDescription(s string) *TROPHIESUpdate {
+	tu.mutation.SetDescription(s)
 	return tu
 }
 
-// SetNillableContents sets the "contents" field if the given value is not nil.
-func (tu *TROPHIESUpdate) SetNillableContents(s *string) *TROPHIESUpdate {
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tu *TROPHIESUpdate) SetNillableDescription(s *string) *TROPHIESUpdate {
 	if s != nil {
-		tu.SetContents(*s)
+		tu.SetDescription(*s)
 	}
 	return tu
 }
@@ -150,8 +150,8 @@ func (tu *TROPHIESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.Title(); ok {
 		_spec.SetField(trophies.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := tu.mutation.Contents(); ok {
-		_spec.SetField(trophies.FieldContents, field.TypeString, value)
+	if value, ok := tu.mutation.Description(); ok {
+		_spec.SetField(trophies.FieldDescription, field.TypeString, value)
 	}
 	if value, ok := tu.mutation.Requirement(); ok {
 		_spec.SetField(trophies.FieldRequirement, field.TypeString, value)
@@ -235,16 +235,16 @@ func (tuo *TROPHIESUpdateOne) SetNillableTitle(s *string) *TROPHIESUpdateOne {
 	return tuo
 }
 
-// SetContents sets the "contents" field.
-func (tuo *TROPHIESUpdateOne) SetContents(s string) *TROPHIESUpdateOne {
-	tuo.mutation.SetContents(s)
+// SetDescription sets the "description" field.
+func (tuo *TROPHIESUpdateOne) SetDescription(s string) *TROPHIESUpdateOne {
+	tuo.mutation.SetDescription(s)
 	return tuo
 }
 
-// SetNillableContents sets the "contents" field if the given value is not nil.
-func (tuo *TROPHIESUpdateOne) SetNillableContents(s *string) *TROPHIESUpdateOne {
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tuo *TROPHIESUpdateOne) SetNillableDescription(s *string) *TROPHIESUpdateOne {
 	if s != nil {
-		tuo.SetContents(*s)
+		tuo.SetDescription(*s)
 	}
 	return tuo
 }
@@ -373,8 +373,8 @@ func (tuo *TROPHIESUpdateOne) sqlSave(ctx context.Context) (_node *TROPHIES, err
 	if value, ok := tuo.mutation.Title(); ok {
 		_spec.SetField(trophies.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := tuo.mutation.Contents(); ok {
-		_spec.SetField(trophies.FieldContents, field.TypeString, value)
+	if value, ok := tuo.mutation.Description(); ok {
+		_spec.SetField(trophies.FieldDescription, field.TypeString, value)
 	}
 	if value, ok := tuo.mutation.Requirement(); ok {
 		_spec.SetField(trophies.FieldRequirement, field.TypeString, value)

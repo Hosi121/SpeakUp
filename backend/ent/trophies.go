@@ -18,8 +18,8 @@ type TROPHIES struct {
 	ID int `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
-	// Contents holds the value of the "contents" field.
-	Contents string `json:"contents,omitempty"`
+	// Description holds the value of the "description" field.
+	Description string `json:"description,omitempty"`
 	// Requirement holds the value of the "requirement" field.
 	Requirement string `json:"requirement,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -53,7 +53,7 @@ func (*TROPHIES) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case trophies.FieldID:
 			values[i] = new(sql.NullInt64)
-		case trophies.FieldTitle, trophies.FieldContents, trophies.FieldRequirement:
+		case trophies.FieldTitle, trophies.FieldDescription, trophies.FieldRequirement:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -82,11 +82,11 @@ func (t *TROPHIES) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.Title = value.String
 			}
-		case trophies.FieldContents:
+		case trophies.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field contents", values[i])
+				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				t.Contents = value.String
+				t.Description = value.String
 			}
 		case trophies.FieldRequirement:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -138,8 +138,8 @@ func (t *TROPHIES) String() string {
 	builder.WriteString("title=")
 	builder.WriteString(t.Title)
 	builder.WriteString(", ")
-	builder.WriteString("contents=")
-	builder.WriteString(t.Contents)
+	builder.WriteString("description=")
+	builder.WriteString(t.Description)
 	builder.WriteString(", ")
 	builder.WriteString("requirement=")
 	builder.WriteString(t.Requirement)

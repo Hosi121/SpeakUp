@@ -13,7 +13,7 @@ type TROPHIES struct {
 func (TROPHIES) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("title"),
-		field.String("contents"),
+		field.String("description"),
 		field.String("requirement"),
 	}
 }

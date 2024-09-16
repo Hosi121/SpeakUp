@@ -58,9 +58,9 @@ func Title(v string) predicate.TROPHIES {
 	return predicate.TROPHIES(sql.FieldEQ(FieldTitle, v))
 }
 
-// Contents applies equality check predicate on the "contents" field. It's identical to ContentsEQ.
-func Contents(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldEQ(FieldContents, v))
+// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
+func Description(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldEQ(FieldDescription, v))
 }
 
 // Requirement applies equality check predicate on the "requirement" field. It's identical to RequirementEQ.
@@ -133,69 +133,69 @@ func TitleContainsFold(v string) predicate.TROPHIES {
 	return predicate.TROPHIES(sql.FieldContainsFold(FieldTitle, v))
 }
 
-// ContentsEQ applies the EQ predicate on the "contents" field.
-func ContentsEQ(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldEQ(FieldContents, v))
+// DescriptionEQ applies the EQ predicate on the "description" field.
+func DescriptionEQ(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldEQ(FieldDescription, v))
 }
 
-// ContentsNEQ applies the NEQ predicate on the "contents" field.
-func ContentsNEQ(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldNEQ(FieldContents, v))
+// DescriptionNEQ applies the NEQ predicate on the "description" field.
+func DescriptionNEQ(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldNEQ(FieldDescription, v))
 }
 
-// ContentsIn applies the In predicate on the "contents" field.
-func ContentsIn(vs ...string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldIn(FieldContents, vs...))
+// DescriptionIn applies the In predicate on the "description" field.
+func DescriptionIn(vs ...string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldIn(FieldDescription, vs...))
 }
 
-// ContentsNotIn applies the NotIn predicate on the "contents" field.
-func ContentsNotIn(vs ...string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldNotIn(FieldContents, vs...))
+// DescriptionNotIn applies the NotIn predicate on the "description" field.
+func DescriptionNotIn(vs ...string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldNotIn(FieldDescription, vs...))
 }
 
-// ContentsGT applies the GT predicate on the "contents" field.
-func ContentsGT(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldGT(FieldContents, v))
+// DescriptionGT applies the GT predicate on the "description" field.
+func DescriptionGT(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldGT(FieldDescription, v))
 }
 
-// ContentsGTE applies the GTE predicate on the "contents" field.
-func ContentsGTE(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldGTE(FieldContents, v))
+// DescriptionGTE applies the GTE predicate on the "description" field.
+func DescriptionGTE(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldGTE(FieldDescription, v))
 }
 
-// ContentsLT applies the LT predicate on the "contents" field.
-func ContentsLT(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldLT(FieldContents, v))
+// DescriptionLT applies the LT predicate on the "description" field.
+func DescriptionLT(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldLT(FieldDescription, v))
 }
 
-// ContentsLTE applies the LTE predicate on the "contents" field.
-func ContentsLTE(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldLTE(FieldContents, v))
+// DescriptionLTE applies the LTE predicate on the "description" field.
+func DescriptionLTE(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldLTE(FieldDescription, v))
 }
 
-// ContentsContains applies the Contains predicate on the "contents" field.
-func ContentsContains(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldContains(FieldContents, v))
+// DescriptionContains applies the Contains predicate on the "description" field.
+func DescriptionContains(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldContains(FieldDescription, v))
 }
 
-// ContentsHasPrefix applies the HasPrefix predicate on the "contents" field.
-func ContentsHasPrefix(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldHasPrefix(FieldContents, v))
+// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
+func DescriptionHasPrefix(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldHasPrefix(FieldDescription, v))
 }
 
-// ContentsHasSuffix applies the HasSuffix predicate on the "contents" field.
-func ContentsHasSuffix(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldHasSuffix(FieldContents, v))
+// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
+func DescriptionHasSuffix(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldHasSuffix(FieldDescription, v))
 }
 
-// ContentsEqualFold applies the EqualFold predicate on the "contents" field.
-func ContentsEqualFold(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldEqualFold(FieldContents, v))
+// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
+func DescriptionEqualFold(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldEqualFold(FieldDescription, v))
 }
 
-// ContentsContainsFold applies the ContainsFold predicate on the "contents" field.
-func ContentsContainsFold(v string) predicate.TROPHIES {
-	return predicate.TROPHIES(sql.FieldContainsFold(FieldContents, v))
+// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
+func DescriptionContainsFold(v string) predicate.TROPHIES {
+	return predicate.TROPHIES(sql.FieldContainsFold(FieldDescription, v))
 }
 
 // RequirementEQ applies the EQ predicate on the "requirement" field.

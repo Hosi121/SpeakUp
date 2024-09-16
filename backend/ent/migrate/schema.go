@@ -160,7 +160,7 @@ var (
 	TrophieSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "title", Type: field.TypeString},
-		{Name: "contents", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
 		{Name: "requirement", Type: field.TypeString},
 	}
 	// TrophieSsTable holds the schema information for the "trophie_ss" table.

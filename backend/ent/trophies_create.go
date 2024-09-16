@@ -26,9 +26,9 @@ func (tc *TROPHIESCreate) SetTitle(s string) *TROPHIESCreate {
 	return tc
 }
 
-// SetContents sets the "contents" field.
-func (tc *TROPHIESCreate) SetContents(s string) *TROPHIESCreate {
-	tc.mutation.SetContents(s)
+// SetDescription sets the "description" field.
+func (tc *TROPHIESCreate) SetDescription(s string) *TROPHIESCreate {
+	tc.mutation.SetDescription(s)
 	return tc
 }
 
@@ -90,8 +90,8 @@ func (tc *TROPHIESCreate) check() error {
 	if _, ok := tc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "TROPHIES.title"`)}
 	}
-	if _, ok := tc.mutation.Contents(); !ok {
-		return &ValidationError{Name: "contents", err: errors.New(`ent: missing required field "TROPHIES.contents"`)}
+	if _, ok := tc.mutation.Description(); !ok {
+		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "TROPHIES.description"`)}
 	}
 	if _, ok := tc.mutation.Requirement(); !ok {
 		return &ValidationError{Name: "requirement", err: errors.New(`ent: missing required field "TROPHIES.requirement"`)}
@@ -126,9 +126,9 @@ func (tc *TROPHIESCreate) createSpec() (*TROPHIES, *sqlgraph.CreateSpec) {
 		_spec.SetField(trophies.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
-	if value, ok := tc.mutation.Contents(); ok {
-		_spec.SetField(trophies.FieldContents, field.TypeString, value)
-		_node.Contents = value
+	if value, ok := tc.mutation.Description(); ok {
+		_spec.SetField(trophies.FieldDescription, field.TypeString, value)
+		_node.Description = value
 	}
 	if value, ok := tc.mutation.Requirement(); ok {
 		_spec.SetField(trophies.FieldRequirement, field.TypeString, value)

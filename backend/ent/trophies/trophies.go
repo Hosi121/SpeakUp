@@ -14,8 +14,8 @@ const (
 	FieldID = "id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
-	// FieldContents holds the string denoting the contents field in the database.
-	FieldContents = "contents"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
 	// FieldRequirement holds the string denoting the requirement field in the database.
 	FieldRequirement = "requirement"
 	// EdgeRefered holds the string denoting the refered edge name in mutations.
@@ -35,7 +35,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldTitle,
-	FieldContents,
+	FieldDescription,
 	FieldRequirement,
 }
 
@@ -62,9 +62,9 @@ func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
 }
 
-// ByContents orders the results by the contents field.
-func ByContents(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldContents, opts...).ToFunc()
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
 // ByRequirement orders the results by the requirement field.
