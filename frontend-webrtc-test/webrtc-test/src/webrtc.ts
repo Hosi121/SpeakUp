@@ -114,11 +114,10 @@ export async function startLocalStream(
   }
 }
 
-export function toggleMute(isMuted: boolean) {
+export function setLocalStreamMute(isMuted: boolean) {
   if (localStream) {
     const audioTrack = localStream.getAudioTracks()[0];
     if (audioTrack) {
-      isMuted = !isMuted;
       audioTrack.enabled = !isMuted;
       console.log(isMuted ? "Muted" : "Unmuted");
     }

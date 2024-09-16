@@ -5,7 +5,7 @@ import {
   hangUp,
   onSdpText,
   startLocalStream,
-  toggleMute,
+  setLocalStreamMute,
 } from "./webrtc";
 import styles from "./App.module.css";
 
@@ -76,7 +76,7 @@ function App() {
   const handleToggleMute = () => {
     const newState = !isMuted;
     setIsMuted(newState);
-    toggleMute(newState);
+    setLocalStreamMute(newState);
   };
 
   return (
@@ -90,7 +90,7 @@ function App() {
       {mediaDeviceStatus === "available" && (
         <>
           <button type="button" onClick={handleToggleMute}>
-            {isMuted ? "Unmute" : "Mute"}
+            {isMuted ? "current: Mute" : "current: UnMute"}
           </button>
           <button type="button" onClick={handleStartAudio}>
             Start Audio
