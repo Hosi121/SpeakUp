@@ -30,7 +30,7 @@ export const MainBottomNavigation = ({ value }: bottomNavigationProps) => {
       value={index}
       sx={{
         padding: "20px 0",
-        height: "100px",
+        height: "70px",
         position: "sticky",
         bottom: 0,
         zIndex: 100,

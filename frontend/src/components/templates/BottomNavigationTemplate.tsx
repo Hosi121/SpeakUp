@@ -1,8 +1,5 @@
 import { ReactNode } from "react";
-import {
-  MainBottomNavigation,
-  mainBottomNavigation,
-} from "../utils/MainBottomNavigation";
+import { MainBottomNavigation, mainBottomNavigation } from "../utils/MainBottomNavigation";
 import { Box } from "@mui/material";
 
 type bottomNavigationTemplateProps = {
@@ -10,12 +7,9 @@ type bottomNavigationTemplateProps = {
   children: ReactNode;
 };
 
-export const BottomNavigationTemplate = ({
-  value,
-  children,
-}: bottomNavigationTemplateProps) => {
+export const BottomNavigationTemplate = ({ value, children }: bottomNavigationTemplateProps) => {
   return (
-    <Box width={"100vw"} height={"100vh"}>
+    <Box width={"100vw"} height={"calc(100vh - 70px )"}>
       {children}
       <MainBottomNavigation value={value} />
     </Box>
