@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
@@ -198,6 +199,21 @@ func (uu *USERSUpdate) SetPrepares(m *MEMOS) *USERSUpdate {
 	return uu.SetPreparesID(m.ID)
 }
 
+// AddAcquireIDs adds the "acquires" edge to the ACHIEVEMENTS entity by IDs.
+func (uu *USERSUpdate) AddAcquireIDs(ids ...int) *USERSUpdate {
+	uu.mutation.AddAcquireIDs(ids...)
+	return uu
+}
+
+// AddAcquires adds the "acquires" edges to the ACHIEVEMENTS entity.
+func (uu *USERSUpdate) AddAcquires(a ...*ACHIEVEMENTS) *USERSUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return uu.AddAcquireIDs(ids...)
+}
+
 // Mutation returns the USERSMutation object of the builder.
 func (uu *USERSUpdate) Mutation() *USERSMutation {
 	return uu.mutation
@@ -249,6 +265,27 @@ func (uu *USERSUpdate) RemoveParticipates(m ...*MATCHINGS) *USERSUpdate {
 func (uu *USERSUpdate) ClearPrepares() *USERSUpdate {
 	uu.mutation.ClearPrepares()
 	return uu
+}
+
+// ClearAcquires clears all "acquires" edges to the ACHIEVEMENTS entity.
+func (uu *USERSUpdate) ClearAcquires() *USERSUpdate {
+	uu.mutation.ClearAcquires()
+	return uu
+}
+
+// RemoveAcquireIDs removes the "acquires" edge to ACHIEVEMENTS entities by IDs.
+func (uu *USERSUpdate) RemoveAcquireIDs(ids ...int) *USERSUpdate {
+	uu.mutation.RemoveAcquireIDs(ids...)
+	return uu
+}
+
+// RemoveAcquires removes "acquires" edges to ACHIEVEMENTS entities.
+func (uu *USERSUpdate) RemoveAcquires(a ...*ACHIEVEMENTS) *USERSUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return uu.RemoveAcquireIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -456,6 +493,51 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.AcquiresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   users.AcquiresTable,
+			Columns: []string{users.AcquiresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedAcquiresIDs(); len(nodes) > 0 && !uu.mutation.AcquiresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   users.AcquiresTable,
+			Columns: []string{users.AcquiresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.AcquiresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   users.AcquiresTable,
+			Columns: []string{users.AcquiresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{users.Label}
@@ -643,6 +725,21 @@ func (uuo *USERSUpdateOne) SetPrepares(m *MEMOS) *USERSUpdateOne {
 	return uuo.SetPreparesID(m.ID)
 }
 
+// AddAcquireIDs adds the "acquires" edge to the ACHIEVEMENTS entity by IDs.
+func (uuo *USERSUpdateOne) AddAcquireIDs(ids ...int) *USERSUpdateOne {
+	uuo.mutation.AddAcquireIDs(ids...)
+	return uuo
+}
+
+// AddAcquires adds the "acquires" edges to the ACHIEVEMENTS entity.
+func (uuo *USERSUpdateOne) AddAcquires(a ...*ACHIEVEMENTS) *USERSUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return uuo.AddAcquireIDs(ids...)
+}
+
 // Mutation returns the USERSMutation object of the builder.
 func (uuo *USERSUpdateOne) Mutation() *USERSMutation {
 	return uuo.mutation
@@ -694,6 +791,27 @@ func (uuo *USERSUpdateOne) RemoveParticipates(m ...*MATCHINGS) *USERSUpdateOne {
 func (uuo *USERSUpdateOne) ClearPrepares() *USERSUpdateOne {
 	uuo.mutation.ClearPrepares()
 	return uuo
+}
+
+// ClearAcquires clears all "acquires" edges to the ACHIEVEMENTS entity.
+func (uuo *USERSUpdateOne) ClearAcquires() *USERSUpdateOne {
+	uuo.mutation.ClearAcquires()
+	return uuo
+}
+
+// RemoveAcquireIDs removes the "acquires" edge to ACHIEVEMENTS entities by IDs.
+func (uuo *USERSUpdateOne) RemoveAcquireIDs(ids ...int) *USERSUpdateOne {
+	uuo.mutation.RemoveAcquireIDs(ids...)
+	return uuo
+}
+
+// RemoveAcquires removes "acquires" edges to ACHIEVEMENTS entities.
+func (uuo *USERSUpdateOne) RemoveAcquires(a ...*ACHIEVEMENTS) *USERSUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return uuo.RemoveAcquireIDs(ids...)
 }
 
 // Where appends a list predicates to the USERSUpdate builder.
@@ -924,6 +1042,51 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(memos.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.AcquiresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   users.AcquiresTable,
+			Columns: []string{users.AcquiresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedAcquiresIDs(); len(nodes) > 0 && !uuo.mutation.AcquiresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   users.AcquiresTable,
+			Columns: []string{users.AcquiresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.AcquiresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   users.AcquiresTable,
+			Columns: []string{users.AcquiresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -12,12 +12,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/aithemes"
 	"github.com/Hosi121/SpeakUp/ent/calls"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
+	"github.com/Hosi121/SpeakUp/ent/trophies"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -79,13 +81,15 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			aithemes.Table:  aithemes.ValidColumn,
-			calls.Table:     calls.ValidColumn,
-			friends.Table:   friends.ValidColumn,
-			matchings.Table: matchings.ValidColumn,
-			memos.Table:     memos.ValidColumn,
-			sessions.Table:  sessions.ValidColumn,
-			users.Table:     users.ValidColumn,
+			achievements.Table: achievements.ValidColumn,
+			aithemes.Table:     aithemes.ValidColumn,
+			calls.Table:        calls.ValidColumn,
+			friends.Table:      friends.ValidColumn,
+			matchings.Table:    matchings.ValidColumn,
+			memos.Table:        memos.ValidColumn,
+			sessions.Table:     sessions.ValidColumn,
+			trophies.Table:     trophies.ValidColumn,
+			users.Table:        users.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

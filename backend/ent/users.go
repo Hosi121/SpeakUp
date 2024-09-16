@@ -48,9 +48,11 @@ type USERSEdges struct {
 	Participates []*MATCHINGS `json:"participates,omitempty"`
 	// Prepares holds the value of the prepares edge.
 	Prepares *MEMOS `json:"prepares,omitempty"`
+	// Acquires holds the value of the acquires edge.
+	Acquires []*ACHIEVEMENTS `json:"acquires,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // ConnectsOrErr returns the Connects value or an error if the edge
@@ -80,6 +82,15 @@ func (e USERSEdges) PreparesOrErr() (*MEMOS, error) {
 		return nil, &NotFoundError{label: memos.Label}
 	}
 	return nil, &NotLoadedError{edge: "prepares"}
+}
+
+// AcquiresOrErr returns the Acquires value or an error if the edge
+// was not loaded in eager-loading.
+func (e USERSEdges) AcquiresOrErr() ([]*ACHIEVEMENTS, error) {
+	if e.loadedTypes[3] {
+		return e.Acquires, nil
+	}
+	return nil, &NotLoadedError{edge: "acquires"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -190,6 +201,11 @@ func (u *USERS) QueryParticipates() *MATCHINGSQuery {
 // QueryPrepares queries the "prepares" edge of the USERS entity.
 func (u *USERS) QueryPrepares() *MEMOSQuery {
 	return NewUSERSClient(u.config).QueryPrepares(u)
+}
+
+// QueryAcquires queries the "acquires" edge of the USERS entity.
+func (u *USERS) QueryAcquires() *ACHIEVEMENTSQuery {
+	return NewUSERSClient(u.config).QueryAcquires(u)
 }
 
 // Update returns a builder for updating this USERS.

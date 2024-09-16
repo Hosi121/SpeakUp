@@ -539,6 +539,29 @@ func HasPreparesWith(preds ...predicate.MEMOS) predicate.USERS {
 	})
 }
 
+// HasAcquires applies the HasEdge predicate on the "acquires" edge.
+func HasAcquires() predicate.USERS {
+	return predicate.USERS(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AcquiresTable, AcquiresColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAcquiresWith applies the HasEdge predicate on the "acquires" edge with a given conditions (other predicates).
+func HasAcquiresWith(preds ...predicate.ACHIEVEMENTS) predicate.USERS {
+	return predicate.USERS(func(s *sql.Selector) {
+		step := newAcquiresStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.USERS) predicate.USERS {
 	return predicate.USERS(sql.AndPredicates(predicates...))

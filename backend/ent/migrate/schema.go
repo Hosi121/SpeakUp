@@ -8,6 +8,35 @@ import (
 )
 
 var (
+	// AchievementSsColumns holds the columns for the "achievement_ss" table.
+	AchievementSsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "trophy_id", Type: field.TypeInt},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "achievements_refers", Type: field.TypeInt, Nullable: true},
+		{Name: "users_acquires", Type: field.TypeInt, Nullable: true},
+	}
+	// AchievementSsTable holds the schema information for the "achievement_ss" table.
+	AchievementSsTable = &schema.Table{
+		Name:       "achievement_ss",
+		Columns:    AchievementSsColumns,
+		PrimaryKey: []*schema.Column{AchievementSsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "achievement_ss_trophie_ss_refers",
+				Columns:    []*schema.Column{AchievementSsColumns[4]},
+				RefColumns: []*schema.Column{TrophieSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "achievement_ss_user_ss_acquires",
+				Columns:    []*schema.Column{AchievementSsColumns[5]},
+				RefColumns: []*schema.Column{UserSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// AithemeSsColumns holds the columns for the "aitheme_ss" table.
 	AithemeSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -127,6 +156,19 @@ var (
 			},
 		},
 	}
+	// TrophieSsColumns holds the columns for the "trophie_ss" table.
+	TrophieSsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "requirement", Type: field.TypeString},
+	}
+	// TrophieSsTable holds the schema information for the "trophie_ss" table.
+	TrophieSsTable = &schema.Table{
+		Name:       "trophie_ss",
+		Columns:    TrophieSsColumns,
+		PrimaryKey: []*schema.Column{TrophieSsColumns[0]},
+	}
 	// UserSsColumns holds the columns for the "user_ss" table.
 	UserSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -197,12 +239,14 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AchievementSsTable,
 		AithemeSsTable,
 		CallSsTable,
 		FriendSsTable,
 		MatchingSsTable,
 		MemoSsTable,
 		SessionSsTable,
+		TrophieSsTable,
 		UserSsTable,
 		UsersConnectsTable,
 		UsersParticipatesTable,
@@ -210,6 +254,8 @@ var (
 )
 
 func init() {
+	AchievementSsTable.ForeignKeys[0].RefTable = TrophieSsTable
+	AchievementSsTable.ForeignKeys[1].RefTable = UserSsTable
 	CallSsTable.ForeignKeys[0].RefTable = MatchingSsTable
 	MatchingSsTable.ForeignKeys[0].RefTable = SessionSsTable
 	MemoSsTable.ForeignKeys[0].RefTable = UserSsTable
