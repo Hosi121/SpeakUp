@@ -1,4 +1,4 @@
-import { Container, Stack, Typography } from "@mui/material";
+import { Button, Container, Stack, Typography } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import TopSection from "../utils/TopSection";
@@ -22,6 +22,20 @@ const MemoContainer = () => {
             持ち込みメモ
           </Typography>
           <MemoInputField />
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              backgroundColor: "primary.main",
+              color: "secondary.main",
+              marginY: 2,
+              "&:hover": {
+                backgroundColor: "#FF3399",
+              },
+            }}
+          >
+            保存
+          </Button>
         </Stack>
       </Container>
     </Container>
