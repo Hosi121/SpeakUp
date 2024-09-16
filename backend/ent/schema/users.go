@@ -44,5 +44,6 @@ func (USERS) Edges() []ent.Edge {
 		edge.To("participates", MATCHINGS.Type),
 		edge.To("prepares", MEMOS.Type).
 			Unique(),
+		edge.To("acquires", ACHIEVEMENTS.Type),
 	}
 }

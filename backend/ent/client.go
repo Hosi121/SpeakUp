@@ -15,12 +15,14 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/aithemes"
 	"github.com/Hosi121/SpeakUp/ent/calls"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
+	"github.com/Hosi121/SpeakUp/ent/trophies"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -29,6 +31,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// ACHIEVEMENTS is the client for interacting with the ACHIEVEMENTS builders.
+	ACHIEVEMENTS *ACHIEVEMENTSClient
 	// AITHEMES is the client for interacting with the AITHEMES builders.
 	AITHEMES *AITHEMESClient
 	// CALLS is the client for interacting with the CALLS builders.
@@ -41,6 +45,8 @@ type Client struct {
 	MEMOS *MEMOSClient
 	// SESSIONS is the client for interacting with the SESSIONS builders.
 	SESSIONS *SESSIONSClient
+	// TROPHIES is the client for interacting with the TROPHIES builders.
+	TROPHIES *TROPHIESClient
 	// USERS is the client for interacting with the USERS builders.
 	USERS *USERSClient
 }
@@ -54,12 +60,14 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.ACHIEVEMENTS = NewACHIEVEMENTSClient(c.config)
 	c.AITHEMES = NewAITHEMESClient(c.config)
 	c.CALLS = NewCALLSClient(c.config)
 	c.FRIENDS = NewFRIENDSClient(c.config)
 	c.MATCHINGS = NewMATCHINGSClient(c.config)
 	c.MEMOS = NewMEMOSClient(c.config)
 	c.SESSIONS = NewSESSIONSClient(c.config)
+	c.TROPHIES = NewTROPHIESClient(c.config)
 	c.USERS = NewUSERSClient(c.config)
 }
 
@@ -151,15 +159,17 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		AITHEMES:  NewAITHEMESClient(cfg),
-		CALLS:     NewCALLSClient(cfg),
-		FRIENDS:   NewFRIENDSClient(cfg),
-		MATCHINGS: NewMATCHINGSClient(cfg),
-		MEMOS:     NewMEMOSClient(cfg),
-		SESSIONS:  NewSESSIONSClient(cfg),
-		USERS:     NewUSERSClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		ACHIEVEMENTS: NewACHIEVEMENTSClient(cfg),
+		AITHEMES:     NewAITHEMESClient(cfg),
+		CALLS:        NewCALLSClient(cfg),
+		FRIENDS:      NewFRIENDSClient(cfg),
+		MATCHINGS:    NewMATCHINGSClient(cfg),
+		MEMOS:        NewMEMOSClient(cfg),
+		SESSIONS:     NewSESSIONSClient(cfg),
+		TROPHIES:     NewTROPHIESClient(cfg),
+		USERS:        NewUSERSClient(cfg),
 	}, nil
 }
 
@@ -177,22 +187,24 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:       ctx,
-		config:    cfg,
-		AITHEMES:  NewAITHEMESClient(cfg),
-		CALLS:     NewCALLSClient(cfg),
-		FRIENDS:   NewFRIENDSClient(cfg),
-		MATCHINGS: NewMATCHINGSClient(cfg),
-		MEMOS:     NewMEMOSClient(cfg),
-		SESSIONS:  NewSESSIONSClient(cfg),
-		USERS:     NewUSERSClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		ACHIEVEMENTS: NewACHIEVEMENTSClient(cfg),
+		AITHEMES:     NewAITHEMESClient(cfg),
+		CALLS:        NewCALLSClient(cfg),
+		FRIENDS:      NewFRIENDSClient(cfg),
+		MATCHINGS:    NewMATCHINGSClient(cfg),
+		MEMOS:        NewMEMOSClient(cfg),
+		SESSIONS:     NewSESSIONSClient(cfg),
+		TROPHIES:     NewTROPHIESClient(cfg),
+		USERS:        NewUSERSClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AITHEMES.
+//		ACHIEVEMENTS.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -215,7 +227,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS, c.SESSIONS, c.USERS,
+		c.ACHIEVEMENTS, c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS,
+		c.SESSIONS, c.TROPHIES, c.USERS,
 	} {
 		n.Use(hooks...)
 	}
@@ -225,7 +238,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS, c.SESSIONS, c.USERS,
+		c.ACHIEVEMENTS, c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS,
+		c.SESSIONS, c.TROPHIES, c.USERS,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -234,6 +248,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *ACHIEVEMENTSMutation:
+		return c.ACHIEVEMENTS.mutate(ctx, m)
 	case *AITHEMESMutation:
 		return c.AITHEMES.mutate(ctx, m)
 	case *CALLSMutation:
@@ -246,10 +262,177 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MEMOS.mutate(ctx, m)
 	case *SESSIONSMutation:
 		return c.SESSIONS.mutate(ctx, m)
+	case *TROPHIESMutation:
+		return c.TROPHIES.mutate(ctx, m)
 	case *USERSMutation:
 		return c.USERS.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// ACHIEVEMENTSClient is a client for the ACHIEVEMENTS schema.
+type ACHIEVEMENTSClient struct {
+	config
+}
+
+// NewACHIEVEMENTSClient returns a client for the ACHIEVEMENTS from the given config.
+func NewACHIEVEMENTSClient(c config) *ACHIEVEMENTSClient {
+	return &ACHIEVEMENTSClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `achievements.Hooks(f(g(h())))`.
+func (c *ACHIEVEMENTSClient) Use(hooks ...Hook) {
+	c.hooks.ACHIEVEMENTS = append(c.hooks.ACHIEVEMENTS, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `achievements.Intercept(f(g(h())))`.
+func (c *ACHIEVEMENTSClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ACHIEVEMENTS = append(c.inters.ACHIEVEMENTS, interceptors...)
+}
+
+// Create returns a builder for creating a ACHIEVEMENTS entity.
+func (c *ACHIEVEMENTSClient) Create() *ACHIEVEMENTSCreate {
+	mutation := newACHIEVEMENTSMutation(c.config, OpCreate)
+	return &ACHIEVEMENTSCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ACHIEVEMENTS entities.
+func (c *ACHIEVEMENTSClient) CreateBulk(builders ...*ACHIEVEMENTSCreate) *ACHIEVEMENTSCreateBulk {
+	return &ACHIEVEMENTSCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ACHIEVEMENTSClient) MapCreateBulk(slice any, setFunc func(*ACHIEVEMENTSCreate, int)) *ACHIEVEMENTSCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ACHIEVEMENTSCreateBulk{err: fmt.Errorf("calling to ACHIEVEMENTSClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ACHIEVEMENTSCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ACHIEVEMENTSCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ACHIEVEMENTS.
+func (c *ACHIEVEMENTSClient) Update() *ACHIEVEMENTSUpdate {
+	mutation := newACHIEVEMENTSMutation(c.config, OpUpdate)
+	return &ACHIEVEMENTSUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ACHIEVEMENTSClient) UpdateOne(a *ACHIEVEMENTS) *ACHIEVEMENTSUpdateOne {
+	mutation := newACHIEVEMENTSMutation(c.config, OpUpdateOne, withACHIEVEMENTS(a))
+	return &ACHIEVEMENTSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ACHIEVEMENTSClient) UpdateOneID(id int) *ACHIEVEMENTSUpdateOne {
+	mutation := newACHIEVEMENTSMutation(c.config, OpUpdateOne, withACHIEVEMENTSID(id))
+	return &ACHIEVEMENTSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ACHIEVEMENTS.
+func (c *ACHIEVEMENTSClient) Delete() *ACHIEVEMENTSDelete {
+	mutation := newACHIEVEMENTSMutation(c.config, OpDelete)
+	return &ACHIEVEMENTSDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ACHIEVEMENTSClient) DeleteOne(a *ACHIEVEMENTS) *ACHIEVEMENTSDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ACHIEVEMENTSClient) DeleteOneID(id int) *ACHIEVEMENTSDeleteOne {
+	builder := c.Delete().Where(achievements.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ACHIEVEMENTSDeleteOne{builder}
+}
+
+// Query returns a query builder for ACHIEVEMENTS.
+func (c *ACHIEVEMENTSClient) Query() *ACHIEVEMENTSQuery {
+	return &ACHIEVEMENTSQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeACHIEVEMENTS},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ACHIEVEMENTS entity by its id.
+func (c *ACHIEVEMENTSClient) Get(ctx context.Context, id int) (*ACHIEVEMENTS, error) {
+	return c.Query().Where(achievements.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ACHIEVEMENTSClient) GetX(ctx context.Context, id int) *ACHIEVEMENTS {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryGranted queries the granted edge of a ACHIEVEMENTS.
+func (c *ACHIEVEMENTSClient) QueryGranted(a *ACHIEVEMENTS) *USERSQuery {
+	query := (&USERSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(achievements.Table, achievements.FieldID, id),
+			sqlgraph.To(users.Table, users.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, achievements.GrantedTable, achievements.GrantedColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRefers queries the refers edge of a ACHIEVEMENTS.
+func (c *ACHIEVEMENTSClient) QueryRefers(a *ACHIEVEMENTS) *TROPHIESQuery {
+	query := (&TROPHIESClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(achievements.Table, achievements.FieldID, id),
+			sqlgraph.To(trophies.Table, trophies.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, achievements.RefersTable, achievements.RefersColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ACHIEVEMENTSClient) Hooks() []Hook {
+	return c.hooks.ACHIEVEMENTS
+}
+
+// Interceptors returns the client interceptors.
+func (c *ACHIEVEMENTSClient) Interceptors() []Interceptor {
+	return c.inters.ACHIEVEMENTS
+}
+
+func (c *ACHIEVEMENTSClient) mutate(ctx context.Context, m *ACHIEVEMENTSMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ACHIEVEMENTSCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ACHIEVEMENTSUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ACHIEVEMENTSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ACHIEVEMENTSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ACHIEVEMENTS mutation op: %q", m.Op())
 	}
 }
 
@@ -1195,6 +1378,155 @@ func (c *SESSIONSClient) mutate(ctx context.Context, m *SESSIONSMutation) (Value
 	}
 }
 
+// TROPHIESClient is a client for the TROPHIES schema.
+type TROPHIESClient struct {
+	config
+}
+
+// NewTROPHIESClient returns a client for the TROPHIES from the given config.
+func NewTROPHIESClient(c config) *TROPHIESClient {
+	return &TROPHIESClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trophies.Hooks(f(g(h())))`.
+func (c *TROPHIESClient) Use(hooks ...Hook) {
+	c.hooks.TROPHIES = append(c.hooks.TROPHIES, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trophies.Intercept(f(g(h())))`.
+func (c *TROPHIESClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TROPHIES = append(c.inters.TROPHIES, interceptors...)
+}
+
+// Create returns a builder for creating a TROPHIES entity.
+func (c *TROPHIESClient) Create() *TROPHIESCreate {
+	mutation := newTROPHIESMutation(c.config, OpCreate)
+	return &TROPHIESCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TROPHIES entities.
+func (c *TROPHIESClient) CreateBulk(builders ...*TROPHIESCreate) *TROPHIESCreateBulk {
+	return &TROPHIESCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TROPHIESClient) MapCreateBulk(slice any, setFunc func(*TROPHIESCreate, int)) *TROPHIESCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TROPHIESCreateBulk{err: fmt.Errorf("calling to TROPHIESClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TROPHIESCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TROPHIESCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TROPHIES.
+func (c *TROPHIESClient) Update() *TROPHIESUpdate {
+	mutation := newTROPHIESMutation(c.config, OpUpdate)
+	return &TROPHIESUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TROPHIESClient) UpdateOne(t *TROPHIES) *TROPHIESUpdateOne {
+	mutation := newTROPHIESMutation(c.config, OpUpdateOne, withTROPHIES(t))
+	return &TROPHIESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TROPHIESClient) UpdateOneID(id int) *TROPHIESUpdateOne {
+	mutation := newTROPHIESMutation(c.config, OpUpdateOne, withTROPHIESID(id))
+	return &TROPHIESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TROPHIES.
+func (c *TROPHIESClient) Delete() *TROPHIESDelete {
+	mutation := newTROPHIESMutation(c.config, OpDelete)
+	return &TROPHIESDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TROPHIESClient) DeleteOne(t *TROPHIES) *TROPHIESDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TROPHIESClient) DeleteOneID(id int) *TROPHIESDeleteOne {
+	builder := c.Delete().Where(trophies.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TROPHIESDeleteOne{builder}
+}
+
+// Query returns a query builder for TROPHIES.
+func (c *TROPHIESClient) Query() *TROPHIESQuery {
+	return &TROPHIESQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTROPHIES},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TROPHIES entity by its id.
+func (c *TROPHIESClient) Get(ctx context.Context, id int) (*TROPHIES, error) {
+	return c.Query().Where(trophies.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TROPHIESClient) GetX(ctx context.Context, id int) *TROPHIES {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRefered queries the refered edge of a TROPHIES.
+func (c *TROPHIESClient) QueryRefered(t *TROPHIES) *ACHIEVEMENTSQuery {
+	query := (&ACHIEVEMENTSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trophies.Table, trophies.FieldID, id),
+			sqlgraph.To(achievements.Table, achievements.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, trophies.ReferedTable, trophies.ReferedColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TROPHIESClient) Hooks() []Hook {
+	return c.hooks.TROPHIES
+}
+
+// Interceptors returns the client interceptors.
+func (c *TROPHIESClient) Interceptors() []Interceptor {
+	return c.inters.TROPHIES
+}
+
+func (c *TROPHIESClient) mutate(ctx context.Context, m *TROPHIESMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TROPHIESCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TROPHIESUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TROPHIESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TROPHIESDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TROPHIES mutation op: %q", m.Op())
+	}
+}
+
 // USERSClient is a client for the USERS schema.
 type USERSClient struct {
 	config
@@ -1351,6 +1683,22 @@ func (c *USERSClient) QueryPrepares(u *USERS) *MEMOSQuery {
 	return query
 }
 
+// QueryAcquires queries the acquires edge of a USERS.
+func (c *USERSClient) QueryAcquires(u *USERS) *ACHIEVEMENTSQuery {
+	query := (&ACHIEVEMENTSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(users.Table, users.FieldID, id),
+			sqlgraph.To(achievements.Table, achievements.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, users.AcquiresTable, users.AcquiresColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *USERSClient) Hooks() []Hook {
 	return c.hooks.USERS
@@ -1379,9 +1727,11 @@ func (c *USERSClient) mutate(ctx context.Context, m *USERSMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, USERS []ent.Hook
+		ACHIEVEMENTS, AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, TROPHIES,
+		USERS []ent.Hook
 	}
 	inters struct {
-		AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, USERS []ent.Interceptor
+		ACHIEVEMENTS, AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, TROPHIES,
+		USERS []ent.Interceptor
 	}
 )

@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/aithemes"
 	"github.com/Hosi121/SpeakUp/ent/calls"
 	"github.com/Hosi121/SpeakUp/ent/friends"
@@ -19,6 +20,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	achievementsFields := schema.ACHIEVEMENTS{}.Fields()
+	_ = achievementsFields
+	// achievementsDescCreatedAt is the schema descriptor for created_at field.
+	achievementsDescCreatedAt := achievementsFields[2].Descriptor()
+	// achievements.DefaultCreatedAt holds the default value on creation for the created_at field.
+	achievements.DefaultCreatedAt = achievementsDescCreatedAt.Default.(func() time.Time)
 	aithemesFields := schema.AITHEMES{}.Fields()
 	_ = aithemesFields
 	// aithemesDescCreatedAt is the schema descriptor for created_at field.

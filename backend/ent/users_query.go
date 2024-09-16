@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
@@ -29,6 +30,7 @@ type USERSQuery struct {
 	withConnects     *FRIENDSQuery
 	withParticipates *MATCHINGSQuery
 	withPrepares     *MEMOSQuery
+	withAcquires     *ACHIEVEMENTSQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -124,6 +126,28 @@ func (uq *USERSQuery) QueryPrepares() *MEMOSQuery {
 			sqlgraph.From(users.Table, users.FieldID, selector),
 			sqlgraph.To(memos.Table, memos.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, users.PreparesTable, users.PreparesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAcquires chains the current query on the "acquires" edge.
+func (uq *USERSQuery) QueryAcquires() *ACHIEVEMENTSQuery {
+	query := (&ACHIEVEMENTSClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(users.Table, users.FieldID, selector),
+			sqlgraph.To(achievements.Table, achievements.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, users.AcquiresTable, users.AcquiresColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -326,6 +350,7 @@ func (uq *USERSQuery) Clone() *USERSQuery {
 		withConnects:     uq.withConnects.Clone(),
 		withParticipates: uq.withParticipates.Clone(),
 		withPrepares:     uq.withPrepares.Clone(),
+		withAcquires:     uq.withAcquires.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -362,6 +387,17 @@ func (uq *USERSQuery) WithPrepares(opts ...func(*MEMOSQuery)) *USERSQuery {
 		opt(query)
 	}
 	uq.withPrepares = query
+	return uq
+}
+
+// WithAcquires tells the query-builder to eager-load the nodes that are connected to
+// the "acquires" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *USERSQuery) WithAcquires(opts ...func(*ACHIEVEMENTSQuery)) *USERSQuery {
+	query := (&ACHIEVEMENTSClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withAcquires = query
 	return uq
 }
 
@@ -443,10 +479,11 @@ func (uq *USERSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*USERS,
 	var (
 		nodes       = []*USERS{}
 		_spec       = uq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			uq.withConnects != nil,
 			uq.withParticipates != nil,
 			uq.withPrepares != nil,
+			uq.withAcquires != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -484,6 +521,13 @@ func (uq *USERSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*USERS,
 	if query := uq.withPrepares; query != nil {
 		if err := uq.loadPrepares(ctx, query, nodes, nil,
 			func(n *USERS, e *MEMOS) { n.Edges.Prepares = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withAcquires; query != nil {
+		if err := uq.loadAcquires(ctx, query, nodes,
+			func(n *USERS) { n.Edges.Acquires = []*ACHIEVEMENTS{} },
+			func(n *USERS, e *ACHIEVEMENTS) { n.Edges.Acquires = append(n.Edges.Acquires, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -635,6 +679,37 @@ func (uq *USERSQuery) loadPrepares(ctx context.Context, query *MEMOSQuery, nodes
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "users_prepares" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *USERSQuery) loadAcquires(ctx context.Context, query *ACHIEVEMENTSQuery, nodes []*USERS, init func(*USERS), assign func(*USERS, *ACHIEVEMENTS)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*USERS)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ACHIEVEMENTS(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(users.AcquiresColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.users_acquires
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "users_acquires" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "users_acquires" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

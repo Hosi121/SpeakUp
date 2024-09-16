@@ -1,7 +1,6 @@
 import { Home, LibraryBooks, Mic } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Theme from "../../styles/Theme";
 
 type bottomNavigationProps = {
   value: mainBottomNavigation;

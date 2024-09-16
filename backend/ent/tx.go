@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// ACHIEVEMENTS is the client for interacting with the ACHIEVEMENTS builders.
+	ACHIEVEMENTS *ACHIEVEMENTSClient
 	// AITHEMES is the client for interacting with the AITHEMES builders.
 	AITHEMES *AITHEMESClient
 	// CALLS is the client for interacting with the CALLS builders.
@@ -24,6 +26,8 @@ type Tx struct {
 	MEMOS *MEMOSClient
 	// SESSIONS is the client for interacting with the SESSIONS builders.
 	SESSIONS *SESSIONSClient
+	// TROPHIES is the client for interacting with the TROPHIES builders.
+	TROPHIES *TROPHIESClient
 	// USERS is the client for interacting with the USERS builders.
 	USERS *USERSClient
 
@@ -157,12 +161,14 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.ACHIEVEMENTS = NewACHIEVEMENTSClient(tx.config)
 	tx.AITHEMES = NewAITHEMESClient(tx.config)
 	tx.CALLS = NewCALLSClient(tx.config)
 	tx.FRIENDS = NewFRIENDSClient(tx.config)
 	tx.MATCHINGS = NewMATCHINGSClient(tx.config)
 	tx.MEMOS = NewMEMOSClient(tx.config)
 	tx.SESSIONS = NewSESSIONSClient(tx.config)
+	tx.TROPHIES = NewTROPHIESClient(tx.config)
 	tx.USERS = NewUSERSClient(tx.config)
 }
 
@@ -173,7 +179,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AITHEMES.QueryXXX(), the query will be executed
+// applies a query, for example: ACHIEVEMENTS.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
