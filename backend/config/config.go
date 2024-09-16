@@ -31,3 +31,9 @@ func GetSupabaseAPI() (string, string) {
 
 	return supabaseRef, supabaseKey
 }
+
+func GetKey() ([]byte, []byte) {
+	publicKey := []byte(os.Getenv("PUBLIC_KEY"))
+	secretKey := []byte(os.Getenv("SECRET_KEY"))
+	return publicKey, secretKey
+}
