@@ -6,28 +6,70 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { IconButton } from "../utils/IconButton";
 import TopSection from "../utils/TopSection";
-import { MainBottomNavigation } from "../utils/MainBottomNavigation";
 import { LibraryBooks } from "@mui/icons-material";
+import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
-export const Record = () => {
+const RecordContainer = () => {
   return (
-    <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
+    <Container
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "100vh",
+      }}
+    >
       <Container sx={{ pt: 3 }}>
         <TopSection />
         <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
-          <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
-            <LibraryBooks sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
+          <Typography
+            variant="h4"
+            sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}
+          >
+            <LibraryBooks
+              sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }}
+            />
             記録
           </Typography>
-          <Box sx={{ display: "flex", placeContent: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
-            <IconButton icon={<DescriptionIcon sx={{ fontSize: "60px" }} />} text="会話の記録" url="conversationrecords" />
-            <IconButton icon={<FolderOutlinedIcon sx={{ fontSize: "60px" }} />} text="履歴" url="history" />
-            <IconButton icon={<EmojiEventsIcon sx={{ fontSize: "60px" }} />} text="データ" url="stats" />
-            <IconButton icon={<EditNoteIcon sx={{ fontSize: "60px" }} />} text="持ち込みメモ" url="memo" />
+          <Box
+            sx={{
+              display: "flex",
+              placeContent: "center",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+            }}
+          >
+            <IconButton
+              icon={<DescriptionIcon sx={{ fontSize: "60px" }} />}
+              text="会話の記録"
+              url="conversationrecords"
+            />
+            <IconButton
+              icon={<FolderOutlinedIcon sx={{ fontSize: "60px" }} />}
+              text="履歴"
+              url="history"
+            />
+            <IconButton
+              icon={<EmojiEventsIcon sx={{ fontSize: "60px" }} />}
+              text="データ"
+              url="stats"
+            />
+            <IconButton
+              icon={<EditNoteIcon sx={{ fontSize: "60px" }} />}
+              text="持ち込みメモ"
+              url="memo"
+            />
           </Box>
         </Stack>
       </Container>
-      <MainBottomNavigation value="record" />
     </Container>
+  );
+};
+
+export const Record = () => {
+  return (
+    <BottomNavigationTemplate value="record">
+      <RecordContainer />
+    </BottomNavigationTemplate>
   );
 };
