@@ -47,9 +47,16 @@ const MessageContainer = () => {
         </Box>
 
         {/* Chat Messages */}
-        <Box sx={{ mt: 4, flexGrow: 1, overflow: "auto", p: 2, height: "55vh" }}>
+        <Box sx={{ mt: 4, flexGrow: 1, overflow: "auto", pt: 2, pb: 2, height: "55vh" }}>
           <List>
             {/* Render each message from the state */}
+            <ListItem sx={{ justifyContent: "flex-start" }}>
+              <Box sx={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: "secondary.main", mr: 2 }}></Box>
+              <Paper sx={{ padding: "10px", backgroundColor: "#ccc", maxWidth: "60%", wordWrap: "break-word" }}>
+                <ListItemText primary="こんにちは" />
+              </Paper>
+            </ListItem>
+
             {messages.map((message, index) => (
               <ListItem key={index} sx={{ justifyContent: "flex-end" }}>
                 <Paper sx={{ padding: "10px", backgroundColor: "#f0f0f0", maxWidth: "60%", wordWrap: "break-word" }}>
