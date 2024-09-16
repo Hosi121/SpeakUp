@@ -3,7 +3,7 @@ import {
   MainBottomNavigation,
   mainBottomNavigation,
 } from "../utils/MainBottomNavigation";
-import styles from "./BottomNavigationTemplate.module.css";
+import { Box } from "@mui/material";
 
 type bottomNavigationTemplateProps = {
   value: mainBottomNavigation;
@@ -15,9 +15,9 @@ export const BottomNavigationTemplate = ({
   children,
 }: bottomNavigationTemplateProps) => {
   return (
-    <div className={styles.container}>
+    <Box width={"100vw"} height={"100vh"}>
       {children}
       <MainBottomNavigation value={value} />
-    </div>
+    </Box>
   );
 };
