@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { TextField } from '@mui/material';
-import { Box } from '@mui/system';
+import React, { useState } from "react";
+import { TextField } from "@mui/material";
+import { Box } from "@mui/system";
+import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
-const Memo = () => {
-  const [text, setText] = useState('');
+const MemoContainer = () => {
+  const [text, setText] = useState("");
   const maxLength = 500;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,8 +23,8 @@ const Memo = () => {
         helperText={`${text.length}/${maxLength}`}
         InputProps={{
           style: {
-            height: '300px'  // テキストエリアの高さを調整
-          }
+            height: "300px", // テキストエリアの高さを調整
+          },
         }}
         rows={10}
       />
@@ -31,4 +32,10 @@ const Memo = () => {
   );
 };
 
-export default Memo;
+export const Memo = () => {
+  return (
+    <BottomNavigationTemplate value="other">
+      <MemoContainer />
+    </BottomNavigationTemplate>
+  );
+};
