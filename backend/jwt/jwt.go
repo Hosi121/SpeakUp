@@ -43,20 +43,20 @@ func GenerateJWT(userID string) (string, error) {
 }
 
 // JWT トークンを検証する関数
-func ValidateJWT(tokenString string) (*jwt.Token, error) {
+func ValidateJWT(tokenString string) (int, error) {
 	config.LoadEnv()
 	// 公開鍵の取得
 	public, _ := config.GetKey()
-	block, _ := pem.Decode(public)
+	block, err := pem.Decode(public)
 	if block == nil {
 		fmt.Println("failed to parse PEM block containing the public key")
-		return nil, nil
+		return nil, err
 	}
 
 	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		fmt.Println("failed to parse public key: %v", err)
-		return nil, nil
+		return nil, err
 	}
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -74,7 +74,14 @@ func ValidateJWT(tokenString string) (*jwt.Token, error) {
 	}
 
 	if token.Valid {
-		return token, nil
+		// クレームを取得
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			// user_idを取得
+			if userID, ok := claims["user_id"].(string); ok {
+				return userID, nil
+			}
+			return "", fmt.Errorf("user_id not found in token claims")
+		}
 	}
 
 	return nil, fmt.Errorf("invalid token")
