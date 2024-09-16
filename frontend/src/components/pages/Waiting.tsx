@@ -1,8 +1,8 @@
 import { Box, Button, Container, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Memo } from "./Memo";
 import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
+import { MemoInputField } from "../utils/MemoInputField";
 
 const WaitingCotainer = () => {
   return (
@@ -17,7 +17,7 @@ const WaitingCotainer = () => {
           <Typography variant="subtitle1" gutterBottom component="div">
             持ち込みメモ
           </Typography>
-          <Memo />
+          <MemoInputField />
         </Box>
 
         <Button variant="contained" sx={{ mt: 4, color: "#000", bgcolor: "secondary.main", "&:hover": { bgcolor: "secondary.dark" }, width: "80%", maxWidth: "300px" }}>

@@ -1,34 +1,30 @@
-import React, { useState } from "react";
-import { TextField } from "@mui/material";
-import { Box } from "@mui/system";
+import { Container, Stack, Typography } from "@mui/material";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
+import TopSection from "../utils/TopSection";
+import { MemoInputField } from "../utils/MemoInputField";
 
 const MemoContainer = () => {
-  const [text, setText] = useState("");
-  const maxLength = 500;
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setText(event.target.value.slice(0, maxLength));
-  };
-
   return (
-    <Box sx={{ margin: 2 }}>
-      <TextField
-        label="持ち込みメモ"
-        multiline
-        fullWidth
-        variant="outlined"
-        value={text}
-        onChange={handleChange}
-        helperText={`${text.length}/${maxLength}`}
-        InputProps={{
-          style: {
-            height: "300px", // テキストエリアの高さを調整
-          },
-        }}
-        rows={10}
-      />
-    </Box>
+    <Container
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "100vh",
+      }}
+    >
+      <Container sx={{ pt: 3 }}>
+        <TopSection />
+        <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
+          <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
+            <EditNoteIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
+            持ち込みメモ
+          </Typography>
+          <MemoInputField />
+        </Stack>
+      </Container>
+    </Container>
   );
 };
 
