@@ -1,7 +1,6 @@
 import { Home, LibraryBooks, Mic } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Theme from "../../styles/Theme";
 
 type bottomNavigationProps = {
   value: mainBottomNavigation;
@@ -26,7 +25,7 @@ export const MainBottomNavigation = ({ value }: bottomNavigationProps) => {
   const index = mainBottomNavigationToIndex(value);
 
   return (
-    <BottomNavigation showLabels value={index} sx={{ padding: "20px 0", height: "100px", position: "sticky", bottom: 0, zIndex: 100, backgroundColor: `${Theme.palette.background.default}` }}>
+    <BottomNavigation showLabels value={index} sx={{ padding: "20px 0", height: "70px", position: "sticky", bottom: 0, zIndex: 100, backgroundColor: "background.default", boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.6);" }}>
       <BottomNavigationAction onClick={() => navigate("/record")} icon={<LibraryBooks fontSize="large" />} />
       <BottomNavigationAction onClick={() => navigate("/home")} icon={<Home fontSize="large" />} />
       <BottomNavigationAction onClick={() => navigate("/session")} icon={<Mic fontSize="large" />} />
