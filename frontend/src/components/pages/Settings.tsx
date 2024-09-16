@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, IconButton, Avatar, TextField, Button, Switch, Paper, Grid, Divider, useTheme, styled } from "@mui/material";
+import { Box, Typography, IconButton, Avatar, TextField, Button, Switch, Paper, Grid, Divider, useTheme, styled, Container } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -81,8 +81,8 @@ const SettingsContainer = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
-      <Box sx={{ pt: 3 }}>
+    <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
+      <Container sx={{ pt: 3 }}>
         <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
           <SettingsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
           設定
@@ -181,8 +181,8 @@ const SettingsContainer = () => {
             ログアウト
           </Button>
         </Box>
-      </Box>
-    </Box>
+      </Container>
+    </Container>
   );
 };
 export const Settings = () => {
