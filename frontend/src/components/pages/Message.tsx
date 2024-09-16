@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, List, ListItem, ListItemText, Paper, TextField, Button, IconButton, Container } from "@mui/material";
+import { Box, List, ListItem, ListItemText, Paper, TextField, Button, IconButton, Container, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection"; // Import TopSection component
@@ -30,6 +30,7 @@ const MessageContainer = () => {
         flexDirection: "column",
         justifyContent: "space-between",
         height: "calc(100vh - 70px)",
+        boxSizing: "border-box",
       }}
     >
       <Container sx={{ pt: 3 }}>
@@ -39,10 +40,14 @@ const MessageContainer = () => {
           <IconButton onClick={handleGoBack}>
             <ArrowBackIcon sx={{ fontSize: 40 }} />
           </IconButton>
+          <Container sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -25%)", width: "fit-content" }}>
+            <Box sx={{ width: "80px", height: "80px", borderRadius: "50%", backgroundColor: "secondary.main" }}></Box>
+            <Typography sx={{ fontSize: "1.5rem" }}>Mike</Typography>
+          </Container>
         </Box>
 
         {/* Chat Messages */}
-        <Box sx={{ flexGrow: 1, overflow: "auto", p: 2 }}>
+        <Box sx={{ mt: 4, flexGrow: 1, overflow: "auto", p: 2, height: "55vh" }}>
           <List>
             {/* Render each message from the state */}
             {messages.map((message, index) => (
