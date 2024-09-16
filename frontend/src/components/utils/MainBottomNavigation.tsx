@@ -26,10 +26,30 @@ export const MainBottomNavigation = ({ value }: bottomNavigationProps) => {
   const index = mainBottomNavigationToIndex(value);
 
   return (
-    <BottomNavigation showLabels value={index} sx={{ padding: "20px 0", height: "100px", position: "sticky", bottom: 0, zIndex: 100, backgroundColor: `${Theme.palette.background.default}` }}>
-      <BottomNavigationAction onClick={() => navigate("/record")} icon={<LibraryBooks fontSize="large" />} />
-      <BottomNavigationAction onClick={() => navigate("/home")} icon={<Home fontSize="large" />} />
-      <BottomNavigationAction onClick={() => navigate("/session")} icon={<Mic fontSize="large" />} />
+    <BottomNavigation
+      showLabels
+      value={index}
+      sx={{
+        padding: "20px 0",
+        height: "100px",
+        position: "sticky",
+        bottom: 0,
+        zIndex: 100,
+        backgroundColor: `${Theme.palette.background.default}`,
+      }}
+    >
+      <BottomNavigationAction
+        onClick={() => navigate("/record")}
+        icon={<LibraryBooks fontSize="large" />}
+      />
+      <BottomNavigationAction
+        onClick={() => navigate("/home")}
+        icon={<Home fontSize="large" />}
+      />
+      <BottomNavigationAction
+        onClick={() => navigate("/session")}
+        icon={<Mic fontSize="large" />}
+      />
     </BottomNavigation>
   );
 };
