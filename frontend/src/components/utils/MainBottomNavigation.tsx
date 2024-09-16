@@ -7,7 +7,7 @@ type bottomNavigationProps = {
   value: mainBottomNavigation;
 };
 
-type mainBottomNavigation = "record" | "home" | "session" | "other";
+export type mainBottomNavigation = "record" | "home" | "session" | "other";
 
 export const MainBottomNavigation = ({ value }: bottomNavigationProps) => {
   const navigate = useNavigate();
@@ -36,6 +36,7 @@ export const MainBottomNavigation = ({ value }: bottomNavigationProps) => {
         bottom: 0,
         zIndex: 100,
         backgroundColor: `${Theme.palette.background.default}`,
+        boxShadow: "0 0 5px rgba(0, 0, 0, 0.6)",
       }}
     >
       <BottomNavigationAction
