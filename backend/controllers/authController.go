@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/Hosi121/SpeakUp/config"
 	"github.com/Hosi121/SpeakUp/ent"
 	"github.com/Hosi121/SpeakUp/ent/users"
+	jwt_auth "github.com/Hosi121/SpeakUp/jwt_auth"
 	supabaseAPI "github.com/Hosi121/SpeakUp/supaseAPI"
 	"github.com/gin-gonic/gin"
 	"github.com/supabase-community/auth-go/types"
@@ -104,10 +104,6 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	// 成功レスポンス
-	slog.Info("User signed in successfully", slog.String("email", request.Email))
-	c.JSON(http.StatusOK, gin.H{"message": "User signed in successfully", "accessToken": resp.AccessToken})
-
 	// DBの用意
 	dsn := config.GetDSN()
 	db_client, err := ent.Open("mysql", dsn)
@@ -153,5 +149,15 @@ func SignIn(c *gin.Context) {
 		// fmt.Println("Failed to update created_at: %v", err)
 		return
 	}
-	fmt.Println("success")
+
+	// JWTトークンを生成
+	jwt_token, err := jwt_auth.GenerateJWT(user.ID)
+	if err != nil {
+		slog.Error("Failed to generate JWT: %v", err)
+	}
+
+	// 成功レスポンス
+	slog.Info("User signed in successfully", slog.String("email", request.Email))
+	c.JSON(http.StatusOK, gin.H{"message": "User signed in successfully", "accessToken": jwt_token})
+
 }
