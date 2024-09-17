@@ -13,24 +13,26 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/friends"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
+	"github.com/Hosi121/SpeakUp/ent/progress"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
 // USERSQuery is the builder for querying USERS entities.
 type USERSQuery struct {
 	config
-	ctx              *QueryContext
-	order            []users.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.USERS
-	withConnects     *FRIENDSQuery
-	withParticipates *MATCHINGSQuery
-	withPrepares     *MEMOSQuery
-	withAcquires     *ACHIEVEMENTSQuery
+	ctx          *QueryContext
+	order        []users.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.USERS
+	withConnects *FRIENDSQuery
+	withMakes    *EVENTRECORDSQuery
+	withPrepares *MEMOSQuery
+	withAcquires *ACHIEVEMENTSQuery
+	withRecords  *PROGRESSQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -89,9 +91,9 @@ func (uq *USERSQuery) QueryConnects() *FRIENDSQuery {
 	return query
 }
 
-// QueryParticipates chains the current query on the "participates" edge.
-func (uq *USERSQuery) QueryParticipates() *MATCHINGSQuery {
-	query := (&MATCHINGSClient{config: uq.config}).Query()
+// QueryMakes chains the current query on the "makes" edge.
+func (uq *USERSQuery) QueryMakes() *EVENTRECORDSQuery {
+	query := (&EVENTRECORDSClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -102,8 +104,8 @@ func (uq *USERSQuery) QueryParticipates() *MATCHINGSQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(users.Table, users.FieldID, selector),
-			sqlgraph.To(matchings.Table, matchings.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, users.ParticipatesTable, users.ParticipatesPrimaryKey...),
+			sqlgraph.To(event_records.Table, event_records.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, users.MakesTable, users.MakesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -148,6 +150,28 @@ func (uq *USERSQuery) QueryAcquires() *ACHIEVEMENTSQuery {
 			sqlgraph.From(users.Table, users.FieldID, selector),
 			sqlgraph.To(achievements.Table, achievements.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, users.AcquiresTable, users.AcquiresColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRecords chains the current query on the "records" edge.
+func (uq *USERSQuery) QueryRecords() *PROGRESSQuery {
+	query := (&PROGRESSClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(users.Table, users.FieldID, selector),
+			sqlgraph.To(progress.Table, progress.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, users.RecordsTable, users.RecordsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -342,15 +366,16 @@ func (uq *USERSQuery) Clone() *USERSQuery {
 		return nil
 	}
 	return &USERSQuery{
-		config:           uq.config,
-		ctx:              uq.ctx.Clone(),
-		order:            append([]users.OrderOption{}, uq.order...),
-		inters:           append([]Interceptor{}, uq.inters...),
-		predicates:       append([]predicate.USERS{}, uq.predicates...),
-		withConnects:     uq.withConnects.Clone(),
-		withParticipates: uq.withParticipates.Clone(),
-		withPrepares:     uq.withPrepares.Clone(),
-		withAcquires:     uq.withAcquires.Clone(),
+		config:       uq.config,
+		ctx:          uq.ctx.Clone(),
+		order:        append([]users.OrderOption{}, uq.order...),
+		inters:       append([]Interceptor{}, uq.inters...),
+		predicates:   append([]predicate.USERS{}, uq.predicates...),
+		withConnects: uq.withConnects.Clone(),
+		withMakes:    uq.withMakes.Clone(),
+		withPrepares: uq.withPrepares.Clone(),
+		withAcquires: uq.withAcquires.Clone(),
+		withRecords:  uq.withRecords.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -368,14 +393,14 @@ func (uq *USERSQuery) WithConnects(opts ...func(*FRIENDSQuery)) *USERSQuery {
 	return uq
 }
 
-// WithParticipates tells the query-builder to eager-load the nodes that are connected to
-// the "participates" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *USERSQuery) WithParticipates(opts ...func(*MATCHINGSQuery)) *USERSQuery {
-	query := (&MATCHINGSClient{config: uq.config}).Query()
+// WithMakes tells the query-builder to eager-load the nodes that are connected to
+// the "makes" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *USERSQuery) WithMakes(opts ...func(*EVENTRECORDSQuery)) *USERSQuery {
+	query := (&EVENTRECORDSClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withParticipates = query
+	uq.withMakes = query
 	return uq
 }
 
@@ -398,6 +423,17 @@ func (uq *USERSQuery) WithAcquires(opts ...func(*ACHIEVEMENTSQuery)) *USERSQuery
 		opt(query)
 	}
 	uq.withAcquires = query
+	return uq
+}
+
+// WithRecords tells the query-builder to eager-load the nodes that are connected to
+// the "records" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *USERSQuery) WithRecords(opts ...func(*PROGRESSQuery)) *USERSQuery {
+	query := (&PROGRESSClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withRecords = query
 	return uq
 }
 
@@ -479,11 +515,12 @@ func (uq *USERSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*USERS,
 	var (
 		nodes       = []*USERS{}
 		_spec       = uq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			uq.withConnects != nil,
-			uq.withParticipates != nil,
+			uq.withMakes != nil,
 			uq.withPrepares != nil,
 			uq.withAcquires != nil,
+			uq.withRecords != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -511,10 +548,10 @@ func (uq *USERSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*USERS,
 			return nil, err
 		}
 	}
-	if query := uq.withParticipates; query != nil {
-		if err := uq.loadParticipates(ctx, query, nodes,
-			func(n *USERS) { n.Edges.Participates = []*MATCHINGS{} },
-			func(n *USERS, e *MATCHINGS) { n.Edges.Participates = append(n.Edges.Participates, e) }); err != nil {
+	if query := uq.withMakes; query != nil {
+		if err := uq.loadMakes(ctx, query, nodes,
+			func(n *USERS) { n.Edges.Makes = []*EVENT_RECORDS{} },
+			func(n *USERS, e *EVENT_RECORDS) { n.Edges.Makes = append(n.Edges.Makes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -528,6 +565,12 @@ func (uq *USERSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*USERS,
 		if err := uq.loadAcquires(ctx, query, nodes,
 			func(n *USERS) { n.Edges.Acquires = []*ACHIEVEMENTS{} },
 			func(n *USERS, e *ACHIEVEMENTS) { n.Edges.Acquires = append(n.Edges.Acquires, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withRecords; query != nil {
+		if err := uq.loadRecords(ctx, query, nodes, nil,
+			func(n *USERS, e *PROGRESS) { n.Edges.Records = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -595,64 +638,34 @@ func (uq *USERSQuery) loadConnects(ctx context.Context, query *FRIENDSQuery, nod
 	}
 	return nil
 }
-func (uq *USERSQuery) loadParticipates(ctx context.Context, query *MATCHINGSQuery, nodes []*USERS, init func(*USERS), assign func(*USERS, *MATCHINGS)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*USERS)
-	nids := make(map[int]map[*USERS]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+func (uq *USERSQuery) loadMakes(ctx context.Context, query *EVENTRECORDSQuery, nodes []*USERS, init func(*USERS), assign func(*USERS, *EVENT_RECORDS)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*USERS)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(users.ParticipatesTable)
-		s.Join(joinT).On(s.C(matchings.FieldID), joinT.C(users.ParticipatesPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(users.ParticipatesPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(users.ParticipatesPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*USERS]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*MATCHINGS](ctx, query, qr, query.inters)
+	query.withFKs = true
+	query.Where(predicate.EVENT_RECORDS(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(users.MakesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.users_makes
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "users_makes" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "participates" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "users_makes" returned %v for node %v`, *fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -710,6 +723,34 @@ func (uq *USERSQuery) loadAcquires(ctx context.Context, query *ACHIEVEMENTSQuery
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "users_acquires" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *USERSQuery) loadRecords(ctx context.Context, query *PROGRESSQuery, nodes []*USERS, init func(*USERS), assign func(*USERS, *PROGRESS)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*USERS)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.PROGRESS(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(users.RecordsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.users_records
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "users_records" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "users_records" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

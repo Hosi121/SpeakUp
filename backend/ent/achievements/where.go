@@ -60,9 +60,9 @@ func UserID(v int) predicate.ACHIEVEMENTS {
 	return predicate.ACHIEVEMENTS(sql.FieldEQ(FieldUserID, v))
 }
 
-// TrophyID applies equality check predicate on the "trophy_id" field. It's identical to TrophyIDEQ.
-func TrophyID(v int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldEQ(FieldTrophyID, v))
+// Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
+func Title(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldEQ(FieldTitle, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -110,44 +110,69 @@ func UserIDLTE(v int) predicate.ACHIEVEMENTS {
 	return predicate.ACHIEVEMENTS(sql.FieldLTE(FieldUserID, v))
 }
 
-// TrophyIDEQ applies the EQ predicate on the "trophy_id" field.
-func TrophyIDEQ(v int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldEQ(FieldTrophyID, v))
+// TitleEQ applies the EQ predicate on the "title" field.
+func TitleEQ(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldEQ(FieldTitle, v))
 }
 
-// TrophyIDNEQ applies the NEQ predicate on the "trophy_id" field.
-func TrophyIDNEQ(v int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldNEQ(FieldTrophyID, v))
+// TitleNEQ applies the NEQ predicate on the "title" field.
+func TitleNEQ(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldNEQ(FieldTitle, v))
 }
 
-// TrophyIDIn applies the In predicate on the "trophy_id" field.
-func TrophyIDIn(vs ...int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldIn(FieldTrophyID, vs...))
+// TitleIn applies the In predicate on the "title" field.
+func TitleIn(vs ...string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldIn(FieldTitle, vs...))
 }
 
-// TrophyIDNotIn applies the NotIn predicate on the "trophy_id" field.
-func TrophyIDNotIn(vs ...int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldNotIn(FieldTrophyID, vs...))
+// TitleNotIn applies the NotIn predicate on the "title" field.
+func TitleNotIn(vs ...string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldNotIn(FieldTitle, vs...))
 }
 
-// TrophyIDGT applies the GT predicate on the "trophy_id" field.
-func TrophyIDGT(v int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldGT(FieldTrophyID, v))
+// TitleGT applies the GT predicate on the "title" field.
+func TitleGT(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldGT(FieldTitle, v))
 }
 
-// TrophyIDGTE applies the GTE predicate on the "trophy_id" field.
-func TrophyIDGTE(v int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldGTE(FieldTrophyID, v))
+// TitleGTE applies the GTE predicate on the "title" field.
+func TitleGTE(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldGTE(FieldTitle, v))
 }
 
-// TrophyIDLT applies the LT predicate on the "trophy_id" field.
-func TrophyIDLT(v int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldLT(FieldTrophyID, v))
+// TitleLT applies the LT predicate on the "title" field.
+func TitleLT(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldLT(FieldTitle, v))
 }
 
-// TrophyIDLTE applies the LTE predicate on the "trophy_id" field.
-func TrophyIDLTE(v int) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(sql.FieldLTE(FieldTrophyID, v))
+// TitleLTE applies the LTE predicate on the "title" field.
+func TitleLTE(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldLTE(FieldTitle, v))
+}
+
+// TitleContains applies the Contains predicate on the "title" field.
+func TitleContains(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldContains(FieldTitle, v))
+}
+
+// TitleHasPrefix applies the HasPrefix predicate on the "title" field.
+func TitleHasPrefix(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldHasPrefix(FieldTitle, v))
+}
+
+// TitleHasSuffix applies the HasSuffix predicate on the "title" field.
+func TitleHasSuffix(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldHasSuffix(FieldTitle, v))
+}
+
+// TitleEqualFold applies the EqualFold predicate on the "title" field.
+func TitleEqualFold(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldEqualFold(FieldTitle, v))
+}
+
+// TitleContainsFold applies the ContainsFold predicate on the "title" field.
+func TitleContainsFold(v string) predicate.ACHIEVEMENTS {
+	return predicate.ACHIEVEMENTS(sql.FieldContainsFold(FieldTitle, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -205,29 +230,6 @@ func HasGranted() predicate.ACHIEVEMENTS {
 func HasGrantedWith(preds ...predicate.USERS) predicate.ACHIEVEMENTS {
 	return predicate.ACHIEVEMENTS(func(s *sql.Selector) {
 		step := newGrantedStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasRefers applies the HasEdge predicate on the "refers" edge.
-func HasRefers() predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, RefersTable, RefersColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRefersWith applies the HasEdge predicate on the "refers" edge with a given conditions (other predicates).
-func HasRefersWith(preds ...predicate.TROPHIES) predicate.ACHIEVEMENTS {
-	return predicate.ACHIEVEMENTS(func(s *sql.Selector) {
-		step := newRefersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

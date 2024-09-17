@@ -30,7 +30,7 @@ func (CALLS) Fields() []ent.Field {
 // Edges of the CALLS.
 func (CALLS) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("made", MATCHINGS.Type).
+		edge.From("made", SESSIONS.Type).
 			Unique().
 			Ref("makes"),
 	}

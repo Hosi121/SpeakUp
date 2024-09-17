@@ -8,27 +8,31 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// SESSIONS holds the schema definition for the SESSIONS entity.
+// MATCHINGS holds the schema definition for the MATCHINGS entity.
 type SESSIONS struct {
 	ent.Schema
 }
 
-// Fields of the SESSIONS.
+// Fields of the MATCHINGS.
 func (SESSIONS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("session_start"),
-		field.Time("session_end"),
-		field.Int("theme_id"),
-		field.Time("created_at").
+		field.Int("user_id"),
+		field.Int("matched_user_id"),
+		field.Int("record_id"),
+		field.Time("matched_at").
 			Default(time.Now()),
+		field.Enum("status").
+			Values("MATCHED", "PROCCESSING", "FINISHED"),
 	}
 }
 
-// Edges of the SESSIONS.
+// Edges of the MATCHINGS.
 func (SESSIONS) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("has", MATCHINGS.Type),
-		edge.To("uses", AITHEMES.Type).
+		edge.From("had", EVENT_RECORDS.Type).
+			Ref("has").
+			Unique(),
+		edge.To("makes", CALLS.Type).
 			Unique(),
 	}
 }

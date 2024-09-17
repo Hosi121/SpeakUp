@@ -16,13 +16,14 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
+	"github.com/Hosi121/SpeakUp/ent/ai_themes"
 	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
+	"github.com/Hosi121/SpeakUp/ent/events"
 	"github.com/Hosi121/SpeakUp/ent/friends"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
+	"github.com/Hosi121/SpeakUp/ent/progress"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
-	"github.com/Hosi121/SpeakUp/ent/trophies"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -33,20 +34,22 @@ type Client struct {
 	Schema *migrate.Schema
 	// ACHIEVEMENTS is the client for interacting with the ACHIEVEMENTS builders.
 	ACHIEVEMENTS *ACHIEVEMENTSClient
-	// AITHEMES is the client for interacting with the AITHEMES builders.
-	AITHEMES *AITHEMESClient
+	// AI_THEMES is the client for interacting with the AI_THEMES builders.
+	AI_THEMES *AITHEMESClient
 	// CALLS is the client for interacting with the CALLS builders.
 	CALLS *CALLSClient
+	// EVENTS is the client for interacting with the EVENTS builders.
+	EVENTS *EVENTSClient
+	// EVENT_RECORDS is the client for interacting with the EVENT_RECORDS builders.
+	EVENT_RECORDS *EVENTRECORDSClient
 	// FRIENDS is the client for interacting with the FRIENDS builders.
 	FRIENDS *FRIENDSClient
-	// MATCHINGS is the client for interacting with the MATCHINGS builders.
-	MATCHINGS *MATCHINGSClient
 	// MEMOS is the client for interacting with the MEMOS builders.
 	MEMOS *MEMOSClient
+	// PROGRESS is the client for interacting with the PROGRESS builders.
+	PROGRESS *PROGRESSClient
 	// SESSIONS is the client for interacting with the SESSIONS builders.
 	SESSIONS *SESSIONSClient
-	// TROPHIES is the client for interacting with the TROPHIES builders.
-	TROPHIES *TROPHIESClient
 	// USERS is the client for interacting with the USERS builders.
 	USERS *USERSClient
 }
@@ -61,13 +64,14 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.ACHIEVEMENTS = NewACHIEVEMENTSClient(c.config)
-	c.AITHEMES = NewAITHEMESClient(c.config)
+	c.AI_THEMES = NewAITHEMESClient(c.config)
 	c.CALLS = NewCALLSClient(c.config)
+	c.EVENTS = NewEVENTSClient(c.config)
+	c.EVENT_RECORDS = NewEVENTRECORDSClient(c.config)
 	c.FRIENDS = NewFRIENDSClient(c.config)
-	c.MATCHINGS = NewMATCHINGSClient(c.config)
 	c.MEMOS = NewMEMOSClient(c.config)
+	c.PROGRESS = NewPROGRESSClient(c.config)
 	c.SESSIONS = NewSESSIONSClient(c.config)
-	c.TROPHIES = NewTROPHIESClient(c.config)
 	c.USERS = NewUSERSClient(c.config)
 }
 
@@ -159,17 +163,18 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		ACHIEVEMENTS: NewACHIEVEMENTSClient(cfg),
-		AITHEMES:     NewAITHEMESClient(cfg),
-		CALLS:        NewCALLSClient(cfg),
-		FRIENDS:      NewFRIENDSClient(cfg),
-		MATCHINGS:    NewMATCHINGSClient(cfg),
-		MEMOS:        NewMEMOSClient(cfg),
-		SESSIONS:     NewSESSIONSClient(cfg),
-		TROPHIES:     NewTROPHIESClient(cfg),
-		USERS:        NewUSERSClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		ACHIEVEMENTS:  NewACHIEVEMENTSClient(cfg),
+		AI_THEMES:     NewAITHEMESClient(cfg),
+		CALLS:         NewCALLSClient(cfg),
+		EVENTS:        NewEVENTSClient(cfg),
+		EVENT_RECORDS: NewEVENTRECORDSClient(cfg),
+		FRIENDS:       NewFRIENDSClient(cfg),
+		MEMOS:         NewMEMOSClient(cfg),
+		PROGRESS:      NewPROGRESSClient(cfg),
+		SESSIONS:      NewSESSIONSClient(cfg),
+		USERS:         NewUSERSClient(cfg),
 	}, nil
 }
 
@@ -187,17 +192,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		ACHIEVEMENTS: NewACHIEVEMENTSClient(cfg),
-		AITHEMES:     NewAITHEMESClient(cfg),
-		CALLS:        NewCALLSClient(cfg),
-		FRIENDS:      NewFRIENDSClient(cfg),
-		MATCHINGS:    NewMATCHINGSClient(cfg),
-		MEMOS:        NewMEMOSClient(cfg),
-		SESSIONS:     NewSESSIONSClient(cfg),
-		TROPHIES:     NewTROPHIESClient(cfg),
-		USERS:        NewUSERSClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		ACHIEVEMENTS:  NewACHIEVEMENTSClient(cfg),
+		AI_THEMES:     NewAITHEMESClient(cfg),
+		CALLS:         NewCALLSClient(cfg),
+		EVENTS:        NewEVENTSClient(cfg),
+		EVENT_RECORDS: NewEVENTRECORDSClient(cfg),
+		FRIENDS:       NewFRIENDSClient(cfg),
+		MEMOS:         NewMEMOSClient(cfg),
+		PROGRESS:      NewPROGRESSClient(cfg),
+		SESSIONS:      NewSESSIONSClient(cfg),
+		USERS:         NewUSERSClient(cfg),
 	}, nil
 }
 
@@ -227,8 +233,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.ACHIEVEMENTS, c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS,
-		c.SESSIONS, c.TROPHIES, c.USERS,
+		c.ACHIEVEMENTS, c.AI_THEMES, c.CALLS, c.EVENTS, c.EVENT_RECORDS, c.FRIENDS,
+		c.MEMOS, c.PROGRESS, c.SESSIONS, c.USERS,
 	} {
 		n.Use(hooks...)
 	}
@@ -238,8 +244,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.ACHIEVEMENTS, c.AITHEMES, c.CALLS, c.FRIENDS, c.MATCHINGS, c.MEMOS,
-		c.SESSIONS, c.TROPHIES, c.USERS,
+		c.ACHIEVEMENTS, c.AI_THEMES, c.CALLS, c.EVENTS, c.EVENT_RECORDS, c.FRIENDS,
+		c.MEMOS, c.PROGRESS, c.SESSIONS, c.USERS,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -251,19 +257,21 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	case *ACHIEVEMENTSMutation:
 		return c.ACHIEVEMENTS.mutate(ctx, m)
 	case *AITHEMESMutation:
-		return c.AITHEMES.mutate(ctx, m)
+		return c.AI_THEMES.mutate(ctx, m)
 	case *CALLSMutation:
 		return c.CALLS.mutate(ctx, m)
+	case *EVENTSMutation:
+		return c.EVENTS.mutate(ctx, m)
+	case *EVENTRECORDSMutation:
+		return c.EVENT_RECORDS.mutate(ctx, m)
 	case *FRIENDSMutation:
 		return c.FRIENDS.mutate(ctx, m)
-	case *MATCHINGSMutation:
-		return c.MATCHINGS.mutate(ctx, m)
 	case *MEMOSMutation:
 		return c.MEMOS.mutate(ctx, m)
+	case *PROGRESSMutation:
+		return c.PROGRESS.mutate(ctx, m)
 	case *SESSIONSMutation:
 		return c.SESSIONS.mutate(ctx, m)
-	case *TROPHIESMutation:
-		return c.TROPHIES.mutate(ctx, m)
 	case *USERSMutation:
 		return c.USERS.mutate(ctx, m)
 	default:
@@ -395,22 +403,6 @@ func (c *ACHIEVEMENTSClient) QueryGranted(a *ACHIEVEMENTS) *USERSQuery {
 	return query
 }
 
-// QueryRefers queries the refers edge of a ACHIEVEMENTS.
-func (c *ACHIEVEMENTSClient) QueryRefers(a *ACHIEVEMENTS) *TROPHIESQuery {
-	query := (&TROPHIESClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(achievements.Table, achievements.FieldID, id),
-			sqlgraph.To(trophies.Table, trophies.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, achievements.RefersTable, achievements.RefersColumn),
-		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *ACHIEVEMENTSClient) Hooks() []Hook {
 	return c.hooks.ACHIEVEMENTS
@@ -436,35 +428,35 @@ func (c *ACHIEVEMENTSClient) mutate(ctx context.Context, m *ACHIEVEMENTSMutation
 	}
 }
 
-// AITHEMESClient is a client for the AITHEMES schema.
+// AITHEMESClient is a client for the AI_THEMES schema.
 type AITHEMESClient struct {
 	config
 }
 
-// NewAITHEMESClient returns a client for the AITHEMES from the given config.
+// NewAITHEMESClient returns a client for the AI_THEMES from the given config.
 func NewAITHEMESClient(c config) *AITHEMESClient {
 	return &AITHEMESClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `aithemes.Hooks(f(g(h())))`.
+// A call to `Use(f, g, h)` equals to `ai_themes.Hooks(f(g(h())))`.
 func (c *AITHEMESClient) Use(hooks ...Hook) {
-	c.hooks.AITHEMES = append(c.hooks.AITHEMES, hooks...)
+	c.hooks.AI_THEMES = append(c.hooks.AI_THEMES, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `aithemes.Intercept(f(g(h())))`.
+// A call to `Intercept(f, g, h)` equals to `ai_themes.Intercept(f(g(h())))`.
 func (c *AITHEMESClient) Intercept(interceptors ...Interceptor) {
-	c.inters.AITHEMES = append(c.inters.AITHEMES, interceptors...)
+	c.inters.AI_THEMES = append(c.inters.AI_THEMES, interceptors...)
 }
 
-// Create returns a builder for creating a AITHEMES entity.
+// Create returns a builder for creating a AI_THEMES entity.
 func (c *AITHEMESClient) Create() *AITHEMESCreate {
 	mutation := newAITHEMESMutation(c.config, OpCreate)
 	return &AITHEMESCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of AITHEMES entities.
+// CreateBulk returns a builder for creating a bulk of AI_THEMES entities.
 func (c *AITHEMESClient) CreateBulk(builders ...*AITHEMESCreate) *AITHEMESCreateBulk {
 	return &AITHEMESCreateBulk{config: c.config, builders: builders}
 }
@@ -484,44 +476,44 @@ func (c *AITHEMESClient) MapCreateBulk(slice any, setFunc func(*AITHEMESCreate, 
 	return &AITHEMESCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for AITHEMES.
+// Update returns an update builder for AI_THEMES.
 func (c *AITHEMESClient) Update() *AITHEMESUpdate {
 	mutation := newAITHEMESMutation(c.config, OpUpdate)
 	return &AITHEMESUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *AITHEMESClient) UpdateOne(a *AITHEMES) *AITHEMESUpdateOne {
-	mutation := newAITHEMESMutation(c.config, OpUpdateOne, withAITHEMES(a))
+func (c *AITHEMESClient) UpdateOne(at *AI_THEMES) *AITHEMESUpdateOne {
+	mutation := newAITHEMESMutation(c.config, OpUpdateOne, withAI_THEMES(at))
 	return &AITHEMESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
 func (c *AITHEMESClient) UpdateOneID(id int) *AITHEMESUpdateOne {
-	mutation := newAITHEMESMutation(c.config, OpUpdateOne, withAITHEMESID(id))
+	mutation := newAITHEMESMutation(c.config, OpUpdateOne, withAI_THEMESID(id))
 	return &AITHEMESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for AITHEMES.
+// Delete returns a delete builder for AI_THEMES.
 func (c *AITHEMESClient) Delete() *AITHEMESDelete {
 	mutation := newAITHEMESMutation(c.config, OpDelete)
 	return &AITHEMESDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *AITHEMESClient) DeleteOne(a *AITHEMES) *AITHEMESDeleteOne {
-	return c.DeleteOneID(a.ID)
+func (c *AITHEMESClient) DeleteOne(at *AI_THEMES) *AITHEMESDeleteOne {
+	return c.DeleteOneID(at.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *AITHEMESClient) DeleteOneID(id int) *AITHEMESDeleteOne {
-	builder := c.Delete().Where(aithemes.ID(id))
+	builder := c.Delete().Where(ai_themes.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
 	return &AITHEMESDeleteOne{builder}
 }
 
-// Query returns a query builder for AITHEMES.
+// Query returns a query builder for AI_THEMES.
 func (c *AITHEMESClient) Query() *AITHEMESQuery {
 	return &AITHEMESQuery{
 		config: c.config,
@@ -530,13 +522,13 @@ func (c *AITHEMESClient) Query() *AITHEMESQuery {
 	}
 }
 
-// Get returns a AITHEMES entity by its id.
-func (c *AITHEMESClient) Get(ctx context.Context, id int) (*AITHEMES, error) {
-	return c.Query().Where(aithemes.ID(id)).Only(ctx)
+// Get returns a AI_THEMES entity by its id.
+func (c *AITHEMESClient) Get(ctx context.Context, id int) (*AI_THEMES, error) {
+	return c.Query().Where(ai_themes.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AITHEMESClient) GetX(ctx context.Context, id int) *AITHEMES {
+func (c *AITHEMESClient) GetX(ctx context.Context, id int) *AI_THEMES {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -544,17 +536,17 @@ func (c *AITHEMESClient) GetX(ctx context.Context, id int) *AITHEMES {
 	return obj
 }
 
-// QueryUsed queries the used edge of a AITHEMES.
-func (c *AITHEMESClient) QueryUsed(a *AITHEMES) *SESSIONSQuery {
-	query := (&SESSIONSClient{config: c.config}).Query()
+// QueryUsed queries the used edge of a AI_THEMES.
+func (c *AITHEMESClient) QueryUsed(at *AI_THEMES) *EVENTSQuery {
+	query := (&EVENTSClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
+		id := at.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(aithemes.Table, aithemes.FieldID, id),
-			sqlgraph.To(sessions.Table, sessions.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, aithemes.UsedTable, aithemes.UsedColumn),
+			sqlgraph.From(ai_themes.Table, ai_themes.FieldID, id),
+			sqlgraph.To(events.Table, events.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, ai_themes.UsedTable, ai_themes.UsedColumn),
 		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(at.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -562,12 +554,12 @@ func (c *AITHEMESClient) QueryUsed(a *AITHEMES) *SESSIONSQuery {
 
 // Hooks returns the client hooks.
 func (c *AITHEMESClient) Hooks() []Hook {
-	return c.hooks.AITHEMES
+	return c.hooks.AI_THEMES
 }
 
 // Interceptors returns the client interceptors.
 func (c *AITHEMESClient) Interceptors() []Interceptor {
-	return c.inters.AITHEMES
+	return c.inters.AI_THEMES
 }
 
 func (c *AITHEMESClient) mutate(ctx context.Context, m *AITHEMESMutation) (Value, error) {
@@ -581,7 +573,7 @@ func (c *AITHEMESClient) mutate(ctx context.Context, m *AITHEMESMutation) (Value
 	case OpDelete, OpDeleteOne:
 		return (&AITHEMESDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown AITHEMES mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown AI_THEMES mutation op: %q", m.Op())
 	}
 }
 
@@ -694,13 +686,13 @@ func (c *CALLSClient) GetX(ctx context.Context, id int) *CALLS {
 }
 
 // QueryMade queries the made edge of a CALLS.
-func (c *CALLSClient) QueryMade(ca *CALLS) *MATCHINGSQuery {
-	query := (&MATCHINGSClient{config: c.config}).Query()
+func (c *CALLSClient) QueryMade(ca *CALLS) *SESSIONSQuery {
+	query := (&SESSIONSClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ca.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(calls.Table, calls.FieldID, id),
-			sqlgraph.To(matchings.Table, matchings.FieldID),
+			sqlgraph.To(sessions.Table, sessions.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, calls.MadeTable, calls.MadeColumn),
 		)
 		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
@@ -731,6 +723,352 @@ func (c *CALLSClient) mutate(ctx context.Context, m *CALLSMutation) (Value, erro
 		return (&CALLSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown CALLS mutation op: %q", m.Op())
+	}
+}
+
+// EVENTSClient is a client for the EVENTS schema.
+type EVENTSClient struct {
+	config
+}
+
+// NewEVENTSClient returns a client for the EVENTS from the given config.
+func NewEVENTSClient(c config) *EVENTSClient {
+	return &EVENTSClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `events.Hooks(f(g(h())))`.
+func (c *EVENTSClient) Use(hooks ...Hook) {
+	c.hooks.EVENTS = append(c.hooks.EVENTS, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `events.Intercept(f(g(h())))`.
+func (c *EVENTSClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EVENTS = append(c.inters.EVENTS, interceptors...)
+}
+
+// Create returns a builder for creating a EVENTS entity.
+func (c *EVENTSClient) Create() *EVENTSCreate {
+	mutation := newEVENTSMutation(c.config, OpCreate)
+	return &EVENTSCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EVENTS entities.
+func (c *EVENTSClient) CreateBulk(builders ...*EVENTSCreate) *EVENTSCreateBulk {
+	return &EVENTSCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EVENTSClient) MapCreateBulk(slice any, setFunc func(*EVENTSCreate, int)) *EVENTSCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EVENTSCreateBulk{err: fmt.Errorf("calling to EVENTSClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EVENTSCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EVENTSCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EVENTS.
+func (c *EVENTSClient) Update() *EVENTSUpdate {
+	mutation := newEVENTSMutation(c.config, OpUpdate)
+	return &EVENTSUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EVENTSClient) UpdateOne(e *EVENTS) *EVENTSUpdateOne {
+	mutation := newEVENTSMutation(c.config, OpUpdateOne, withEVENTS(e))
+	return &EVENTSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EVENTSClient) UpdateOneID(id int) *EVENTSUpdateOne {
+	mutation := newEVENTSMutation(c.config, OpUpdateOne, withEVENTSID(id))
+	return &EVENTSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EVENTS.
+func (c *EVENTSClient) Delete() *EVENTSDelete {
+	mutation := newEVENTSMutation(c.config, OpDelete)
+	return &EVENTSDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EVENTSClient) DeleteOne(e *EVENTS) *EVENTSDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EVENTSClient) DeleteOneID(id int) *EVENTSDeleteOne {
+	builder := c.Delete().Where(events.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EVENTSDeleteOne{builder}
+}
+
+// Query returns a query builder for EVENTS.
+func (c *EVENTSClient) Query() *EVENTSQuery {
+	return &EVENTSQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEVENTS},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EVENTS entity by its id.
+func (c *EVENTSClient) Get(ctx context.Context, id int) (*EVENTS, error) {
+	return c.Query().Where(events.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EVENTSClient) GetX(ctx context.Context, id int) *EVENTS {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryParticipated queries the participated edge of a EVENTS.
+func (c *EVENTSClient) QueryParticipated(e *EVENTS) *EVENTRECORDSQuery {
+	query := (&EVENTRECORDSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(events.Table, events.FieldID, id),
+			sqlgraph.To(event_records.Table, event_records.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, events.ParticipatedTable, events.ParticipatedColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUses queries the uses edge of a EVENTS.
+func (c *EVENTSClient) QueryUses(e *EVENTS) *AITHEMESQuery {
+	query := (&AITHEMESClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(events.Table, events.FieldID, id),
+			sqlgraph.To(ai_themes.Table, ai_themes.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, events.UsesTable, events.UsesColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EVENTSClient) Hooks() []Hook {
+	return c.hooks.EVENTS
+}
+
+// Interceptors returns the client interceptors.
+func (c *EVENTSClient) Interceptors() []Interceptor {
+	return c.inters.EVENTS
+}
+
+func (c *EVENTSClient) mutate(ctx context.Context, m *EVENTSMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EVENTSCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EVENTSUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EVENTSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EVENTSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EVENTS mutation op: %q", m.Op())
+	}
+}
+
+// EVENTRECORDSClient is a client for the EVENT_RECORDS schema.
+type EVENTRECORDSClient struct {
+	config
+}
+
+// NewEVENTRECORDSClient returns a client for the EVENT_RECORDS from the given config.
+func NewEVENTRECORDSClient(c config) *EVENTRECORDSClient {
+	return &EVENTRECORDSClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `event_records.Hooks(f(g(h())))`.
+func (c *EVENTRECORDSClient) Use(hooks ...Hook) {
+	c.hooks.EVENT_RECORDS = append(c.hooks.EVENT_RECORDS, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `event_records.Intercept(f(g(h())))`.
+func (c *EVENTRECORDSClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EVENT_RECORDS = append(c.inters.EVENT_RECORDS, interceptors...)
+}
+
+// Create returns a builder for creating a EVENT_RECORDS entity.
+func (c *EVENTRECORDSClient) Create() *EVENTRECORDSCreate {
+	mutation := newEVENTRECORDSMutation(c.config, OpCreate)
+	return &EVENTRECORDSCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EVENT_RECORDS entities.
+func (c *EVENTRECORDSClient) CreateBulk(builders ...*EVENTRECORDSCreate) *EVENTRECORDSCreateBulk {
+	return &EVENTRECORDSCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EVENTRECORDSClient) MapCreateBulk(slice any, setFunc func(*EVENTRECORDSCreate, int)) *EVENTRECORDSCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EVENTRECORDSCreateBulk{err: fmt.Errorf("calling to EVENTRECORDSClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EVENTRECORDSCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EVENTRECORDSCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EVENT_RECORDS.
+func (c *EVENTRECORDSClient) Update() *EVENTRECORDSUpdate {
+	mutation := newEVENTRECORDSMutation(c.config, OpUpdate)
+	return &EVENTRECORDSUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EVENTRECORDSClient) UpdateOne(er *EVENT_RECORDS) *EVENTRECORDSUpdateOne {
+	mutation := newEVENTRECORDSMutation(c.config, OpUpdateOne, withEVENT_RECORDS(er))
+	return &EVENTRECORDSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EVENTRECORDSClient) UpdateOneID(id int) *EVENTRECORDSUpdateOne {
+	mutation := newEVENTRECORDSMutation(c.config, OpUpdateOne, withEVENT_RECORDSID(id))
+	return &EVENTRECORDSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EVENT_RECORDS.
+func (c *EVENTRECORDSClient) Delete() *EVENTRECORDSDelete {
+	mutation := newEVENTRECORDSMutation(c.config, OpDelete)
+	return &EVENTRECORDSDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EVENTRECORDSClient) DeleteOne(er *EVENT_RECORDS) *EVENTRECORDSDeleteOne {
+	return c.DeleteOneID(er.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EVENTRECORDSClient) DeleteOneID(id int) *EVENTRECORDSDeleteOne {
+	builder := c.Delete().Where(event_records.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EVENTRECORDSDeleteOne{builder}
+}
+
+// Query returns a query builder for EVENT_RECORDS.
+func (c *EVENTRECORDSClient) Query() *EVENTRECORDSQuery {
+	return &EVENTRECORDSQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEVENTRECORDS},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EVENT_RECORDS entity by its id.
+func (c *EVENTRECORDSClient) Get(ctx context.Context, id int) (*EVENT_RECORDS, error) {
+	return c.Query().Where(event_records.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EVENTRECORDSClient) GetX(ctx context.Context, id int) *EVENT_RECORDS {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMade queries the made edge of a EVENT_RECORDS.
+func (c *EVENTRECORDSClient) QueryMade(er *EVENT_RECORDS) *USERSQuery {
+	query := (&USERSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := er.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event_records.Table, event_records.FieldID, id),
+			sqlgraph.To(users.Table, users.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event_records.MadeTable, event_records.MadeColumn),
+		)
+		fromV = sqlgraph.Neighbors(er.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParticipates queries the participates edge of a EVENT_RECORDS.
+func (c *EVENTRECORDSClient) QueryParticipates(er *EVENT_RECORDS) *EVENTSQuery {
+	query := (&EVENTSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := er.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event_records.Table, event_records.FieldID, id),
+			sqlgraph.To(events.Table, events.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event_records.ParticipatesTable, event_records.ParticipatesColumn),
+		)
+		fromV = sqlgraph.Neighbors(er.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryHas queries the has edge of a EVENT_RECORDS.
+func (c *EVENTRECORDSClient) QueryHas(er *EVENT_RECORDS) *SESSIONSQuery {
+	query := (&SESSIONSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := er.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event_records.Table, event_records.FieldID, id),
+			sqlgraph.To(sessions.Table, sessions.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event_records.HasTable, event_records.HasColumn),
+		)
+		fromV = sqlgraph.Neighbors(er.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EVENTRECORDSClient) Hooks() []Hook {
+	return c.hooks.EVENT_RECORDS
+}
+
+// Interceptors returns the client interceptors.
+func (c *EVENTRECORDSClient) Interceptors() []Interceptor {
+	return c.inters.EVENT_RECORDS
+}
+
+func (c *EVENTRECORDSClient) mutate(ctx context.Context, m *EVENTRECORDSMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EVENTRECORDSCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EVENTRECORDSUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EVENTRECORDSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EVENTRECORDSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EVENT_RECORDS mutation op: %q", m.Op())
 	}
 }
 
@@ -883,187 +1221,6 @@ func (c *FRIENDSClient) mutate(ctx context.Context, m *FRIENDSMutation) (Value, 
 	}
 }
 
-// MATCHINGSClient is a client for the MATCHINGS schema.
-type MATCHINGSClient struct {
-	config
-}
-
-// NewMATCHINGSClient returns a client for the MATCHINGS from the given config.
-func NewMATCHINGSClient(c config) *MATCHINGSClient {
-	return &MATCHINGSClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `matchings.Hooks(f(g(h())))`.
-func (c *MATCHINGSClient) Use(hooks ...Hook) {
-	c.hooks.MATCHINGS = append(c.hooks.MATCHINGS, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `matchings.Intercept(f(g(h())))`.
-func (c *MATCHINGSClient) Intercept(interceptors ...Interceptor) {
-	c.inters.MATCHINGS = append(c.inters.MATCHINGS, interceptors...)
-}
-
-// Create returns a builder for creating a MATCHINGS entity.
-func (c *MATCHINGSClient) Create() *MATCHINGSCreate {
-	mutation := newMATCHINGSMutation(c.config, OpCreate)
-	return &MATCHINGSCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of MATCHINGS entities.
-func (c *MATCHINGSClient) CreateBulk(builders ...*MATCHINGSCreate) *MATCHINGSCreateBulk {
-	return &MATCHINGSCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *MATCHINGSClient) MapCreateBulk(slice any, setFunc func(*MATCHINGSCreate, int)) *MATCHINGSCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &MATCHINGSCreateBulk{err: fmt.Errorf("calling to MATCHINGSClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*MATCHINGSCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &MATCHINGSCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for MATCHINGS.
-func (c *MATCHINGSClient) Update() *MATCHINGSUpdate {
-	mutation := newMATCHINGSMutation(c.config, OpUpdate)
-	return &MATCHINGSUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *MATCHINGSClient) UpdateOne(m *MATCHINGS) *MATCHINGSUpdateOne {
-	mutation := newMATCHINGSMutation(c.config, OpUpdateOne, withMATCHINGS(m))
-	return &MATCHINGSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *MATCHINGSClient) UpdateOneID(id int) *MATCHINGSUpdateOne {
-	mutation := newMATCHINGSMutation(c.config, OpUpdateOne, withMATCHINGSID(id))
-	return &MATCHINGSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for MATCHINGS.
-func (c *MATCHINGSClient) Delete() *MATCHINGSDelete {
-	mutation := newMATCHINGSMutation(c.config, OpDelete)
-	return &MATCHINGSDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *MATCHINGSClient) DeleteOne(m *MATCHINGS) *MATCHINGSDeleteOne {
-	return c.DeleteOneID(m.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *MATCHINGSClient) DeleteOneID(id int) *MATCHINGSDeleteOne {
-	builder := c.Delete().Where(matchings.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &MATCHINGSDeleteOne{builder}
-}
-
-// Query returns a query builder for MATCHINGS.
-func (c *MATCHINGSClient) Query() *MATCHINGSQuery {
-	return &MATCHINGSQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeMATCHINGS},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a MATCHINGS entity by its id.
-func (c *MATCHINGSClient) Get(ctx context.Context, id int) (*MATCHINGS, error) {
-	return c.Query().Where(matchings.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *MATCHINGSClient) GetX(ctx context.Context, id int) *MATCHINGS {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryMember queries the member edge of a MATCHINGS.
-func (c *MATCHINGSClient) QueryMember(m *MATCHINGS) *USERSQuery {
-	query := (&USERSClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(matchings.Table, matchings.FieldID, id),
-			sqlgraph.To(users.Table, users.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, matchings.MemberTable, matchings.MemberPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryHad queries the had edge of a MATCHINGS.
-func (c *MATCHINGSClient) QueryHad(m *MATCHINGS) *SESSIONSQuery {
-	query := (&SESSIONSClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(matchings.Table, matchings.FieldID, id),
-			sqlgraph.To(sessions.Table, sessions.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, matchings.HadTable, matchings.HadColumn),
-		)
-		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryMakes queries the makes edge of a MATCHINGS.
-func (c *MATCHINGSClient) QueryMakes(m *MATCHINGS) *CALLSQuery {
-	query := (&CALLSClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(matchings.Table, matchings.FieldID, id),
-			sqlgraph.To(calls.Table, calls.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, matchings.MakesTable, matchings.MakesColumn),
-		)
-		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *MATCHINGSClient) Hooks() []Hook {
-	return c.hooks.MATCHINGS
-}
-
-// Interceptors returns the client interceptors.
-func (c *MATCHINGSClient) Interceptors() []Interceptor {
-	return c.inters.MATCHINGS
-}
-
-func (c *MATCHINGSClient) mutate(ctx context.Context, m *MATCHINGSMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&MATCHINGSCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&MATCHINGSUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&MATCHINGSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&MATCHINGSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown MATCHINGS mutation op: %q", m.Op())
-	}
-}
-
 // MEMOSClient is a client for the MEMOS schema.
 type MEMOSClient struct {
 	config
@@ -1213,6 +1370,155 @@ func (c *MEMOSClient) mutate(ctx context.Context, m *MEMOSMutation) (Value, erro
 	}
 }
 
+// PROGRESSClient is a client for the PROGRESS schema.
+type PROGRESSClient struct {
+	config
+}
+
+// NewPROGRESSClient returns a client for the PROGRESS from the given config.
+func NewPROGRESSClient(c config) *PROGRESSClient {
+	return &PROGRESSClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `progress.Hooks(f(g(h())))`.
+func (c *PROGRESSClient) Use(hooks ...Hook) {
+	c.hooks.PROGRESS = append(c.hooks.PROGRESS, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `progress.Intercept(f(g(h())))`.
+func (c *PROGRESSClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PROGRESS = append(c.inters.PROGRESS, interceptors...)
+}
+
+// Create returns a builder for creating a PROGRESS entity.
+func (c *PROGRESSClient) Create() *PROGRESSCreate {
+	mutation := newPROGRESSMutation(c.config, OpCreate)
+	return &PROGRESSCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PROGRESS entities.
+func (c *PROGRESSClient) CreateBulk(builders ...*PROGRESSCreate) *PROGRESSCreateBulk {
+	return &PROGRESSCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PROGRESSClient) MapCreateBulk(slice any, setFunc func(*PROGRESSCreate, int)) *PROGRESSCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PROGRESSCreateBulk{err: fmt.Errorf("calling to PROGRESSClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PROGRESSCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PROGRESSCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PROGRESS.
+func (c *PROGRESSClient) Update() *PROGRESSUpdate {
+	mutation := newPROGRESSMutation(c.config, OpUpdate)
+	return &PROGRESSUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PROGRESSClient) UpdateOne(pr *PROGRESS) *PROGRESSUpdateOne {
+	mutation := newPROGRESSMutation(c.config, OpUpdateOne, withPROGRESS(pr))
+	return &PROGRESSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PROGRESSClient) UpdateOneID(id int) *PROGRESSUpdateOne {
+	mutation := newPROGRESSMutation(c.config, OpUpdateOne, withPROGRESSID(id))
+	return &PROGRESSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PROGRESS.
+func (c *PROGRESSClient) Delete() *PROGRESSDelete {
+	mutation := newPROGRESSMutation(c.config, OpDelete)
+	return &PROGRESSDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PROGRESSClient) DeleteOne(pr *PROGRESS) *PROGRESSDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PROGRESSClient) DeleteOneID(id int) *PROGRESSDeleteOne {
+	builder := c.Delete().Where(progress.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PROGRESSDeleteOne{builder}
+}
+
+// Query returns a query builder for PROGRESS.
+func (c *PROGRESSClient) Query() *PROGRESSQuery {
+	return &PROGRESSQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePROGRESS},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PROGRESS entity by its id.
+func (c *PROGRESSClient) Get(ctx context.Context, id int) (*PROGRESS, error) {
+	return c.Query().Where(progress.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PROGRESSClient) GetX(ctx context.Context, id int) *PROGRESS {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRecorded queries the recorded edge of a PROGRESS.
+func (c *PROGRESSClient) QueryRecorded(pr *PROGRESS) *USERSQuery {
+	query := (&USERSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(progress.Table, progress.FieldID, id),
+			sqlgraph.To(users.Table, users.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, progress.RecordedTable, progress.RecordedColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PROGRESSClient) Hooks() []Hook {
+	return c.hooks.PROGRESS
+}
+
+// Interceptors returns the client interceptors.
+func (c *PROGRESSClient) Interceptors() []Interceptor {
+	return c.inters.PROGRESS
+}
+
+func (c *PROGRESSClient) mutate(ctx context.Context, m *PROGRESSMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PROGRESSCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PROGRESSUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PROGRESSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PROGRESSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PROGRESS mutation op: %q", m.Op())
+	}
+}
+
 // SESSIONSClient is a client for the SESSIONS schema.
 type SESSIONSClient struct {
 	config
@@ -1321,15 +1627,15 @@ func (c *SESSIONSClient) GetX(ctx context.Context, id int) *SESSIONS {
 	return obj
 }
 
-// QueryHas queries the has edge of a SESSIONS.
-func (c *SESSIONSClient) QueryHas(s *SESSIONS) *MATCHINGSQuery {
-	query := (&MATCHINGSClient{config: c.config}).Query()
+// QueryHad queries the had edge of a SESSIONS.
+func (c *SESSIONSClient) QueryHad(s *SESSIONS) *EVENTRECORDSQuery {
+	query := (&EVENTRECORDSClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(sessions.Table, sessions.FieldID, id),
-			sqlgraph.To(matchings.Table, matchings.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, sessions.HasTable, sessions.HasColumn),
+			sqlgraph.To(event_records.Table, event_records.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sessions.HadTable, sessions.HadColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1337,15 +1643,15 @@ func (c *SESSIONSClient) QueryHas(s *SESSIONS) *MATCHINGSQuery {
 	return query
 }
 
-// QueryUses queries the uses edge of a SESSIONS.
-func (c *SESSIONSClient) QueryUses(s *SESSIONS) *AITHEMESQuery {
-	query := (&AITHEMESClient{config: c.config}).Query()
+// QueryMakes queries the makes edge of a SESSIONS.
+func (c *SESSIONSClient) QueryMakes(s *SESSIONS) *CALLSQuery {
+	query := (&CALLSClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(sessions.Table, sessions.FieldID, id),
-			sqlgraph.To(aithemes.Table, aithemes.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, sessions.UsesTable, sessions.UsesColumn),
+			sqlgraph.To(calls.Table, calls.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, sessions.MakesTable, sessions.MakesColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1375,155 +1681,6 @@ func (c *SESSIONSClient) mutate(ctx context.Context, m *SESSIONSMutation) (Value
 		return (&SESSIONSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown SESSIONS mutation op: %q", m.Op())
-	}
-}
-
-// TROPHIESClient is a client for the TROPHIES schema.
-type TROPHIESClient struct {
-	config
-}
-
-// NewTROPHIESClient returns a client for the TROPHIES from the given config.
-func NewTROPHIESClient(c config) *TROPHIESClient {
-	return &TROPHIESClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `trophies.Hooks(f(g(h())))`.
-func (c *TROPHIESClient) Use(hooks ...Hook) {
-	c.hooks.TROPHIES = append(c.hooks.TROPHIES, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `trophies.Intercept(f(g(h())))`.
-func (c *TROPHIESClient) Intercept(interceptors ...Interceptor) {
-	c.inters.TROPHIES = append(c.inters.TROPHIES, interceptors...)
-}
-
-// Create returns a builder for creating a TROPHIES entity.
-func (c *TROPHIESClient) Create() *TROPHIESCreate {
-	mutation := newTROPHIESMutation(c.config, OpCreate)
-	return &TROPHIESCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of TROPHIES entities.
-func (c *TROPHIESClient) CreateBulk(builders ...*TROPHIESCreate) *TROPHIESCreateBulk {
-	return &TROPHIESCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *TROPHIESClient) MapCreateBulk(slice any, setFunc func(*TROPHIESCreate, int)) *TROPHIESCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &TROPHIESCreateBulk{err: fmt.Errorf("calling to TROPHIESClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*TROPHIESCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &TROPHIESCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for TROPHIES.
-func (c *TROPHIESClient) Update() *TROPHIESUpdate {
-	mutation := newTROPHIESMutation(c.config, OpUpdate)
-	return &TROPHIESUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *TROPHIESClient) UpdateOne(t *TROPHIES) *TROPHIESUpdateOne {
-	mutation := newTROPHIESMutation(c.config, OpUpdateOne, withTROPHIES(t))
-	return &TROPHIESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *TROPHIESClient) UpdateOneID(id int) *TROPHIESUpdateOne {
-	mutation := newTROPHIESMutation(c.config, OpUpdateOne, withTROPHIESID(id))
-	return &TROPHIESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for TROPHIES.
-func (c *TROPHIESClient) Delete() *TROPHIESDelete {
-	mutation := newTROPHIESMutation(c.config, OpDelete)
-	return &TROPHIESDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *TROPHIESClient) DeleteOne(t *TROPHIES) *TROPHIESDeleteOne {
-	return c.DeleteOneID(t.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TROPHIESClient) DeleteOneID(id int) *TROPHIESDeleteOne {
-	builder := c.Delete().Where(trophies.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &TROPHIESDeleteOne{builder}
-}
-
-// Query returns a query builder for TROPHIES.
-func (c *TROPHIESClient) Query() *TROPHIESQuery {
-	return &TROPHIESQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeTROPHIES},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a TROPHIES entity by its id.
-func (c *TROPHIESClient) Get(ctx context.Context, id int) (*TROPHIES, error) {
-	return c.Query().Where(trophies.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *TROPHIESClient) GetX(ctx context.Context, id int) *TROPHIES {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryRefered queries the refered edge of a TROPHIES.
-func (c *TROPHIESClient) QueryRefered(t *TROPHIES) *ACHIEVEMENTSQuery {
-	query := (&ACHIEVEMENTSClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(trophies.Table, trophies.FieldID, id),
-			sqlgraph.To(achievements.Table, achievements.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, trophies.ReferedTable, trophies.ReferedColumn),
-		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *TROPHIESClient) Hooks() []Hook {
-	return c.hooks.TROPHIES
-}
-
-// Interceptors returns the client interceptors.
-func (c *TROPHIESClient) Interceptors() []Interceptor {
-	return c.inters.TROPHIES
-}
-
-func (c *TROPHIESClient) mutate(ctx context.Context, m *TROPHIESMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&TROPHIESCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&TROPHIESUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&TROPHIESUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&TROPHIESDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown TROPHIES mutation op: %q", m.Op())
 	}
 }
 
@@ -1651,15 +1808,15 @@ func (c *USERSClient) QueryConnects(u *USERS) *FRIENDSQuery {
 	return query
 }
 
-// QueryParticipates queries the participates edge of a USERS.
-func (c *USERSClient) QueryParticipates(u *USERS) *MATCHINGSQuery {
-	query := (&MATCHINGSClient{config: c.config}).Query()
+// QueryMakes queries the makes edge of a USERS.
+func (c *USERSClient) QueryMakes(u *USERS) *EVENTRECORDSQuery {
+	query := (&EVENTRECORDSClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(users.Table, users.FieldID, id),
-			sqlgraph.To(matchings.Table, matchings.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, users.ParticipatesTable, users.ParticipatesPrimaryKey...),
+			sqlgraph.To(event_records.Table, event_records.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, users.MakesTable, users.MakesColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1699,6 +1856,22 @@ func (c *USERSClient) QueryAcquires(u *USERS) *ACHIEVEMENTSQuery {
 	return query
 }
 
+// QueryRecords queries the records edge of a USERS.
+func (c *USERSClient) QueryRecords(u *USERS) *PROGRESSQuery {
+	query := (&PROGRESSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(users.Table, users.FieldID, id),
+			sqlgraph.To(progress.Table, progress.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, users.RecordsTable, users.RecordsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *USERSClient) Hooks() []Hook {
 	return c.hooks.USERS
@@ -1727,11 +1900,11 @@ func (c *USERSClient) mutate(ctx context.Context, m *USERSMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		ACHIEVEMENTS, AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, TROPHIES,
-		USERS []ent.Hook
+		ACHIEVEMENTS, AI_THEMES, CALLS, EVENTS, EVENT_RECORDS, FRIENDS, MEMOS, PROGRESS,
+		SESSIONS, USERS []ent.Hook
 	}
 	inters struct {
-		ACHIEVEMENTS, AITHEMES, CALLS, FRIENDS, MATCHINGS, MEMOS, SESSIONS, TROPHIES,
-		USERS []ent.Interceptor
+		ACHIEVEMENTS, AI_THEMES, CALLS, EVENTS, EVENT_RECORDS, FRIENDS, MEMOS, PROGRESS,
+		SESSIONS, USERS []ent.Interceptor
 	}
 )

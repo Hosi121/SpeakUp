@@ -8,11 +8,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
+	"github.com/Hosi121/SpeakUp/ent/ai_themes"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
 )
 
-// AITHEMESDelete is the builder for deleting a AITHEMES entity.
+// AITHEMESDelete is the builder for deleting a AI_THEMES entity.
 type AITHEMESDelete struct {
 	config
 	hooks    []Hook
@@ -20,7 +20,7 @@ type AITHEMESDelete struct {
 }
 
 // Where appends a list predicates to the AITHEMESDelete builder.
-func (ad *AITHEMESDelete) Where(ps ...predicate.AITHEMES) *AITHEMESDelete {
+func (ad *AITHEMESDelete) Where(ps ...predicate.AI_THEMES) *AITHEMESDelete {
 	ad.mutation.Where(ps...)
 	return ad
 }
@@ -40,7 +40,7 @@ func (ad *AITHEMESDelete) ExecX(ctx context.Context) int {
 }
 
 func (ad *AITHEMESDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(aithemes.Table, sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(ai_themes.Table, sqlgraph.NewFieldSpec(ai_themes.FieldID, field.TypeInt))
 	if ps := ad.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,13 +56,13 @@ func (ad *AITHEMESDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// AITHEMESDeleteOne is the builder for deleting a single AITHEMES entity.
+// AITHEMESDeleteOne is the builder for deleting a single AI_THEMES entity.
 type AITHEMESDeleteOne struct {
 	ad *AITHEMESDelete
 }
 
 // Where appends a list predicates to the AITHEMESDelete builder.
-func (ado *AITHEMESDeleteOne) Where(ps ...predicate.AITHEMES) *AITHEMESDeleteOne {
+func (ado *AITHEMESDeleteOne) Where(ps ...predicate.AI_THEMES) *AITHEMESDeleteOne {
 	ado.ad.mutation.Where(ps...)
 	return ado
 }
@@ -74,7 +74,7 @@ func (ado *AITHEMESDeleteOne) Exec(ctx context.Context) error {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{aithemes.Label}
+		return &NotFoundError{ai_themes.Label}
 	default:
 		return nil
 	}

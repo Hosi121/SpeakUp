@@ -292,7 +292,7 @@ func HasMade() predicate.CALLS {
 }
 
 // HasMadeWith applies the HasEdge predicate on the "made" edge with a given conditions (other predicates).
-func HasMadeWith(preds ...predicate.MATCHINGS) predicate.CALLS {
+func HasMadeWith(preds ...predicate.SESSIONS) predicate.CALLS {
 	return predicate.CALLS(func(s *sql.Selector) {
 		step := newMadeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

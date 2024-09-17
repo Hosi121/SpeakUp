@@ -3,6 +3,7 @@
 package sessions
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -14,49 +15,52 @@ const (
 	Label = "sessions"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldSessionStart holds the string denoting the session_start field in the database.
-	FieldSessionStart = "session_start"
-	// FieldSessionEnd holds the string denoting the session_end field in the database.
-	FieldSessionEnd = "session_end"
-	// FieldThemeID holds the string denoting the theme_id field in the database.
-	FieldThemeID = "theme_id"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// EdgeHas holds the string denoting the has edge name in mutations.
-	EdgeHas = "has"
-	// EdgeUses holds the string denoting the uses edge name in mutations.
-	EdgeUses = "uses"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// FieldMatchedUserID holds the string denoting the matched_user_id field in the database.
+	FieldMatchedUserID = "matched_user_id"
+	// FieldRecordID holds the string denoting the record_id field in the database.
+	FieldRecordID = "record_id"
+	// FieldMatchedAt holds the string denoting the matched_at field in the database.
+	FieldMatchedAt = "matched_at"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// EdgeHad holds the string denoting the had edge name in mutations.
+	EdgeHad = "had"
+	// EdgeMakes holds the string denoting the makes edge name in mutations.
+	EdgeMakes = "makes"
 	// Table holds the table name of the sessions in the database.
 	Table = "session_ss"
-	// HasTable is the table that holds the has relation/edge.
-	HasTable = "matching_ss"
-	// HasInverseTable is the table name for the MATCHINGS entity.
-	// It exists in this package in order to avoid circular dependency with the "matchings" package.
-	HasInverseTable = "matching_ss"
-	// HasColumn is the table column denoting the has relation/edge.
-	HasColumn = "sessions_has"
-	// UsesTable is the table that holds the uses relation/edge.
-	UsesTable = "session_ss"
-	// UsesInverseTable is the table name for the AITHEMES entity.
-	// It exists in this package in order to avoid circular dependency with the "aithemes" package.
-	UsesInverseTable = "aitheme_ss"
-	// UsesColumn is the table column denoting the uses relation/edge.
-	UsesColumn = "sessions_uses"
+	// HadTable is the table that holds the had relation/edge.
+	HadTable = "session_ss"
+	// HadInverseTable is the table name for the EVENT_RECORDS entity.
+	// It exists in this package in order to avoid circular dependency with the "event_records" package.
+	HadInverseTable = "event_record_ss"
+	// HadColumn is the table column denoting the had relation/edge.
+	HadColumn = "event_records_has"
+	// MakesTable is the table that holds the makes relation/edge.
+	MakesTable = "call_ss"
+	// MakesInverseTable is the table name for the CALLS entity.
+	// It exists in this package in order to avoid circular dependency with the "calls" package.
+	MakesInverseTable = "call_ss"
+	// MakesColumn is the table column denoting the makes relation/edge.
+	MakesColumn = "sessions_makes"
 )
 
 // Columns holds all SQL columns for sessions fields.
 var Columns = []string{
 	FieldID,
-	FieldSessionStart,
-	FieldSessionEnd,
-	FieldThemeID,
-	FieldCreatedAt,
+	FieldUserID,
+	FieldMatchedUserID,
+	FieldRecordID,
+	FieldMatchedAt,
+	FieldStatus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "session_ss"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"sessions_uses",
+	"event_records_has",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -75,9 +79,33 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt time.Time
+	// DefaultMatchedAt holds the default value on creation for the "matched_at" field.
+	DefaultMatchedAt time.Time
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// Status values.
+const (
+	StatusMATCHED     Status = "MATCHED"
+	StatusPROCCESSING Status = "PROCCESSING"
+	StatusFINISHED    Status = "FINISHED"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusMATCHED, StatusPROCCESSING, StatusFINISHED:
+		return nil
+	default:
+		return fmt.Errorf("sessions: invalid enum value for status field: %q", s)
+	}
+}
 
 // OrderOption defines the ordering options for the SESSIONS queries.
 type OrderOption func(*sql.Selector)
@@ -87,57 +115,55 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// BySessionStart orders the results by the session_start field.
-func BySessionStart(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSessionStart, opts...).ToFunc()
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
-// BySessionEnd orders the results by the session_end field.
-func BySessionEnd(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSessionEnd, opts...).ToFunc()
+// ByMatchedUserID orders the results by the matched_user_id field.
+func ByMatchedUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMatchedUserID, opts...).ToFunc()
 }
 
-// ByThemeID orders the results by the theme_id field.
-func ByThemeID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThemeID, opts...).ToFunc()
+// ByRecordID orders the results by the record_id field.
+func ByRecordID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRecordID, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+// ByMatchedAt orders the results by the matched_at field.
+func ByMatchedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMatchedAt, opts...).ToFunc()
 }
 
-// ByHasCount orders the results by has count.
-func ByHasCount(opts ...sql.OrderTermOption) OrderOption {
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByHadField orders the results by had field.
+func ByHadField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newHasStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newHadStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByHas orders the results by has terms.
-func ByHas(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByMakesField orders the results by makes field.
+func ByMakesField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newHasStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newMakesStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByUsesField orders the results by uses field.
-func ByUsesField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUsesStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newHasStep() *sqlgraph.Step {
+func newHadStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(HasInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, HasTable, HasColumn),
+		sqlgraph.To(HadInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, HadTable, HadColumn),
 	)
 }
-func newUsesStep() *sqlgraph.Step {
+func newMakesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UsesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, UsesTable, UsesColumn),
+		sqlgraph.To(MakesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, MakesTable, MakesColumn),
 	)
 }

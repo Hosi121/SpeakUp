@@ -11,9 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/friends"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
+	"github.com/Hosi121/SpeakUp/ent/progress"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -27,12 +28,6 @@ type USERSCreate struct {
 // SetUsername sets the "username" field.
 func (uc *USERSCreate) SetUsername(s string) *USERSCreate {
 	uc.mutation.SetUsername(s)
-	return uc
-}
-
-// SetEmail sets the "email" field.
-func (uc *USERSCreate) SetEmail(s string) *USERSCreate {
-	uc.mutation.SetEmail(s)
 	return uc
 }
 
@@ -98,20 +93,6 @@ func (uc *USERSCreate) SetNillableUpdatedAt(t *time.Time) *USERSCreate {
 	return uc
 }
 
-// SetAccessToken sets the "access_token" field.
-func (uc *USERSCreate) SetAccessToken(s string) *USERSCreate {
-	uc.mutation.SetAccessToken(s)
-	return uc
-}
-
-// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
-func (uc *USERSCreate) SetNillableAccessToken(s *string) *USERSCreate {
-	if s != nil {
-		uc.SetAccessToken(*s)
-	}
-	return uc
-}
-
 // AddConnectIDs adds the "connects" edge to the FRIENDS entity by IDs.
 func (uc *USERSCreate) AddConnectIDs(ids ...int) *USERSCreate {
 	uc.mutation.AddConnectIDs(ids...)
@@ -127,19 +108,19 @@ func (uc *USERSCreate) AddConnects(f ...*FRIENDS) *USERSCreate {
 	return uc.AddConnectIDs(ids...)
 }
 
-// AddParticipateIDs adds the "participates" edge to the MATCHINGS entity by IDs.
-func (uc *USERSCreate) AddParticipateIDs(ids ...int) *USERSCreate {
-	uc.mutation.AddParticipateIDs(ids...)
+// AddMakeIDs adds the "makes" edge to the EVENT_RECORDS entity by IDs.
+func (uc *USERSCreate) AddMakeIDs(ids ...int) *USERSCreate {
+	uc.mutation.AddMakeIDs(ids...)
 	return uc
 }
 
-// AddParticipates adds the "participates" edges to the MATCHINGS entity.
-func (uc *USERSCreate) AddParticipates(m ...*MATCHINGS) *USERSCreate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// AddMakes adds the "makes" edges to the EVENT_RECORDS entity.
+func (uc *USERSCreate) AddMakes(e ...*EVENT_RECORDS) *USERSCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return uc.AddParticipateIDs(ids...)
+	return uc.AddMakeIDs(ids...)
 }
 
 // SetPreparesID sets the "prepares" edge to the MEMOS entity by ID.
@@ -174,6 +155,25 @@ func (uc *USERSCreate) AddAcquires(a ...*ACHIEVEMENTS) *USERSCreate {
 		ids[i] = a[i].ID
 	}
 	return uc.AddAcquireIDs(ids...)
+}
+
+// SetRecordsID sets the "records" edge to the PROGRESS entity by ID.
+func (uc *USERSCreate) SetRecordsID(id int) *USERSCreate {
+	uc.mutation.SetRecordsID(id)
+	return uc
+}
+
+// SetNillableRecordsID sets the "records" edge to the PROGRESS entity by ID if the given value is not nil.
+func (uc *USERSCreate) SetNillableRecordsID(id *int) *USERSCreate {
+	if id != nil {
+		uc = uc.SetRecordsID(*id)
+	}
+	return uc
+}
+
+// SetRecords sets the "records" edge to the PROGRESS entity.
+func (uc *USERSCreate) SetRecords(p *PROGRESS) *USERSCreate {
+	return uc.SetRecordsID(p.ID)
 }
 
 // Mutation returns the USERSMutation object of the builder.
@@ -223,10 +223,6 @@ func (uc *USERSCreate) defaults() {
 		v := users.DefaultUpdatedAt()
 		uc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := uc.mutation.AccessToken(); !ok {
-		v := users.DefaultAccessToken
-		uc.mutation.SetAccessToken(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -237,14 +233,6 @@ func (uc *USERSCreate) check() error {
 	if v, ok := uc.mutation.Username(); ok {
 		if err := users.UsernameValidator(v); err != nil {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "USERS.username": %w`, err)}
-		}
-	}
-	if _, ok := uc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "USERS.email"`)}
-	}
-	if v, ok := uc.mutation.Email(); ok {
-		if err := users.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
 		}
 	}
 	if _, ok := uc.mutation.Role(); !ok {
@@ -263,9 +251,6 @@ func (uc *USERSCreate) check() error {
 	}
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "USERS.updated_at"`)}
-	}
-	if _, ok := uc.mutation.AccessToken(); !ok {
-		return &ValidationError{Name: "access_token", err: errors.New(`ent: missing required field "USERS.access_token"`)}
 	}
 	return nil
 }
@@ -297,10 +282,6 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 		_node.Username = value
 	}
-	if value, ok := uc.mutation.Email(); ok {
-		_spec.SetField(users.FieldEmail, field.TypeString, value)
-		_node.Email = value
-	}
 	if value, ok := uc.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
 		_node.AvatarURL = value
@@ -321,10 +302,6 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 		_spec.SetField(users.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := uc.mutation.AccessToken(); ok {
-		_spec.SetField(users.FieldAccessToken, field.TypeString, value)
-		_node.AccessToken = value
-	}
 	if nodes := uc.mutation.ConnectsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -341,15 +318,15 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.ParticipatesIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.MakesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   users.ParticipatesTable,
-			Columns: users.ParticipatesPrimaryKey,
+			Table:   users.MakesTable,
+			Columns: []string{users.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -382,6 +359,22 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.RecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.RecordsTable,
+			Columns: []string{users.RecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -21,12 +21,12 @@ func (f ACHIEVEMENTSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ACHIEVEMENTSMutation", m)
 }
 
-// The AITHEMESFunc type is an adapter to allow the use of ordinary
-// function as AITHEMES mutator.
-type AITHEMESFunc func(context.Context, *ent.AITHEMESMutation) (ent.Value, error)
+// The AI_THEMESFunc type is an adapter to allow the use of ordinary
+// function as AI_THEMES mutator.
+type AI_THEMESFunc func(context.Context, *ent.AITHEMESMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f AITHEMESFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+func (f AI_THEMESFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 	if mv, ok := m.(*ent.AITHEMESMutation); ok {
 		return f(ctx, mv)
 	}
@@ -45,6 +45,30 @@ func (f CALLSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CALLSMutation", m)
 }
 
+// The EVENTSFunc type is an adapter to allow the use of ordinary
+// function as EVENTS mutator.
+type EVENTSFunc func(context.Context, *ent.EVENTSMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EVENTSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EVENTSMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EVENTSMutation", m)
+}
+
+// The EVENT_RECORDSFunc type is an adapter to allow the use of ordinary
+// function as EVENT_RECORDS mutator.
+type EVENT_RECORDSFunc func(context.Context, *ent.EVENTRECORDSMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EVENT_RECORDSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EVENTRECORDSMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EVENTRECORDSMutation", m)
+}
+
 // The FRIENDSFunc type is an adapter to allow the use of ordinary
 // function as FRIENDS mutator.
 type FRIENDSFunc func(context.Context, *ent.FRIENDSMutation) (ent.Value, error)
@@ -55,18 +79,6 @@ func (f FRIENDSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FRIENDSMutation", m)
-}
-
-// The MATCHINGSFunc type is an adapter to allow the use of ordinary
-// function as MATCHINGS mutator.
-type MATCHINGSFunc func(context.Context, *ent.MATCHINGSMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f MATCHINGSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.MATCHINGSMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MATCHINGSMutation", m)
 }
 
 // The MEMOSFunc type is an adapter to allow the use of ordinary
@@ -81,6 +93,18 @@ func (f MEMOSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MEMOSMutation", m)
 }
 
+// The PROGRESSFunc type is an adapter to allow the use of ordinary
+// function as PROGRESS mutator.
+type PROGRESSFunc func(context.Context, *ent.PROGRESSMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PROGRESSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PROGRESSMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PROGRESSMutation", m)
+}
+
 // The SESSIONSFunc type is an adapter to allow the use of ordinary
 // function as SESSIONS mutator.
 type SESSIONSFunc func(context.Context, *ent.SESSIONSMutation) (ent.Value, error)
@@ -91,18 +115,6 @@ func (f SESSIONSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SESSIONSMutation", m)
-}
-
-// The TROPHIESFunc type is an adapter to allow the use of ordinary
-// function as TROPHIES mutator.
-type TROPHIESFunc func(context.Context, *ent.TROPHIESMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f TROPHIESFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TROPHIESMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TROPHIESMutation", m)
 }
 
 // The USERSFunc type is an adapter to allow the use of ordinary

@@ -19,9 +19,6 @@ func (USERS) Fields() []ent.Field {
 		field.String("username").
 			NotEmpty().
 			MaxLen(255),
-		field.String("email").
-			NotEmpty().
-			MaxLen(255),
 		field.Text("avatar_url").
 			Optional(),
 		field.Enum("role").
@@ -32,8 +29,6 @@ func (USERS) Fields() []ent.Field {
 			Default(false),
 		field.Time("updated_at").
 			Default(time.Now),
-		field.Text("access_token").
-			Default(""),
 	}
 }
 
@@ -41,9 +36,11 @@ func (USERS) Fields() []ent.Field {
 func (USERS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("connects", FRIENDS.Type),
-		edge.To("participates", MATCHINGS.Type),
+		edge.To("makes", EVENT_RECORDS.Type),
 		edge.To("prepares", MEMOS.Type).
 			Unique(),
 		edge.To("acquires", ACHIEVEMENTS.Type),
+		edge.To("records", PROGRESS.Type).
+			Unique(),
 	}
 }

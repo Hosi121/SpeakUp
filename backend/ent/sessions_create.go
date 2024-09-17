@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
@@ -22,70 +22,80 @@ type SESSIONSCreate struct {
 	hooks    []Hook
 }
 
-// SetSessionStart sets the "session_start" field.
-func (sc *SESSIONSCreate) SetSessionStart(t time.Time) *SESSIONSCreate {
-	sc.mutation.SetSessionStart(t)
+// SetUserID sets the "user_id" field.
+func (sc *SESSIONSCreate) SetUserID(i int) *SESSIONSCreate {
+	sc.mutation.SetUserID(i)
 	return sc
 }
 
-// SetSessionEnd sets the "session_end" field.
-func (sc *SESSIONSCreate) SetSessionEnd(t time.Time) *SESSIONSCreate {
-	sc.mutation.SetSessionEnd(t)
+// SetMatchedUserID sets the "matched_user_id" field.
+func (sc *SESSIONSCreate) SetMatchedUserID(i int) *SESSIONSCreate {
+	sc.mutation.SetMatchedUserID(i)
 	return sc
 }
 
-// SetThemeID sets the "theme_id" field.
-func (sc *SESSIONSCreate) SetThemeID(i int) *SESSIONSCreate {
-	sc.mutation.SetThemeID(i)
+// SetRecordID sets the "record_id" field.
+func (sc *SESSIONSCreate) SetRecordID(i int) *SESSIONSCreate {
+	sc.mutation.SetRecordID(i)
 	return sc
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (sc *SESSIONSCreate) SetCreatedAt(t time.Time) *SESSIONSCreate {
-	sc.mutation.SetCreatedAt(t)
+// SetMatchedAt sets the "matched_at" field.
+func (sc *SESSIONSCreate) SetMatchedAt(t time.Time) *SESSIONSCreate {
+	sc.mutation.SetMatchedAt(t)
 	return sc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (sc *SESSIONSCreate) SetNillableCreatedAt(t *time.Time) *SESSIONSCreate {
+// SetNillableMatchedAt sets the "matched_at" field if the given value is not nil.
+func (sc *SESSIONSCreate) SetNillableMatchedAt(t *time.Time) *SESSIONSCreate {
 	if t != nil {
-		sc.SetCreatedAt(*t)
+		sc.SetMatchedAt(*t)
 	}
 	return sc
 }
 
-// AddHaIDs adds the "has" edge to the MATCHINGS entity by IDs.
-func (sc *SESSIONSCreate) AddHaIDs(ids ...int) *SESSIONSCreate {
-	sc.mutation.AddHaIDs(ids...)
+// SetStatus sets the "status" field.
+func (sc *SESSIONSCreate) SetStatus(s sessions.Status) *SESSIONSCreate {
+	sc.mutation.SetStatus(s)
 	return sc
 }
 
-// AddHas adds the "has" edges to the MATCHINGS entity.
-func (sc *SESSIONSCreate) AddHas(m ...*MATCHINGS) *SESSIONSCreate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return sc.AddHaIDs(ids...)
-}
-
-// SetUsesID sets the "uses" edge to the AITHEMES entity by ID.
-func (sc *SESSIONSCreate) SetUsesID(id int) *SESSIONSCreate {
-	sc.mutation.SetUsesID(id)
+// SetHadID sets the "had" edge to the EVENT_RECORDS entity by ID.
+func (sc *SESSIONSCreate) SetHadID(id int) *SESSIONSCreate {
+	sc.mutation.SetHadID(id)
 	return sc
 }
 
-// SetNillableUsesID sets the "uses" edge to the AITHEMES entity by ID if the given value is not nil.
-func (sc *SESSIONSCreate) SetNillableUsesID(id *int) *SESSIONSCreate {
+// SetNillableHadID sets the "had" edge to the EVENT_RECORDS entity by ID if the given value is not nil.
+func (sc *SESSIONSCreate) SetNillableHadID(id *int) *SESSIONSCreate {
 	if id != nil {
-		sc = sc.SetUsesID(*id)
+		sc = sc.SetHadID(*id)
 	}
 	return sc
 }
 
-// SetUses sets the "uses" edge to the AITHEMES entity.
-func (sc *SESSIONSCreate) SetUses(a *AITHEMES) *SESSIONSCreate {
-	return sc.SetUsesID(a.ID)
+// SetHad sets the "had" edge to the EVENT_RECORDS entity.
+func (sc *SESSIONSCreate) SetHad(e *EVENT_RECORDS) *SESSIONSCreate {
+	return sc.SetHadID(e.ID)
+}
+
+// SetMakesID sets the "makes" edge to the CALLS entity by ID.
+func (sc *SESSIONSCreate) SetMakesID(id int) *SESSIONSCreate {
+	sc.mutation.SetMakesID(id)
+	return sc
+}
+
+// SetNillableMakesID sets the "makes" edge to the CALLS entity by ID if the given value is not nil.
+func (sc *SESSIONSCreate) SetNillableMakesID(id *int) *SESSIONSCreate {
+	if id != nil {
+		sc = sc.SetMakesID(*id)
+	}
+	return sc
+}
+
+// SetMakes sets the "makes" edge to the CALLS entity.
+func (sc *SESSIONSCreate) SetMakes(c *CALLS) *SESSIONSCreate {
+	return sc.SetMakesID(c.ID)
 }
 
 // Mutation returns the SESSIONSMutation object of the builder.
@@ -123,25 +133,33 @@ func (sc *SESSIONSCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *SESSIONSCreate) defaults() {
-	if _, ok := sc.mutation.CreatedAt(); !ok {
-		v := sessions.DefaultCreatedAt
-		sc.mutation.SetCreatedAt(v)
+	if _, ok := sc.mutation.MatchedAt(); !ok {
+		v := sessions.DefaultMatchedAt
+		sc.mutation.SetMatchedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *SESSIONSCreate) check() error {
-	if _, ok := sc.mutation.SessionStart(); !ok {
-		return &ValidationError{Name: "session_start", err: errors.New(`ent: missing required field "SESSIONS.session_start"`)}
+	if _, ok := sc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "SESSIONS.user_id"`)}
 	}
-	if _, ok := sc.mutation.SessionEnd(); !ok {
-		return &ValidationError{Name: "session_end", err: errors.New(`ent: missing required field "SESSIONS.session_end"`)}
+	if _, ok := sc.mutation.MatchedUserID(); !ok {
+		return &ValidationError{Name: "matched_user_id", err: errors.New(`ent: missing required field "SESSIONS.matched_user_id"`)}
 	}
-	if _, ok := sc.mutation.ThemeID(); !ok {
-		return &ValidationError{Name: "theme_id", err: errors.New(`ent: missing required field "SESSIONS.theme_id"`)}
+	if _, ok := sc.mutation.RecordID(); !ok {
+		return &ValidationError{Name: "record_id", err: errors.New(`ent: missing required field "SESSIONS.record_id"`)}
 	}
-	if _, ok := sc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "SESSIONS.created_at"`)}
+	if _, ok := sc.mutation.MatchedAt(); !ok {
+		return &ValidationError{Name: "matched_at", err: errors.New(`ent: missing required field "SESSIONS.matched_at"`)}
+	}
+	if _, ok := sc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "SESSIONS.status"`)}
+	}
+	if v, ok := sc.mutation.Status(); ok {
+		if err := sessions.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "SESSIONS.status": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -169,53 +187,57 @@ func (sc *SESSIONSCreate) createSpec() (*SESSIONS, *sqlgraph.CreateSpec) {
 		_node = &SESSIONS{config: sc.config}
 		_spec = sqlgraph.NewCreateSpec(sessions.Table, sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt))
 	)
-	if value, ok := sc.mutation.SessionStart(); ok {
-		_spec.SetField(sessions.FieldSessionStart, field.TypeTime, value)
-		_node.SessionStart = value
+	if value, ok := sc.mutation.UserID(); ok {
+		_spec.SetField(sessions.FieldUserID, field.TypeInt, value)
+		_node.UserID = value
 	}
-	if value, ok := sc.mutation.SessionEnd(); ok {
-		_spec.SetField(sessions.FieldSessionEnd, field.TypeTime, value)
-		_node.SessionEnd = value
+	if value, ok := sc.mutation.MatchedUserID(); ok {
+		_spec.SetField(sessions.FieldMatchedUserID, field.TypeInt, value)
+		_node.MatchedUserID = value
 	}
-	if value, ok := sc.mutation.ThemeID(); ok {
-		_spec.SetField(sessions.FieldThemeID, field.TypeInt, value)
-		_node.ThemeID = value
+	if value, ok := sc.mutation.RecordID(); ok {
+		_spec.SetField(sessions.FieldRecordID, field.TypeInt, value)
+		_node.RecordID = value
 	}
-	if value, ok := sc.mutation.CreatedAt(); ok {
-		_spec.SetField(sessions.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := sc.mutation.MatchedAt(); ok {
+		_spec.SetField(sessions.FieldMatchedAt, field.TypeTime, value)
+		_node.MatchedAt = value
 	}
-	if nodes := sc.mutation.HasIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   sessions.HasTable,
-			Columns: []string{sessions.HasColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := sc.mutation.Status(); ok {
+		_spec.SetField(sessions.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
-	if nodes := sc.mutation.UsesIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.HadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   sessions.UsesTable,
-			Columns: []string{sessions.UsesColumn},
+			Inverse: true,
+			Table:   sessions.HadTable,
+			Columns: []string{sessions.HadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.sessions_uses = &nodes[0]
+		_node.event_records_has = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.MakesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   sessions.MakesTable,
+			Columns: []string{sessions.MakesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(calls.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

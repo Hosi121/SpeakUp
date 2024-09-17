@@ -60,11 +60,6 @@ func Username(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldUsername, v))
 }
 
-// Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
-func Email(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldEmail, v))
-}
-
 // AvatarURL applies equality check predicate on the "avatar_url" field. It's identical to AvatarURLEQ.
 func AvatarURL(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldAvatarURL, v))
@@ -83,11 +78,6 @@ func IsDeleted(v bool) predicate.USERS {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// AccessToken applies equality check predicate on the "access_token" field. It's identical to AccessTokenEQ.
-func AccessToken(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldAccessToken, v))
 }
 
 // UsernameEQ applies the EQ predicate on the "username" field.
@@ -153,71 +143,6 @@ func UsernameEqualFold(v string) predicate.USERS {
 // UsernameContainsFold applies the ContainsFold predicate on the "username" field.
 func UsernameContainsFold(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldContainsFold(FieldUsername, v))
-}
-
-// EmailEQ applies the EQ predicate on the "email" field.
-func EmailEQ(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldEmail, v))
-}
-
-// EmailNEQ applies the NEQ predicate on the "email" field.
-func EmailNEQ(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldNEQ(FieldEmail, v))
-}
-
-// EmailIn applies the In predicate on the "email" field.
-func EmailIn(vs ...string) predicate.USERS {
-	return predicate.USERS(sql.FieldIn(FieldEmail, vs...))
-}
-
-// EmailNotIn applies the NotIn predicate on the "email" field.
-func EmailNotIn(vs ...string) predicate.USERS {
-	return predicate.USERS(sql.FieldNotIn(FieldEmail, vs...))
-}
-
-// EmailGT applies the GT predicate on the "email" field.
-func EmailGT(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldGT(FieldEmail, v))
-}
-
-// EmailGTE applies the GTE predicate on the "email" field.
-func EmailGTE(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldGTE(FieldEmail, v))
-}
-
-// EmailLT applies the LT predicate on the "email" field.
-func EmailLT(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldLT(FieldEmail, v))
-}
-
-// EmailLTE applies the LTE predicate on the "email" field.
-func EmailLTE(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldLTE(FieldEmail, v))
-}
-
-// EmailContains applies the Contains predicate on the "email" field.
-func EmailContains(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldContains(FieldEmail, v))
-}
-
-// EmailHasPrefix applies the HasPrefix predicate on the "email" field.
-func EmailHasPrefix(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldHasPrefix(FieldEmail, v))
-}
-
-// EmailHasSuffix applies the HasSuffix predicate on the "email" field.
-func EmailHasSuffix(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldHasSuffix(FieldEmail, v))
-}
-
-// EmailEqualFold applies the EqualFold predicate on the "email" field.
-func EmailEqualFold(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEqualFold(FieldEmail, v))
-}
-
-// EmailContainsFold applies the ContainsFold predicate on the "email" field.
-func EmailContainsFold(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldContainsFold(FieldEmail, v))
 }
 
 // AvatarURLEQ applies the EQ predicate on the "avatar_url" field.
@@ -405,71 +330,6 @@ func UpdatedAtLTE(v time.Time) predicate.USERS {
 	return predicate.USERS(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// AccessTokenEQ applies the EQ predicate on the "access_token" field.
-func AccessTokenEQ(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEQ(FieldAccessToken, v))
-}
-
-// AccessTokenNEQ applies the NEQ predicate on the "access_token" field.
-func AccessTokenNEQ(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldNEQ(FieldAccessToken, v))
-}
-
-// AccessTokenIn applies the In predicate on the "access_token" field.
-func AccessTokenIn(vs ...string) predicate.USERS {
-	return predicate.USERS(sql.FieldIn(FieldAccessToken, vs...))
-}
-
-// AccessTokenNotIn applies the NotIn predicate on the "access_token" field.
-func AccessTokenNotIn(vs ...string) predicate.USERS {
-	return predicate.USERS(sql.FieldNotIn(FieldAccessToken, vs...))
-}
-
-// AccessTokenGT applies the GT predicate on the "access_token" field.
-func AccessTokenGT(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldGT(FieldAccessToken, v))
-}
-
-// AccessTokenGTE applies the GTE predicate on the "access_token" field.
-func AccessTokenGTE(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldGTE(FieldAccessToken, v))
-}
-
-// AccessTokenLT applies the LT predicate on the "access_token" field.
-func AccessTokenLT(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldLT(FieldAccessToken, v))
-}
-
-// AccessTokenLTE applies the LTE predicate on the "access_token" field.
-func AccessTokenLTE(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldLTE(FieldAccessToken, v))
-}
-
-// AccessTokenContains applies the Contains predicate on the "access_token" field.
-func AccessTokenContains(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldContains(FieldAccessToken, v))
-}
-
-// AccessTokenHasPrefix applies the HasPrefix predicate on the "access_token" field.
-func AccessTokenHasPrefix(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldHasPrefix(FieldAccessToken, v))
-}
-
-// AccessTokenHasSuffix applies the HasSuffix predicate on the "access_token" field.
-func AccessTokenHasSuffix(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldHasSuffix(FieldAccessToken, v))
-}
-
-// AccessTokenEqualFold applies the EqualFold predicate on the "access_token" field.
-func AccessTokenEqualFold(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldEqualFold(FieldAccessToken, v))
-}
-
-// AccessTokenContainsFold applies the ContainsFold predicate on the "access_token" field.
-func AccessTokenContainsFold(v string) predicate.USERS {
-	return predicate.USERS(sql.FieldContainsFold(FieldAccessToken, v))
-}
-
 // HasConnects applies the HasEdge predicate on the "connects" edge.
 func HasConnects() predicate.USERS {
 	return predicate.USERS(func(s *sql.Selector) {
@@ -493,21 +353,21 @@ func HasConnectsWith(preds ...predicate.FRIENDS) predicate.USERS {
 	})
 }
 
-// HasParticipates applies the HasEdge predicate on the "participates" edge.
-func HasParticipates() predicate.USERS {
+// HasMakes applies the HasEdge predicate on the "makes" edge.
+func HasMakes() predicate.USERS {
 	return predicate.USERS(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ParticipatesTable, ParticipatesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, MakesTable, MakesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasParticipatesWith applies the HasEdge predicate on the "participates" edge with a given conditions (other predicates).
-func HasParticipatesWith(preds ...predicate.MATCHINGS) predicate.USERS {
+// HasMakesWith applies the HasEdge predicate on the "makes" edge with a given conditions (other predicates).
+func HasMakesWith(preds ...predicate.EVENT_RECORDS) predicate.USERS {
 	return predicate.USERS(func(s *sql.Selector) {
-		step := newParticipatesStep()
+		step := newMakesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -554,6 +414,29 @@ func HasAcquires() predicate.USERS {
 func HasAcquiresWith(preds ...predicate.ACHIEVEMENTS) predicate.USERS {
 	return predicate.USERS(func(s *sql.Selector) {
 		step := newAcquiresStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRecords applies the HasEdge predicate on the "records" edge.
+func HasRecords() predicate.USERS {
+	return predicate.USERS(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, RecordsTable, RecordsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRecordsWith applies the HasEdge predicate on the "records" edge with a given conditions (other predicates).
+func HasRecordsWith(preds ...predicate.PROGRESS) predicate.USERS {
+	return predicate.USERS(func(s *sql.Selector) {
+		step := newRecordsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

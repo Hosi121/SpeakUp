@@ -10,11 +10,11 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
-	"github.com/Hosi121/SpeakUp/ent/sessions"
+	"github.com/Hosi121/SpeakUp/ent/ai_themes"
+	"github.com/Hosi121/SpeakUp/ent/events"
 )
 
-// AITHEMESCreate is the builder for creating a AITHEMES entity.
+// AITHEMESCreate is the builder for creating a AI_THEMES entity.
 type AITHEMESCreate struct {
 	config
 	mutation *AITHEMESMutation
@@ -41,17 +41,17 @@ func (ac *AITHEMESCreate) SetNillableCreatedAt(t *time.Time) *AITHEMESCreate {
 	return ac
 }
 
-// AddUsedIDs adds the "used" edge to the SESSIONS entity by IDs.
+// AddUsedIDs adds the "used" edge to the EVENTS entity by IDs.
 func (ac *AITHEMESCreate) AddUsedIDs(ids ...int) *AITHEMESCreate {
 	ac.mutation.AddUsedIDs(ids...)
 	return ac
 }
 
-// AddUsed adds the "used" edges to the SESSIONS entity.
-func (ac *AITHEMESCreate) AddUsed(s ...*SESSIONS) *AITHEMESCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// AddUsed adds the "used" edges to the EVENTS entity.
+func (ac *AITHEMESCreate) AddUsed(e ...*EVENTS) *AITHEMESCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
 	return ac.AddUsedIDs(ids...)
 }
@@ -61,14 +61,14 @@ func (ac *AITHEMESCreate) Mutation() *AITHEMESMutation {
 	return ac.mutation
 }
 
-// Save creates the AITHEMES in the database.
-func (ac *AITHEMESCreate) Save(ctx context.Context) (*AITHEMES, error) {
+// Save creates the AI_THEMES in the database.
+func (ac *AITHEMESCreate) Save(ctx context.Context) (*AI_THEMES, error) {
 	ac.defaults()
 	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (ac *AITHEMESCreate) SaveX(ctx context.Context) *AITHEMES {
+func (ac *AITHEMESCreate) SaveX(ctx context.Context) *AI_THEMES {
 	v, err := ac.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -92,7 +92,7 @@ func (ac *AITHEMESCreate) ExecX(ctx context.Context) {
 // defaults sets the default values of the builder before save.
 func (ac *AITHEMESCreate) defaults() {
 	if _, ok := ac.mutation.CreatedAt(); !ok {
-		v := aithemes.DefaultCreatedAt
+		v := ai_themes.DefaultCreatedAt
 		ac.mutation.SetCreatedAt(v)
 	}
 }
@@ -100,15 +100,15 @@ func (ac *AITHEMESCreate) defaults() {
 // check runs all checks and user-defined validators on the builder.
 func (ac *AITHEMESCreate) check() error {
 	if _, ok := ac.mutation.ThemeText(); !ok {
-		return &ValidationError{Name: "theme_text", err: errors.New(`ent: missing required field "AITHEMES.theme_text"`)}
+		return &ValidationError{Name: "theme_text", err: errors.New(`ent: missing required field "AI_THEMES.theme_text"`)}
 	}
 	if _, ok := ac.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "AITHEMES.created_at"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "AI_THEMES.created_at"`)}
 	}
 	return nil
 }
 
-func (ac *AITHEMESCreate) sqlSave(ctx context.Context) (*AITHEMES, error) {
+func (ac *AITHEMESCreate) sqlSave(ctx context.Context) (*AI_THEMES, error) {
 	if err := ac.check(); err != nil {
 		return nil, err
 	}
@@ -126,28 +126,28 @@ func (ac *AITHEMESCreate) sqlSave(ctx context.Context) (*AITHEMES, error) {
 	return _node, nil
 }
 
-func (ac *AITHEMESCreate) createSpec() (*AITHEMES, *sqlgraph.CreateSpec) {
+func (ac *AITHEMESCreate) createSpec() (*AI_THEMES, *sqlgraph.CreateSpec) {
 	var (
-		_node = &AITHEMES{config: ac.config}
-		_spec = sqlgraph.NewCreateSpec(aithemes.Table, sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt))
+		_node = &AI_THEMES{config: ac.config}
+		_spec = sqlgraph.NewCreateSpec(ai_themes.Table, sqlgraph.NewFieldSpec(ai_themes.FieldID, field.TypeInt))
 	)
 	if value, ok := ac.mutation.ThemeText(); ok {
-		_spec.SetField(aithemes.FieldThemeText, field.TypeString, value)
+		_spec.SetField(ai_themes.FieldThemeText, field.TypeString, value)
 		_node.ThemeText = value
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
-		_spec.SetField(aithemes.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(ai_themes.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if nodes := ac.mutation.UsedIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   aithemes.UsedTable,
-			Columns: []string{aithemes.UsedColumn},
+			Table:   ai_themes.UsedTable,
+			Columns: []string{ai_themes.UsedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(events.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -158,20 +158,20 @@ func (ac *AITHEMESCreate) createSpec() (*AITHEMES, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
-// AITHEMESCreateBulk is the builder for creating many AITHEMES entities in bulk.
+// AITHEMESCreateBulk is the builder for creating many AI_THEMES entities in bulk.
 type AITHEMESCreateBulk struct {
 	config
 	err      error
 	builders []*AITHEMESCreate
 }
 
-// Save creates the AITHEMES entities in the database.
-func (acb *AITHEMESCreateBulk) Save(ctx context.Context) ([]*AITHEMES, error) {
+// Save creates the AI_THEMES entities in the database.
+func (acb *AITHEMESCreateBulk) Save(ctx context.Context) ([]*AI_THEMES, error) {
 	if acb.err != nil {
 		return nil, acb.err
 	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
-	nodes := make([]*AITHEMES, len(acb.builders))
+	nodes := make([]*AI_THEMES, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
 	for i := range acb.builders {
 		func(i int, root context.Context) {
@@ -225,7 +225,7 @@ func (acb *AITHEMESCreateBulk) Save(ctx context.Context) ([]*AITHEMES, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (acb *AITHEMESCreateBulk) SaveX(ctx context.Context) []*AITHEMES {
+func (acb *AITHEMESCreateBulk) SaveX(ctx context.Context) []*AI_THEMES {
 	v, err := acb.Save(ctx)
 	if err != nil {
 		panic(err)

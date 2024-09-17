@@ -14,20 +14,22 @@ type Tx struct {
 	config
 	// ACHIEVEMENTS is the client for interacting with the ACHIEVEMENTS builders.
 	ACHIEVEMENTS *ACHIEVEMENTSClient
-	// AITHEMES is the client for interacting with the AITHEMES builders.
-	AITHEMES *AITHEMESClient
+	// AI_THEMES is the client for interacting with the AI_THEMES builders.
+	AI_THEMES *AITHEMESClient
 	// CALLS is the client for interacting with the CALLS builders.
 	CALLS *CALLSClient
+	// EVENTS is the client for interacting with the EVENTS builders.
+	EVENTS *EVENTSClient
+	// EVENT_RECORDS is the client for interacting with the EVENT_RECORDS builders.
+	EVENT_RECORDS *EVENTRECORDSClient
 	// FRIENDS is the client for interacting with the FRIENDS builders.
 	FRIENDS *FRIENDSClient
-	// MATCHINGS is the client for interacting with the MATCHINGS builders.
-	MATCHINGS *MATCHINGSClient
 	// MEMOS is the client for interacting with the MEMOS builders.
 	MEMOS *MEMOSClient
+	// PROGRESS is the client for interacting with the PROGRESS builders.
+	PROGRESS *PROGRESSClient
 	// SESSIONS is the client for interacting with the SESSIONS builders.
 	SESSIONS *SESSIONSClient
-	// TROPHIES is the client for interacting with the TROPHIES builders.
-	TROPHIES *TROPHIESClient
 	// USERS is the client for interacting with the USERS builders.
 	USERS *USERSClient
 
@@ -162,13 +164,14 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.ACHIEVEMENTS = NewACHIEVEMENTSClient(tx.config)
-	tx.AITHEMES = NewAITHEMESClient(tx.config)
+	tx.AI_THEMES = NewAITHEMESClient(tx.config)
 	tx.CALLS = NewCALLSClient(tx.config)
+	tx.EVENTS = NewEVENTSClient(tx.config)
+	tx.EVENT_RECORDS = NewEVENTRECORDSClient(tx.config)
 	tx.FRIENDS = NewFRIENDSClient(tx.config)
-	tx.MATCHINGS = NewMATCHINGSClient(tx.config)
 	tx.MEMOS = NewMEMOSClient(tx.config)
+	tx.PROGRESS = NewPROGRESSClient(tx.config)
 	tx.SESSIONS = NewSESSIONSClient(tx.config)
-	tx.TROPHIES = NewTROPHIESClient(tx.config)
 	tx.USERS = NewUSERSClient(tx.config)
 }
 

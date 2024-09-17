@@ -12,10 +12,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/friends"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
+	"github.com/Hosi121/SpeakUp/ent/progress"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -42,20 +43,6 @@ func (uu *USERSUpdate) SetUsername(s string) *USERSUpdate {
 func (uu *USERSUpdate) SetNillableUsername(s *string) *USERSUpdate {
 	if s != nil {
 		uu.SetUsername(*s)
-	}
-	return uu
-}
-
-// SetEmail sets the "email" field.
-func (uu *USERSUpdate) SetEmail(s string) *USERSUpdate {
-	uu.mutation.SetEmail(s)
-	return uu
-}
-
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (uu *USERSUpdate) SetNillableEmail(s *string) *USERSUpdate {
-	if s != nil {
-		uu.SetEmail(*s)
 	}
 	return uu
 }
@@ -136,20 +123,6 @@ func (uu *USERSUpdate) SetNillableUpdatedAt(t *time.Time) *USERSUpdate {
 	return uu
 }
 
-// SetAccessToken sets the "access_token" field.
-func (uu *USERSUpdate) SetAccessToken(s string) *USERSUpdate {
-	uu.mutation.SetAccessToken(s)
-	return uu
-}
-
-// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
-func (uu *USERSUpdate) SetNillableAccessToken(s *string) *USERSUpdate {
-	if s != nil {
-		uu.SetAccessToken(*s)
-	}
-	return uu
-}
-
 // AddConnectIDs adds the "connects" edge to the FRIENDS entity by IDs.
 func (uu *USERSUpdate) AddConnectIDs(ids ...int) *USERSUpdate {
 	uu.mutation.AddConnectIDs(ids...)
@@ -165,19 +138,19 @@ func (uu *USERSUpdate) AddConnects(f ...*FRIENDS) *USERSUpdate {
 	return uu.AddConnectIDs(ids...)
 }
 
-// AddParticipateIDs adds the "participates" edge to the MATCHINGS entity by IDs.
-func (uu *USERSUpdate) AddParticipateIDs(ids ...int) *USERSUpdate {
-	uu.mutation.AddParticipateIDs(ids...)
+// AddMakeIDs adds the "makes" edge to the EVENT_RECORDS entity by IDs.
+func (uu *USERSUpdate) AddMakeIDs(ids ...int) *USERSUpdate {
+	uu.mutation.AddMakeIDs(ids...)
 	return uu
 }
 
-// AddParticipates adds the "participates" edges to the MATCHINGS entity.
-func (uu *USERSUpdate) AddParticipates(m ...*MATCHINGS) *USERSUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// AddMakes adds the "makes" edges to the EVENT_RECORDS entity.
+func (uu *USERSUpdate) AddMakes(e ...*EVENT_RECORDS) *USERSUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return uu.AddParticipateIDs(ids...)
+	return uu.AddMakeIDs(ids...)
 }
 
 // SetPreparesID sets the "prepares" edge to the MEMOS entity by ID.
@@ -214,6 +187,25 @@ func (uu *USERSUpdate) AddAcquires(a ...*ACHIEVEMENTS) *USERSUpdate {
 	return uu.AddAcquireIDs(ids...)
 }
 
+// SetRecordsID sets the "records" edge to the PROGRESS entity by ID.
+func (uu *USERSUpdate) SetRecordsID(id int) *USERSUpdate {
+	uu.mutation.SetRecordsID(id)
+	return uu
+}
+
+// SetNillableRecordsID sets the "records" edge to the PROGRESS entity by ID if the given value is not nil.
+func (uu *USERSUpdate) SetNillableRecordsID(id *int) *USERSUpdate {
+	if id != nil {
+		uu = uu.SetRecordsID(*id)
+	}
+	return uu
+}
+
+// SetRecords sets the "records" edge to the PROGRESS entity.
+func (uu *USERSUpdate) SetRecords(p *PROGRESS) *USERSUpdate {
+	return uu.SetRecordsID(p.ID)
+}
+
 // Mutation returns the USERSMutation object of the builder.
 func (uu *USERSUpdate) Mutation() *USERSMutation {
 	return uu.mutation
@@ -240,25 +232,25 @@ func (uu *USERSUpdate) RemoveConnects(f ...*FRIENDS) *USERSUpdate {
 	return uu.RemoveConnectIDs(ids...)
 }
 
-// ClearParticipates clears all "participates" edges to the MATCHINGS entity.
-func (uu *USERSUpdate) ClearParticipates() *USERSUpdate {
-	uu.mutation.ClearParticipates()
+// ClearMakes clears all "makes" edges to the EVENT_RECORDS entity.
+func (uu *USERSUpdate) ClearMakes() *USERSUpdate {
+	uu.mutation.ClearMakes()
 	return uu
 }
 
-// RemoveParticipateIDs removes the "participates" edge to MATCHINGS entities by IDs.
-func (uu *USERSUpdate) RemoveParticipateIDs(ids ...int) *USERSUpdate {
-	uu.mutation.RemoveParticipateIDs(ids...)
+// RemoveMakeIDs removes the "makes" edge to EVENT_RECORDS entities by IDs.
+func (uu *USERSUpdate) RemoveMakeIDs(ids ...int) *USERSUpdate {
+	uu.mutation.RemoveMakeIDs(ids...)
 	return uu
 }
 
-// RemoveParticipates removes "participates" edges to MATCHINGS entities.
-func (uu *USERSUpdate) RemoveParticipates(m ...*MATCHINGS) *USERSUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// RemoveMakes removes "makes" edges to EVENT_RECORDS entities.
+func (uu *USERSUpdate) RemoveMakes(e ...*EVENT_RECORDS) *USERSUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return uu.RemoveParticipateIDs(ids...)
+	return uu.RemoveMakeIDs(ids...)
 }
 
 // ClearPrepares clears the "prepares" edge to the MEMOS entity.
@@ -286,6 +278,12 @@ func (uu *USERSUpdate) RemoveAcquires(a ...*ACHIEVEMENTS) *USERSUpdate {
 		ids[i] = a[i].ID
 	}
 	return uu.RemoveAcquireIDs(ids...)
+}
+
+// ClearRecords clears the "records" edge to the PROGRESS entity.
+func (uu *USERSUpdate) ClearRecords() *USERSUpdate {
+	uu.mutation.ClearRecords()
+	return uu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -322,11 +320,6 @@ func (uu *USERSUpdate) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "USERS.username": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.Email(); ok {
-		if err := users.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
-		}
-	}
 	if v, ok := uu.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -350,9 +343,6 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 	}
-	if value, ok := uu.mutation.Email(); ok {
-		_spec.SetField(users.FieldEmail, field.TypeString, value)
-	}
 	if value, ok := uu.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
 	}
@@ -370,9 +360,6 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.UpdatedAt(); ok {
 		_spec.SetField(users.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := uu.mutation.AccessToken(); ok {
-		_spec.SetField(users.FieldAccessToken, field.TypeString, value)
 	}
 	if uu.mutation.ConnectsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -419,28 +406,28 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.ParticipatesCleared() {
+	if uu.mutation.MakesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   users.ParticipatesTable,
-			Columns: users.ParticipatesPrimaryKey,
+			Table:   users.MakesTable,
+			Columns: []string{users.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedParticipatesIDs(); len(nodes) > 0 && !uu.mutation.ParticipatesCleared() {
+	if nodes := uu.mutation.RemovedMakesIDs(); len(nodes) > 0 && !uu.mutation.MakesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   users.ParticipatesTable,
-			Columns: users.ParticipatesPrimaryKey,
+			Table:   users.MakesTable,
+			Columns: []string{users.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -448,15 +435,15 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.ParticipatesIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.MakesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   users.ParticipatesTable,
-			Columns: users.ParticipatesPrimaryKey,
+			Table:   users.MakesTable,
+			Columns: []string{users.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -538,6 +525,35 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.RecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.RecordsTable,
+			Columns: []string{users.RecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.RecordsTable,
+			Columns: []string{users.RecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{users.Label}
@@ -568,20 +584,6 @@ func (uuo *USERSUpdateOne) SetUsername(s string) *USERSUpdateOne {
 func (uuo *USERSUpdateOne) SetNillableUsername(s *string) *USERSUpdateOne {
 	if s != nil {
 		uuo.SetUsername(*s)
-	}
-	return uuo
-}
-
-// SetEmail sets the "email" field.
-func (uuo *USERSUpdateOne) SetEmail(s string) *USERSUpdateOne {
-	uuo.mutation.SetEmail(s)
-	return uuo
-}
-
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (uuo *USERSUpdateOne) SetNillableEmail(s *string) *USERSUpdateOne {
-	if s != nil {
-		uuo.SetEmail(*s)
 	}
 	return uuo
 }
@@ -662,20 +664,6 @@ func (uuo *USERSUpdateOne) SetNillableUpdatedAt(t *time.Time) *USERSUpdateOne {
 	return uuo
 }
 
-// SetAccessToken sets the "access_token" field.
-func (uuo *USERSUpdateOne) SetAccessToken(s string) *USERSUpdateOne {
-	uuo.mutation.SetAccessToken(s)
-	return uuo
-}
-
-// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
-func (uuo *USERSUpdateOne) SetNillableAccessToken(s *string) *USERSUpdateOne {
-	if s != nil {
-		uuo.SetAccessToken(*s)
-	}
-	return uuo
-}
-
 // AddConnectIDs adds the "connects" edge to the FRIENDS entity by IDs.
 func (uuo *USERSUpdateOne) AddConnectIDs(ids ...int) *USERSUpdateOne {
 	uuo.mutation.AddConnectIDs(ids...)
@@ -691,19 +679,19 @@ func (uuo *USERSUpdateOne) AddConnects(f ...*FRIENDS) *USERSUpdateOne {
 	return uuo.AddConnectIDs(ids...)
 }
 
-// AddParticipateIDs adds the "participates" edge to the MATCHINGS entity by IDs.
-func (uuo *USERSUpdateOne) AddParticipateIDs(ids ...int) *USERSUpdateOne {
-	uuo.mutation.AddParticipateIDs(ids...)
+// AddMakeIDs adds the "makes" edge to the EVENT_RECORDS entity by IDs.
+func (uuo *USERSUpdateOne) AddMakeIDs(ids ...int) *USERSUpdateOne {
+	uuo.mutation.AddMakeIDs(ids...)
 	return uuo
 }
 
-// AddParticipates adds the "participates" edges to the MATCHINGS entity.
-func (uuo *USERSUpdateOne) AddParticipates(m ...*MATCHINGS) *USERSUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// AddMakes adds the "makes" edges to the EVENT_RECORDS entity.
+func (uuo *USERSUpdateOne) AddMakes(e ...*EVENT_RECORDS) *USERSUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return uuo.AddParticipateIDs(ids...)
+	return uuo.AddMakeIDs(ids...)
 }
 
 // SetPreparesID sets the "prepares" edge to the MEMOS entity by ID.
@@ -740,6 +728,25 @@ func (uuo *USERSUpdateOne) AddAcquires(a ...*ACHIEVEMENTS) *USERSUpdateOne {
 	return uuo.AddAcquireIDs(ids...)
 }
 
+// SetRecordsID sets the "records" edge to the PROGRESS entity by ID.
+func (uuo *USERSUpdateOne) SetRecordsID(id int) *USERSUpdateOne {
+	uuo.mutation.SetRecordsID(id)
+	return uuo
+}
+
+// SetNillableRecordsID sets the "records" edge to the PROGRESS entity by ID if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableRecordsID(id *int) *USERSUpdateOne {
+	if id != nil {
+		uuo = uuo.SetRecordsID(*id)
+	}
+	return uuo
+}
+
+// SetRecords sets the "records" edge to the PROGRESS entity.
+func (uuo *USERSUpdateOne) SetRecords(p *PROGRESS) *USERSUpdateOne {
+	return uuo.SetRecordsID(p.ID)
+}
+
 // Mutation returns the USERSMutation object of the builder.
 func (uuo *USERSUpdateOne) Mutation() *USERSMutation {
 	return uuo.mutation
@@ -766,25 +773,25 @@ func (uuo *USERSUpdateOne) RemoveConnects(f ...*FRIENDS) *USERSUpdateOne {
 	return uuo.RemoveConnectIDs(ids...)
 }
 
-// ClearParticipates clears all "participates" edges to the MATCHINGS entity.
-func (uuo *USERSUpdateOne) ClearParticipates() *USERSUpdateOne {
-	uuo.mutation.ClearParticipates()
+// ClearMakes clears all "makes" edges to the EVENT_RECORDS entity.
+func (uuo *USERSUpdateOne) ClearMakes() *USERSUpdateOne {
+	uuo.mutation.ClearMakes()
 	return uuo
 }
 
-// RemoveParticipateIDs removes the "participates" edge to MATCHINGS entities by IDs.
-func (uuo *USERSUpdateOne) RemoveParticipateIDs(ids ...int) *USERSUpdateOne {
-	uuo.mutation.RemoveParticipateIDs(ids...)
+// RemoveMakeIDs removes the "makes" edge to EVENT_RECORDS entities by IDs.
+func (uuo *USERSUpdateOne) RemoveMakeIDs(ids ...int) *USERSUpdateOne {
+	uuo.mutation.RemoveMakeIDs(ids...)
 	return uuo
 }
 
-// RemoveParticipates removes "participates" edges to MATCHINGS entities.
-func (uuo *USERSUpdateOne) RemoveParticipates(m ...*MATCHINGS) *USERSUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// RemoveMakes removes "makes" edges to EVENT_RECORDS entities.
+func (uuo *USERSUpdateOne) RemoveMakes(e ...*EVENT_RECORDS) *USERSUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return uuo.RemoveParticipateIDs(ids...)
+	return uuo.RemoveMakeIDs(ids...)
 }
 
 // ClearPrepares clears the "prepares" edge to the MEMOS entity.
@@ -812,6 +819,12 @@ func (uuo *USERSUpdateOne) RemoveAcquires(a ...*ACHIEVEMENTS) *USERSUpdateOne {
 		ids[i] = a[i].ID
 	}
 	return uuo.RemoveAcquireIDs(ids...)
+}
+
+// ClearRecords clears the "records" edge to the PROGRESS entity.
+func (uuo *USERSUpdateOne) ClearRecords() *USERSUpdateOne {
+	uuo.mutation.ClearRecords()
+	return uuo
 }
 
 // Where appends a list predicates to the USERSUpdate builder.
@@ -861,11 +874,6 @@ func (uuo *USERSUpdateOne) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "USERS.username": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.Email(); ok {
-		if err := users.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
-		}
-	}
 	if v, ok := uuo.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -906,9 +914,6 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 	if value, ok := uuo.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 	}
-	if value, ok := uuo.mutation.Email(); ok {
-		_spec.SetField(users.FieldEmail, field.TypeString, value)
-	}
 	if value, ok := uuo.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
 	}
@@ -926,9 +931,6 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 	}
 	if value, ok := uuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(users.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := uuo.mutation.AccessToken(); ok {
-		_spec.SetField(users.FieldAccessToken, field.TypeString, value)
 	}
 	if uuo.mutation.ConnectsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -975,28 +977,28 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.ParticipatesCleared() {
+	if uuo.mutation.MakesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   users.ParticipatesTable,
-			Columns: users.ParticipatesPrimaryKey,
+			Table:   users.MakesTable,
+			Columns: []string{users.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedParticipatesIDs(); len(nodes) > 0 && !uuo.mutation.ParticipatesCleared() {
+	if nodes := uuo.mutation.RemovedMakesIDs(); len(nodes) > 0 && !uuo.mutation.MakesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   users.ParticipatesTable,
-			Columns: users.ParticipatesPrimaryKey,
+			Table:   users.MakesTable,
+			Columns: []string{users.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1004,15 +1006,15 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.ParticipatesIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.MakesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   users.ParticipatesTable,
-			Columns: users.ParticipatesPrimaryKey,
+			Table:   users.MakesTable,
+			Columns: []string{users.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1087,6 +1089,35 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(achievements.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.RecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.RecordsTable,
+			Columns: []string{users.RecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   users.RecordsTable,
+			Columns: []string{users.RecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

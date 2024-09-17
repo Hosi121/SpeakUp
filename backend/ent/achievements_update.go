@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
-	"github.com/Hosi121/SpeakUp/ent/trophies"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -51,24 +50,17 @@ func (au *ACHIEVEMENTSUpdate) AddUserID(i int) *ACHIEVEMENTSUpdate {
 	return au
 }
 
-// SetTrophyID sets the "trophy_id" field.
-func (au *ACHIEVEMENTSUpdate) SetTrophyID(i int) *ACHIEVEMENTSUpdate {
-	au.mutation.ResetTrophyID()
-	au.mutation.SetTrophyID(i)
+// SetTitle sets the "title" field.
+func (au *ACHIEVEMENTSUpdate) SetTitle(s string) *ACHIEVEMENTSUpdate {
+	au.mutation.SetTitle(s)
 	return au
 }
 
-// SetNillableTrophyID sets the "trophy_id" field if the given value is not nil.
-func (au *ACHIEVEMENTSUpdate) SetNillableTrophyID(i *int) *ACHIEVEMENTSUpdate {
-	if i != nil {
-		au.SetTrophyID(*i)
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (au *ACHIEVEMENTSUpdate) SetNillableTitle(s *string) *ACHIEVEMENTSUpdate {
+	if s != nil {
+		au.SetTitle(*s)
 	}
-	return au
-}
-
-// AddTrophyID adds i to the "trophy_id" field.
-func (au *ACHIEVEMENTSUpdate) AddTrophyID(i int) *ACHIEVEMENTSUpdate {
-	au.mutation.AddTrophyID(i)
 	return au
 }
 
@@ -105,25 +97,6 @@ func (au *ACHIEVEMENTSUpdate) SetGranted(u *USERS) *ACHIEVEMENTSUpdate {
 	return au.SetGrantedID(u.ID)
 }
 
-// SetRefersID sets the "refers" edge to the TROPHIES entity by ID.
-func (au *ACHIEVEMENTSUpdate) SetRefersID(id int) *ACHIEVEMENTSUpdate {
-	au.mutation.SetRefersID(id)
-	return au
-}
-
-// SetNillableRefersID sets the "refers" edge to the TROPHIES entity by ID if the given value is not nil.
-func (au *ACHIEVEMENTSUpdate) SetNillableRefersID(id *int) *ACHIEVEMENTSUpdate {
-	if id != nil {
-		au = au.SetRefersID(*id)
-	}
-	return au
-}
-
-// SetRefers sets the "refers" edge to the TROPHIES entity.
-func (au *ACHIEVEMENTSUpdate) SetRefers(t *TROPHIES) *ACHIEVEMENTSUpdate {
-	return au.SetRefersID(t.ID)
-}
-
 // Mutation returns the ACHIEVEMENTSMutation object of the builder.
 func (au *ACHIEVEMENTSUpdate) Mutation() *ACHIEVEMENTSMutation {
 	return au.mutation
@@ -132,12 +105,6 @@ func (au *ACHIEVEMENTSUpdate) Mutation() *ACHIEVEMENTSMutation {
 // ClearGranted clears the "granted" edge to the USERS entity.
 func (au *ACHIEVEMENTSUpdate) ClearGranted() *ACHIEVEMENTSUpdate {
 	au.mutation.ClearGranted()
-	return au
-}
-
-// ClearRefers clears the "refers" edge to the TROPHIES entity.
-func (au *ACHIEVEMENTSUpdate) ClearRefers() *ACHIEVEMENTSUpdate {
-	au.mutation.ClearRefers()
 	return au
 }
 
@@ -183,11 +150,8 @@ func (au *ACHIEVEMENTSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.AddedUserID(); ok {
 		_spec.AddField(achievements.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.TrophyID(); ok {
-		_spec.SetField(achievements.FieldTrophyID, field.TypeInt, value)
-	}
-	if value, ok := au.mutation.AddedTrophyID(); ok {
-		_spec.AddField(achievements.FieldTrophyID, field.TypeInt, value)
+	if value, ok := au.mutation.Title(); ok {
+		_spec.SetField(achievements.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := au.mutation.CreatedAt(); ok {
 		_spec.SetField(achievements.FieldCreatedAt, field.TypeTime, value)
@@ -214,35 +178,6 @@ func (au *ACHIEVEMENTSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(users.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if au.mutation.RefersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   achievements.RefersTable,
-			Columns: []string{achievements.RefersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(trophies.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.RefersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   achievements.RefersTable,
-			Columns: []string{achievements.RefersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(trophies.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -291,24 +226,17 @@ func (auo *ACHIEVEMENTSUpdateOne) AddUserID(i int) *ACHIEVEMENTSUpdateOne {
 	return auo
 }
 
-// SetTrophyID sets the "trophy_id" field.
-func (auo *ACHIEVEMENTSUpdateOne) SetTrophyID(i int) *ACHIEVEMENTSUpdateOne {
-	auo.mutation.ResetTrophyID()
-	auo.mutation.SetTrophyID(i)
+// SetTitle sets the "title" field.
+func (auo *ACHIEVEMENTSUpdateOne) SetTitle(s string) *ACHIEVEMENTSUpdateOne {
+	auo.mutation.SetTitle(s)
 	return auo
 }
 
-// SetNillableTrophyID sets the "trophy_id" field if the given value is not nil.
-func (auo *ACHIEVEMENTSUpdateOne) SetNillableTrophyID(i *int) *ACHIEVEMENTSUpdateOne {
-	if i != nil {
-		auo.SetTrophyID(*i)
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (auo *ACHIEVEMENTSUpdateOne) SetNillableTitle(s *string) *ACHIEVEMENTSUpdateOne {
+	if s != nil {
+		auo.SetTitle(*s)
 	}
-	return auo
-}
-
-// AddTrophyID adds i to the "trophy_id" field.
-func (auo *ACHIEVEMENTSUpdateOne) AddTrophyID(i int) *ACHIEVEMENTSUpdateOne {
-	auo.mutation.AddTrophyID(i)
 	return auo
 }
 
@@ -345,25 +273,6 @@ func (auo *ACHIEVEMENTSUpdateOne) SetGranted(u *USERS) *ACHIEVEMENTSUpdateOne {
 	return auo.SetGrantedID(u.ID)
 }
 
-// SetRefersID sets the "refers" edge to the TROPHIES entity by ID.
-func (auo *ACHIEVEMENTSUpdateOne) SetRefersID(id int) *ACHIEVEMENTSUpdateOne {
-	auo.mutation.SetRefersID(id)
-	return auo
-}
-
-// SetNillableRefersID sets the "refers" edge to the TROPHIES entity by ID if the given value is not nil.
-func (auo *ACHIEVEMENTSUpdateOne) SetNillableRefersID(id *int) *ACHIEVEMENTSUpdateOne {
-	if id != nil {
-		auo = auo.SetRefersID(*id)
-	}
-	return auo
-}
-
-// SetRefers sets the "refers" edge to the TROPHIES entity.
-func (auo *ACHIEVEMENTSUpdateOne) SetRefers(t *TROPHIES) *ACHIEVEMENTSUpdateOne {
-	return auo.SetRefersID(t.ID)
-}
-
 // Mutation returns the ACHIEVEMENTSMutation object of the builder.
 func (auo *ACHIEVEMENTSUpdateOne) Mutation() *ACHIEVEMENTSMutation {
 	return auo.mutation
@@ -372,12 +281,6 @@ func (auo *ACHIEVEMENTSUpdateOne) Mutation() *ACHIEVEMENTSMutation {
 // ClearGranted clears the "granted" edge to the USERS entity.
 func (auo *ACHIEVEMENTSUpdateOne) ClearGranted() *ACHIEVEMENTSUpdateOne {
 	auo.mutation.ClearGranted()
-	return auo
-}
-
-// ClearRefers clears the "refers" edge to the TROPHIES entity.
-func (auo *ACHIEVEMENTSUpdateOne) ClearRefers() *ACHIEVEMENTSUpdateOne {
-	auo.mutation.ClearRefers()
 	return auo
 }
 
@@ -453,11 +356,8 @@ func (auo *ACHIEVEMENTSUpdateOne) sqlSave(ctx context.Context) (_node *ACHIEVEME
 	if value, ok := auo.mutation.AddedUserID(); ok {
 		_spec.AddField(achievements.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.TrophyID(); ok {
-		_spec.SetField(achievements.FieldTrophyID, field.TypeInt, value)
-	}
-	if value, ok := auo.mutation.AddedTrophyID(); ok {
-		_spec.AddField(achievements.FieldTrophyID, field.TypeInt, value)
+	if value, ok := auo.mutation.Title(); ok {
+		_spec.SetField(achievements.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.CreatedAt(); ok {
 		_spec.SetField(achievements.FieldCreatedAt, field.TypeTime, value)
@@ -484,35 +384,6 @@ func (auo *ACHIEVEMENTSUpdateOne) sqlSave(ctx context.Context) (_node *ACHIEVEME
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(users.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if auo.mutation.RefersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   achievements.RefersTable,
-			Columns: []string{achievements.RefersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(trophies.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.RefersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   achievements.RefersTable,
-			Columns: []string{achievements.RefersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(trophies.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

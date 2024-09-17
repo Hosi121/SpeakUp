@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
-	"github.com/Hosi121/SpeakUp/ent/trophies"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -21,27 +20,24 @@ type ACHIEVEMENTS struct {
 	ID int `json:"id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
-	// TrophyID holds the value of the "trophy_id" field.
-	TrophyID int `json:"trophy_id,omitempty"`
+	// Title holds the value of the "title" field.
+	Title string `json:"title,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ACHIEVEMENTSQuery when eager-loading is set.
-	Edges               ACHIEVEMENTSEdges `json:"edges"`
-	achievements_refers *int
-	users_acquires      *int
-	selectValues        sql.SelectValues
+	Edges          ACHIEVEMENTSEdges `json:"edges"`
+	users_acquires *int
+	selectValues   sql.SelectValues
 }
 
 // ACHIEVEMENTSEdges holds the relations/edges for other nodes in the graph.
 type ACHIEVEMENTSEdges struct {
 	// Granted holds the value of the granted edge.
 	Granted *USERS `json:"granted,omitempty"`
-	// Refers holds the value of the refers edge.
-	Refers *TROPHIES `json:"refers,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // GrantedOrErr returns the Granted value or an error if the edge
@@ -55,29 +51,18 @@ func (e ACHIEVEMENTSEdges) GrantedOrErr() (*USERS, error) {
 	return nil, &NotLoadedError{edge: "granted"}
 }
 
-// RefersOrErr returns the Refers value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ACHIEVEMENTSEdges) RefersOrErr() (*TROPHIES, error) {
-	if e.Refers != nil {
-		return e.Refers, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: trophies.Label}
-	}
-	return nil, &NotLoadedError{edge: "refers"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*ACHIEVEMENTS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case achievements.FieldID, achievements.FieldUserID, achievements.FieldTrophyID:
+		case achievements.FieldID, achievements.FieldUserID:
 			values[i] = new(sql.NullInt64)
+		case achievements.FieldTitle:
+			values[i] = new(sql.NullString)
 		case achievements.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case achievements.ForeignKeys[0]: // achievements_refers
-			values[i] = new(sql.NullInt64)
-		case achievements.ForeignKeys[1]: // users_acquires
+		case achievements.ForeignKeys[0]: // users_acquires
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -106,11 +91,11 @@ func (a *ACHIEVEMENTS) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.UserID = int(value.Int64)
 			}
-		case achievements.FieldTrophyID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field trophy_id", values[i])
+		case achievements.FieldTitle:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
-				a.TrophyID = int(value.Int64)
+				a.Title = value.String
 			}
 		case achievements.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -119,13 +104,6 @@ func (a *ACHIEVEMENTS) assignValues(columns []string, values []any) error {
 				a.CreatedAt = value.Time
 			}
 		case achievements.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field achievements_refers", value)
-			} else if value.Valid {
-				a.achievements_refers = new(int)
-				*a.achievements_refers = int(value.Int64)
-			}
-		case achievements.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field users_acquires", value)
 			} else if value.Valid {
@@ -148,11 +126,6 @@ func (a *ACHIEVEMENTS) Value(name string) (ent.Value, error) {
 // QueryGranted queries the "granted" edge of the ACHIEVEMENTS entity.
 func (a *ACHIEVEMENTS) QueryGranted() *USERSQuery {
 	return NewACHIEVEMENTSClient(a.config).QueryGranted(a)
-}
-
-// QueryRefers queries the "refers" edge of the ACHIEVEMENTS entity.
-func (a *ACHIEVEMENTS) QueryRefers() *TROPHIESQuery {
-	return NewACHIEVEMENTSClient(a.config).QueryRefers(a)
 }
 
 // Update returns a builder for updating this ACHIEVEMENTS.
@@ -181,8 +154,8 @@ func (a *ACHIEVEMENTS) String() string {
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", a.UserID))
 	builder.WriteString(", ")
-	builder.WriteString("trophy_id=")
-	builder.WriteString(fmt.Sprintf("%v", a.TrophyID))
+	builder.WriteString("title=")
+	builder.WriteString(a.Title)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
