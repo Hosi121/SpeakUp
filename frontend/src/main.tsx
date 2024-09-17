@@ -7,7 +7,7 @@ import { Home } from "./components/pages/Home.tsx";
 import { SessionList } from "./components/pages/SessionList.tsx";
 import { Waiting } from "./components/pages/Waiting.tsx";
 import { MicCheck } from "./components/pages/MicCheck.tsx";
-import { Session } from "./components/pages/Session.tsx";
+import Session from "./components/pages/Session.tsx";
 import { SessionInterval } from "./components/pages/SessionInterval.tsx";
 import { SessionFinished } from "./components/pages/SessionFinished.tsx";
 import SignUp from "./components/pages/SignUp.tsx";
@@ -18,6 +18,7 @@ import Login from "./components/pages/Login.tsx";
 import { Stats } from "./components/pages/Stats.tsx";
 import { ConversationHistory } from "./components/pages/ConversationHistory.tsx";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import AdminPage from "./components/pages/AdminPage.tsx";
 import Theme from "./styles/Theme.tsx";
 
 const router = createBrowserRouter([
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
   {
     path: "conversation_history",
     element: <ConversationHistory />,
+  },
+  {
+    path: "admin",
+    element: <AdminPage />,
   },
 ]);
 
