@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Hosi121/SpeakUp/ent/chats"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
@@ -66,6 +67,21 @@ func (fc *FRIENDSCreate) AddConnects(u ...*USERS) *FRIENDSCreate {
 		ids[i] = u[i].ID
 	}
 	return fc.AddConnectIDs(ids...)
+}
+
+// AddHaIDs adds the "has" edge to the CHATS entity by IDs.
+func (fc *FRIENDSCreate) AddHaIDs(ids ...int) *FRIENDSCreate {
+	fc.mutation.AddHaIDs(ids...)
+	return fc
+}
+
+// AddHas adds the "has" edges to the CHATS entity.
+func (fc *FRIENDSCreate) AddHas(c ...*CHATS) *FRIENDSCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return fc.AddHaIDs(ids...)
 }
 
 // Mutation returns the FRIENDSMutation object of the builder.
@@ -179,6 +195,22 @@ func (fc *FRIENDSCreate) createSpec() (*FRIENDS, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(users.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := fc.mutation.HasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   friends.HasTable,
+			Columns: []string{friends.HasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chats.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

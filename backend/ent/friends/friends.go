@@ -25,6 +25,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// EdgeConnects holds the string denoting the connects edge name in mutations.
 	EdgeConnects = "connects"
+	// EdgeHas holds the string denoting the has edge name in mutations.
+	EdgeHas = "has"
 	// Table holds the table name of the friends in the database.
 	Table = "friend_ss"
 	// ConnectsTable is the table that holds the connects relation/edge. The primary key declared below.
@@ -32,6 +34,13 @@ const (
 	// ConnectsInverseTable is the table name for the USERS entity.
 	// It exists in this package in order to avoid circular dependency with the "users" package.
 	ConnectsInverseTable = "user_ss"
+	// HasTable is the table that holds the has relation/edge.
+	HasTable = "chat_ss"
+	// HasInverseTable is the table name for the CHATS entity.
+	// It exists in this package in order to avoid circular dependency with the "chats" package.
+	HasInverseTable = "chat_ss"
+	// HasColumn is the table column denoting the has relation/edge.
+	HasColumn = "friends_has"
 )
 
 // Columns holds all SQL columns for friends fields.
@@ -129,10 +138,31 @@ func ByConnects(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newConnectsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByHasCount orders the results by has count.
+func ByHasCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newHasStep(), opts...)
+	}
+}
+
+// ByHas orders the results by has terms.
+func ByHas(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newHasStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newConnectsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ConnectsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ConnectsTable, ConnectsPrimaryKey...),
+	)
+}
+func newHasStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(HasInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, HasTable, HasColumn),
 	)
 }

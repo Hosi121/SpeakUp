@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Hosi121/SpeakUp/ent/chats"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
 	"github.com/Hosi121/SpeakUp/ent/users"
@@ -25,6 +26,7 @@ type FRIENDSQuery struct {
 	inters       []Interceptor
 	predicates   []predicate.FRIENDS
 	withConnects *USERSQuery
+	withHas      *CHATSQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,28 @@ func (fq *FRIENDSQuery) QueryConnects() *USERSQuery {
 			sqlgraph.From(friends.Table, friends.FieldID, selector),
 			sqlgraph.To(users.Table, users.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, friends.ConnectsTable, friends.ConnectsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryHas chains the current query on the "has" edge.
+func (fq *FRIENDSQuery) QueryHas() *CHATSQuery {
+	query := (&CHATSClient{config: fq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := fq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := fq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(friends.Table, friends.FieldID, selector),
+			sqlgraph.To(chats.Table, chats.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, friends.HasTable, friends.HasColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
 		return fromU, nil
@@ -276,6 +300,7 @@ func (fq *FRIENDSQuery) Clone() *FRIENDSQuery {
 		inters:       append([]Interceptor{}, fq.inters...),
 		predicates:   append([]predicate.FRIENDS{}, fq.predicates...),
 		withConnects: fq.withConnects.Clone(),
+		withHas:      fq.withHas.Clone(),
 		// clone intermediate query.
 		sql:  fq.sql.Clone(),
 		path: fq.path,
@@ -290,6 +315,17 @@ func (fq *FRIENDSQuery) WithConnects(opts ...func(*USERSQuery)) *FRIENDSQuery {
 		opt(query)
 	}
 	fq.withConnects = query
+	return fq
+}
+
+// WithHas tells the query-builder to eager-load the nodes that are connected to
+// the "has" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *FRIENDSQuery) WithHas(opts ...func(*CHATSQuery)) *FRIENDSQuery {
+	query := (&CHATSClient{config: fq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	fq.withHas = query
 	return fq
 }
 
@@ -371,8 +407,9 @@ func (fq *FRIENDSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*FRIE
 	var (
 		nodes       = []*FRIENDS{}
 		_spec       = fq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			fq.withConnects != nil,
+			fq.withHas != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -397,6 +434,13 @@ func (fq *FRIENDSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*FRIE
 		if err := fq.loadConnects(ctx, query, nodes,
 			func(n *FRIENDS) { n.Edges.Connects = []*USERS{} },
 			func(n *FRIENDS, e *USERS) { n.Edges.Connects = append(n.Edges.Connects, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := fq.withHas; query != nil {
+		if err := fq.loadHas(ctx, query, nodes,
+			func(n *FRIENDS) { n.Edges.Has = []*CHATS{} },
+			func(n *FRIENDS, e *CHATS) { n.Edges.Has = append(n.Edges.Has, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -461,6 +505,37 @@ func (fq *FRIENDSQuery) loadConnects(ctx context.Context, query *USERSQuery, nod
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (fq *FRIENDSQuery) loadHas(ctx context.Context, query *CHATSQuery, nodes []*FRIENDS, init func(*FRIENDS), assign func(*FRIENDS, *CHATS)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*FRIENDS)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.CHATS(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(friends.HasColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.friends_has
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "friends_has" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "friends_has" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

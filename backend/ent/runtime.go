@@ -8,6 +8,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/ai_themes"
 	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/chats"
 	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/events"
 	"github.com/Hosi121/SpeakUp/ent/friends"
@@ -48,6 +49,20 @@ func init() {
 	callsDescCreatedAt := callsFields[4].Descriptor()
 	// calls.DefaultCreatedAt holds the default value on creation for the created_at field.
 	calls.DefaultCreatedAt = callsDescCreatedAt.Default.(func() time.Time)
+	chatsFields := schema.CHATS{}.Fields()
+	_ = chatsFields
+	// chatsDescMessage is the schema descriptor for message field.
+	chatsDescMessage := chatsFields[1].Descriptor()
+	// chats.MessageValidator is a validator for the "message" field. It is called by the builders before save.
+	chats.MessageValidator = chatsDescMessage.Validators[0].(func(string) error)
+	// chatsDescIsRecieved is the schema descriptor for is_recieved field.
+	chatsDescIsRecieved := chatsFields[2].Descriptor()
+	// chats.DefaultIsRecieved holds the default value on creation for the is_recieved field.
+	chats.DefaultIsRecieved = chatsDescIsRecieved.Default.(bool)
+	// chatsDescCreatedAt is the schema descriptor for created_at field.
+	chatsDescCreatedAt := chatsFields[3].Descriptor()
+	// chats.DefaultCreatedAt holds the default value on creation for the created_at field.
+	chats.DefaultCreatedAt = chatsDescCreatedAt.Default.(func() time.Time)
 	eventsFields := schema.EVENTS{}.Fields()
 	_ = eventsFields
 	// eventsDescCreatedAt is the schema descriptor for created_at field.

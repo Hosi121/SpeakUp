@@ -15,6 +15,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/ai_themes"
 	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/chats"
 	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/events"
 	"github.com/Hosi121/SpeakUp/ent/friends"
@@ -85,6 +86,7 @@ func checkColumn(table, column string) error {
 			achievements.Table:  achievements.ValidColumn,
 			ai_themes.Table:     ai_themes.ValidColumn,
 			calls.Table:         calls.ValidColumn,
+			chats.Table:         chats.ValidColumn,
 			events.Table:        events.ValidColumn,
 			event_records.Table: event_records.ValidColumn,
 			friends.Table:       friends.ValidColumn,

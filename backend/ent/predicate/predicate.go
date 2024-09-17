@@ -15,6 +15,9 @@ type AI_THEMES func(*sql.Selector)
 // CALLS is the predicate function for calls builders.
 type CALLS func(*sql.Selector)
 
+// CHATS is the predicate function for chats builders.
+type CHATS func(*sql.Selector)
+
 // EVENTS is the predicate function for events builders.
 type EVENTS func(*sql.Selector)
 

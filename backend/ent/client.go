@@ -18,6 +18,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/ai_themes"
 	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/chats"
 	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/events"
 	"github.com/Hosi121/SpeakUp/ent/friends"
@@ -38,6 +39,8 @@ type Client struct {
 	AI_THEMES *AITHEMESClient
 	// CALLS is the client for interacting with the CALLS builders.
 	CALLS *CALLSClient
+	// CHATS is the client for interacting with the CHATS builders.
+	CHATS *CHATSClient
 	// EVENTS is the client for interacting with the EVENTS builders.
 	EVENTS *EVENTSClient
 	// EVENT_RECORDS is the client for interacting with the EVENT_RECORDS builders.
@@ -66,6 +69,7 @@ func (c *Client) init() {
 	c.ACHIEVEMENTS = NewACHIEVEMENTSClient(c.config)
 	c.AI_THEMES = NewAITHEMESClient(c.config)
 	c.CALLS = NewCALLSClient(c.config)
+	c.CHATS = NewCHATSClient(c.config)
 	c.EVENTS = NewEVENTSClient(c.config)
 	c.EVENT_RECORDS = NewEVENTRECORDSClient(c.config)
 	c.FRIENDS = NewFRIENDSClient(c.config)
@@ -168,6 +172,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ACHIEVEMENTS:  NewACHIEVEMENTSClient(cfg),
 		AI_THEMES:     NewAITHEMESClient(cfg),
 		CALLS:         NewCALLSClient(cfg),
+		CHATS:         NewCHATSClient(cfg),
 		EVENTS:        NewEVENTSClient(cfg),
 		EVENT_RECORDS: NewEVENTRECORDSClient(cfg),
 		FRIENDS:       NewFRIENDSClient(cfg),
@@ -197,6 +202,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ACHIEVEMENTS:  NewACHIEVEMENTSClient(cfg),
 		AI_THEMES:     NewAITHEMESClient(cfg),
 		CALLS:         NewCALLSClient(cfg),
+		CHATS:         NewCHATSClient(cfg),
 		EVENTS:        NewEVENTSClient(cfg),
 		EVENT_RECORDS: NewEVENTRECORDSClient(cfg),
 		FRIENDS:       NewFRIENDSClient(cfg),
@@ -233,8 +239,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.ACHIEVEMENTS, c.AI_THEMES, c.CALLS, c.EVENTS, c.EVENT_RECORDS, c.FRIENDS,
-		c.MEMOS, c.PROGRESS, c.SESSIONS, c.USERS,
+		c.ACHIEVEMENTS, c.AI_THEMES, c.CALLS, c.CHATS, c.EVENTS, c.EVENT_RECORDS,
+		c.FRIENDS, c.MEMOS, c.PROGRESS, c.SESSIONS, c.USERS,
 	} {
 		n.Use(hooks...)
 	}
@@ -244,8 +250,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.ACHIEVEMENTS, c.AI_THEMES, c.CALLS, c.EVENTS, c.EVENT_RECORDS, c.FRIENDS,
-		c.MEMOS, c.PROGRESS, c.SESSIONS, c.USERS,
+		c.ACHIEVEMENTS, c.AI_THEMES, c.CALLS, c.CHATS, c.EVENTS, c.EVENT_RECORDS,
+		c.FRIENDS, c.MEMOS, c.PROGRESS, c.SESSIONS, c.USERS,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -260,6 +266,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AI_THEMES.mutate(ctx, m)
 	case *CALLSMutation:
 		return c.CALLS.mutate(ctx, m)
+	case *CHATSMutation:
+		return c.CHATS.mutate(ctx, m)
 	case *EVENTSMutation:
 		return c.EVENTS.mutate(ctx, m)
 	case *EVENTRECORDSMutation:
@@ -726,6 +734,155 @@ func (c *CALLSClient) mutate(ctx context.Context, m *CALLSMutation) (Value, erro
 	}
 }
 
+// CHATSClient is a client for the CHATS schema.
+type CHATSClient struct {
+	config
+}
+
+// NewCHATSClient returns a client for the CHATS from the given config.
+func NewCHATSClient(c config) *CHATSClient {
+	return &CHATSClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `chats.Hooks(f(g(h())))`.
+func (c *CHATSClient) Use(hooks ...Hook) {
+	c.hooks.CHATS = append(c.hooks.CHATS, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `chats.Intercept(f(g(h())))`.
+func (c *CHATSClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CHATS = append(c.inters.CHATS, interceptors...)
+}
+
+// Create returns a builder for creating a CHATS entity.
+func (c *CHATSClient) Create() *CHATSCreate {
+	mutation := newCHATSMutation(c.config, OpCreate)
+	return &CHATSCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CHATS entities.
+func (c *CHATSClient) CreateBulk(builders ...*CHATSCreate) *CHATSCreateBulk {
+	return &CHATSCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CHATSClient) MapCreateBulk(slice any, setFunc func(*CHATSCreate, int)) *CHATSCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CHATSCreateBulk{err: fmt.Errorf("calling to CHATSClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CHATSCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CHATSCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CHATS.
+func (c *CHATSClient) Update() *CHATSUpdate {
+	mutation := newCHATSMutation(c.config, OpUpdate)
+	return &CHATSUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CHATSClient) UpdateOne(ch *CHATS) *CHATSUpdateOne {
+	mutation := newCHATSMutation(c.config, OpUpdateOne, withCHATS(ch))
+	return &CHATSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CHATSClient) UpdateOneID(id int) *CHATSUpdateOne {
+	mutation := newCHATSMutation(c.config, OpUpdateOne, withCHATSID(id))
+	return &CHATSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CHATS.
+func (c *CHATSClient) Delete() *CHATSDelete {
+	mutation := newCHATSMutation(c.config, OpDelete)
+	return &CHATSDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CHATSClient) DeleteOne(ch *CHATS) *CHATSDeleteOne {
+	return c.DeleteOneID(ch.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CHATSClient) DeleteOneID(id int) *CHATSDeleteOne {
+	builder := c.Delete().Where(chats.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CHATSDeleteOne{builder}
+}
+
+// Query returns a query builder for CHATS.
+func (c *CHATSClient) Query() *CHATSQuery {
+	return &CHATSQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCHATS},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CHATS entity by its id.
+func (c *CHATSClient) Get(ctx context.Context, id int) (*CHATS, error) {
+	return c.Query().Where(chats.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CHATSClient) GetX(ctx context.Context, id int) *CHATS {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryHad queries the had edge of a CHATS.
+func (c *CHATSClient) QueryHad(ch *CHATS) *FRIENDSQuery {
+	query := (&FRIENDSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(chats.Table, chats.FieldID, id),
+			sqlgraph.To(friends.Table, friends.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, chats.HadTable, chats.HadColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CHATSClient) Hooks() []Hook {
+	return c.hooks.CHATS
+}
+
+// Interceptors returns the client interceptors.
+func (c *CHATSClient) Interceptors() []Interceptor {
+	return c.inters.CHATS
+}
+
+func (c *CHATSClient) mutate(ctx context.Context, m *CHATSMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CHATSCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CHATSUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CHATSUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CHATSDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CHATS mutation op: %q", m.Op())
+	}
+}
+
 // EVENTSClient is a client for the EVENTS schema.
 type EVENTSClient struct {
 	config
@@ -1189,6 +1346,22 @@ func (c *FRIENDSClient) QueryConnects(f *FRIENDS) *USERSQuery {
 			sqlgraph.From(friends.Table, friends.FieldID, id),
 			sqlgraph.To(users.Table, users.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, friends.ConnectsTable, friends.ConnectsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryHas queries the has edge of a FRIENDS.
+func (c *FRIENDSClient) QueryHas(f *FRIENDS) *CHATSQuery {
+	query := (&CHATSClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(friends.Table, friends.FieldID, id),
+			sqlgraph.To(chats.Table, chats.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, friends.HasTable, friends.HasColumn),
 		)
 		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
 		return fromV, nil
@@ -1900,11 +2073,11 @@ func (c *USERSClient) mutate(ctx context.Context, m *USERSMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		ACHIEVEMENTS, AI_THEMES, CALLS, EVENTS, EVENT_RECORDS, FRIENDS, MEMOS, PROGRESS,
-		SESSIONS, USERS []ent.Hook
+		ACHIEVEMENTS, AI_THEMES, CALLS, CHATS, EVENTS, EVENT_RECORDS, FRIENDS, MEMOS,
+		PROGRESS, SESSIONS, USERS []ent.Hook
 	}
 	inters struct {
-		ACHIEVEMENTS, AI_THEMES, CALLS, EVENTS, EVENT_RECORDS, FRIENDS, MEMOS, PROGRESS,
-		SESSIONS, USERS []ent.Interceptor
+		ACHIEVEMENTS, AI_THEMES, CALLS, CHATS, EVENTS, EVENT_RECORDS, FRIENDS, MEMOS,
+		PROGRESS, SESSIONS, USERS []ent.Interceptor
 	}
 )
