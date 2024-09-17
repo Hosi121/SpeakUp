@@ -12,7 +12,7 @@ type SessionData = {
   sessions: number;
   completionRate: string;
   comment: string;
-  examples: string[];
+  examples: { english: string; japanese: string }[];
 };
 
 const ConversationHistoryContainer = () => {
@@ -54,33 +54,39 @@ const ConversationHistoryContainer = () => {
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>{item.date}</Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ p: 3 }}>
+              <AccordionDetails sx={{ p: 4 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-around", alignItems: "center", mb: 3 }}>
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                     <Typography variant="h4" sx={{ color: "primary.main" }}>
                       {item.sessions}
                     </Typography>
-                    <Typography textAlign="center">セッション数</Typography>
+                    <Typography textAlign="center" fontWeight={"bolder"}>
+                      セッション数
+                    </Typography>
                   </Box>
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                     <Typography variant="h4" sx={{ color: "primary.main" }}>
                       {item.completionRate}
                     </Typography>
-                    <Typography>満足度</Typography>
+                    <Typography textAlign="center" fontWeight={"bolder"}>
+                      満足度
+                    </Typography>
                   </Box>
                 </Box>
-                <Typography variant="body2" fontSize={"large"} textAlign={"left"}>
+                <Typography variant="body2" fontSize={"large"} textAlign={"left"} sx={{ mb: 1 }} fontWeight={"bolder"}>
                   感想
                 </Typography>
                 <Typography variant="body2" textAlign={"left"}>
                   {item.comment}
                 </Typography>
-                <Typography variant="body2" fontSize={"large"} textAlign={"left"} sx={{ mt: 3 }}>
+                <Typography variant="body2" fontSize={"large"} textAlign={"left"} sx={{ mt: 3, mb: 1 }} fontWeight={"bolder"}>
                   学んだ表現
                 </Typography>
-                <Typography variant="body2" textAlign={"left"}>
-                  {item.examples.join(", ")}
-                </Typography>
+                {item.examples.map((examples, index) => (
+                  <Typography key={index} variant="body2" textAlign={"left"}>
+                    {examples.english} : {examples.japanese}
+                  </Typography>
+                ))}
               </AccordionDetails>
             </Accordion>
           ))}{" "}
