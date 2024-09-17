@@ -9,15 +9,15 @@ import (
 )
 
 // SESSIONS holds the schema definition for the SESSIONS entity.
-type SESSIONS struct {
+type EVENTS struct {
 	ent.Schema
 }
 
 // Fields of the SESSIONS.
-func (SESSIONS) Fields() []ent.Field {
+func (EVENTS) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("session_start"),
-		field.Time("session_end"),
+		field.Time("event_start"),
+		field.Time("event_end"),
 		field.Int("theme_id"),
 		field.Time("created_at").
 			Default(time.Now()),
@@ -25,10 +25,10 @@ func (SESSIONS) Fields() []ent.Field {
 }
 
 // Edges of the SESSIONS.
-func (SESSIONS) Edges() []ent.Edge {
+func (EVENTS) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("has", MATCHINGS.Type),
-		edge.To("uses", AITHEMES.Type).
+		edge.To("participated", EVENT_RECORDS.Type),
+		edge.To("uses", AI_THEMES.Type).
 			Unique(),
 	}
 }

@@ -9,12 +9,12 @@ import (
 )
 
 // AITHEMES holds the schema definition for the AITHEMES entity.
-type AITHEMES struct {
+type AI_THEMES struct {
 	ent.Schema
 }
 
 // Fields of the AITHEMES.
-func (AITHEMES) Fields() []ent.Field {
+func (AI_THEMES) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("theme_text"),
 		field.Time("created_at").
@@ -23,9 +23,9 @@ func (AITHEMES) Fields() []ent.Field {
 }
 
 // Edges of the AITHEMES.
-func (AITHEMES) Edges() []ent.Edge {
+func (AI_THEMES) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("used", SESSIONS.Type).
+		edge.From("used", EVENTS.Type).
 			Ref("uses"),
 	}
 }
