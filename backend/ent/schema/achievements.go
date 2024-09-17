@@ -15,7 +15,7 @@ type ACHIEVEMENTS struct {
 func (ACHIEVEMENTS) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id"),
-		field.Int("trophy_id"),
+		field.String("title"),
 		field.Time("created_at").
 			Default(time.Now),
 	}
@@ -25,8 +25,6 @@ func (ACHIEVEMENTS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("granted", USERS.Type).
 			Ref("acquires").
-			Unique(),
-		edge.To("refers", TROPHIES.Type).
 			Unique(),
 	}
 }
