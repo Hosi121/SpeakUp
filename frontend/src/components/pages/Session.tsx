@@ -1,10 +1,11 @@
-import { Card, CardContent, Typography, Avatar, Grid, Box, Container, Stack } from "@mui/material";
+import { Card, CardContent, Typography, Avatar, Grid, Box, Container, Stack, List, ListItem, Paper, ListItemText, TextField, Button } from "@mui/material";
 import { Favorite, Person } from "@mui/icons-material";
 import TopSection from "../utils/TopSection";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionCountDownModal from "../utils/SessionCountDownModal";
 import { HalfModal } from "../utils/HalfModal";
 import { useState } from "react";
+import HomeLogo from "../../assets/homeLogo";
 
 const SessionContainer = () => {
   const users = [
@@ -68,8 +69,16 @@ const SessionContainer = () => {
 export const Session = () => {
   const [memoOpen, setMemoOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [messages, setMessages] = useState<string[]>([]);
+  const [inputMessage, setInputMessage] = useState<string>("");
   const handleMemoClose = () => setMemoOpen(false);
   const handleAssistantClose = () => setAssistantOpen(false);
+  const handleSendMessage = () => {
+    if (inputMessage.trim() !== "") {
+      setMessages([...messages, inputMessage]);
+      setInputMessage(""); // Clear the input field after sending
+    }
+  };
   const memo = "I'm Hanako. Please call me Hanako.";
 
   return (
@@ -80,7 +89,47 @@ export const Session = () => {
       </HalfModal>
 
       <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
-        <Typography variant="body1">アシスタント画面</Typography>
+        <Box>
+          {" "}
+          <Box sx={{ overflow: "auto", pt: 1, pb: 1, maxHeight: "30vh" }}>
+            <List>
+              <ListItem sx={{ justifyContent: "flex-start" }}>
+                <Box sx={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: "secondary.main", mr: 2, display: "grid", placeContent: "center" }}>
+                  <HomeLogo style={{ width: "70%", height: "fit-content" }} />
+                </Box>
+                <Paper sx={{ padding: "5px", backgroundColor: "background.default", maxWidth: "60%", wordWrap: "break-word" }}>
+                  <ListItemText primary="何かお困りですか？" />
+                </Paper>
+              </ListItem>
+
+              {messages.map((message, index) => (
+                <ListItem key={index} sx={{ justifyContent: "flex-end" }}>
+                  <Paper sx={{ padding: "5px", backgroundColor: "#f0f0f0", maxWidth: "60%", wordWrap: "break-word" }}>
+                    <ListItemText primary={message} />
+                  </Paper>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", pb: 2, position: "fixed", bottom: 0, backgroundColor: "secondary.main" }}>
+            <TextField
+              variant="outlined"
+              placeholder="メッセージを入力"
+              fullWidth
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              sx={{ mr: 2 }}
+              InputProps={{
+                style: {
+                  height: "40px",
+                },
+              }}
+            />
+            <Button variant="contained" color="primary" onClick={handleSendMessage}>
+              送信
+            </Button>
+          </Box>
+        </Box>
       </HalfModal>
     </SessionBottomNavigationTemplate>
   );
