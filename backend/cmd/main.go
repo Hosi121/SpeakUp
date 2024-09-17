@@ -37,7 +37,7 @@ func main() {
 	}
 
 	// Unauthenticated routes
-	routes.SupabaseAuthRoutes(r)
+	routes.SupabaseAuthRoutes(r, client)
 
 	// Create a group for protected routes
 	protected := r.Group("/")
