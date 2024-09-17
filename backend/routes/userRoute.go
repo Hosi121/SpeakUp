@@ -14,4 +14,6 @@ func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
 	// Memo routes
 	router.GET("/memo", controllers.GetMemo(client))
 	router.PUT("/memo", controllers.UpdateMemo(client))
+
+	router.GET("/friend/me", controllers.GetFriendList())
 }
