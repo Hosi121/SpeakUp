@@ -41,7 +41,7 @@ func (USERS) Fields() []ent.Field {
 func (USERS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("connects", FRIENDS.Type),
-		edge.To("participates", MATCHINGS.Type),
+		edge.To("makes", EVENT_RECORDS.Type),
 		edge.To("prepares", MEMOS.Type).
 			Unique(),
 		edge.To("acquires", ACHIEVEMENTS.Type),
