@@ -18,7 +18,7 @@ import Login from "./components/pages/Login.tsx";
 import { Stats } from "./components/pages/Stats.tsx";
 import { ConversationHistory } from "./components/pages/ConversationHistory.tsx";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import adminPage from "./components/pages/adminPage.tsx";
+import AdminPage from "./components/pages/AdminPage.tsx";
 import Theme from "./styles/Theme.tsx";
 
 const router = createBrowserRouter([
@@ -85,6 +85,10 @@ const router = createBrowserRouter([
   {
     path: "conversation_history",
     element: <ConversationHistory />,
+  },
+  {
+    path: "admin",
+    element: <AdminPage />,
   },
 ]);
 
