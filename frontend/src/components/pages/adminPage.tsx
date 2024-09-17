@@ -1,16 +1,33 @@
 import { useState } from 'react';
 import { 
   Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, 
-  TextField, Typography, Snackbar, Tab, Tabs, Paper 
+  TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert 
 } from '@mui/material';
+import api from '../../services/api';
 
-function AdminPage() {
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dateTime, setDateTime] = useState('');
-  const [theme, setTheme] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [eventDetails, setEventDetails] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+interface EventDetails {
+  dateTime: string;
+  theme: string;
+}
+
+interface ChatResponse {
+  choices: Array<{
+    message: {
+      role: string;
+      content: string;
+    };
+    index: number;
+    finish_reason: string;
+  }>;
+}
+
+const AdminPage: React.FC = () => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [dateTime, setDateTime] = useState<string>('');
+  const [theme, setTheme] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
+  const [activeTab, setActiveTab] = useState<number>(0);
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
@@ -24,9 +41,15 @@ function AdminPage() {
     setTheme('');
   };
 
-  const handleGenerateTheme = () => {
-    // AIによるテーマ生成をシミュレート
-    setTheme('自動生成されたテーマ');
+  const handleGenerateTheme = async () => {
+    try {
+      const prompt = 'イベントのテーマを提案してください。';
+      const response = await api.post<ChatResponse>('/chat/ask', { content: prompt });
+      const generatedTheme = response.data.choices[0].message.content;
+      setTheme(generatedTheme);
+    } catch (error) {
+      console.error('Failed to generate theme', error);
+    }
   };
 
   const handleSubmit = () => {
@@ -37,8 +60,18 @@ function AdminPage() {
     handleCloseDialog();
   };
 
-  const handleTabChange = (event, newValue) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
+  };
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSuccessMessage('');
   };
 
   return (
@@ -57,9 +90,17 @@ function AdminPage() {
           {successMessage && (
             <Snackbar
               open={true}
-              message={successMessage}
               autoHideDuration={6000}
-            />
+              onClose={handleSnackbarClose}
+            >
+              <Alert
+                onClose={handleSnackbarClose}
+                severity="success"
+                sx={{ width: '100%' }}
+              >
+                {successMessage}
+              </Alert>
+            </Snackbar>
           )}
 
           {eventDetails && (
@@ -81,7 +122,9 @@ function AdminPage() {
                   label="予定日時"
                   type="datetime-local"
                   value={dateTime}
-                  onChange={(e) => setDateTime(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setDateTime(e.target.value)
+                  }
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -92,7 +135,9 @@ function AdminPage() {
                   fullWidth
                   label="テーマ"
                   value={theme}
-                  onChange={(e) => setTheme(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTheme(e.target.value)
+                  }
                 />
                 <Button
                   variant="outlined"
@@ -126,6 +171,6 @@ function AdminPage() {
       )}
     </Box>
   );
-}
+};
 
 export default AdminPage;
