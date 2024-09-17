@@ -14,10 +14,39 @@ type SessionData = {
 
 const SessionListContainer = () => {
   const [sessionData, setSessionData] = useState<SessionData[]>([]);
+  const [selectedSessions, setSelectedSessions] = useState<{ [key: string]: number[] }>({});
 
   useEffect(() => {
     setSessionData(sessions);
+    const initialSelections: { [key: string]: number[] } = {};
+    sessions.forEach((session) => {
+      initialSelections[session.dateTime] = [...session.sessions];
+    });
+    setSelectedSessions(initialSelections);
   }, []);
+
+  const handleCheckboxChange = (dateTime: string, session: number) => {
+    setSelectedSessions((prevSelected) => {
+      const newSelected = { ...prevSelected };
+      if (newSelected[dateTime].includes(session)) {
+        newSelected[dateTime] = newSelected[dateTime].filter((s) => s !== session);
+      } else {
+        newSelected[dateTime].push(session);
+      }
+      return newSelected;
+    });
+  };
+
+  const handleSave = (dateTime: string) => {
+    setSessionData((prevData) =>
+      prevData.map((data) => {
+        if (data.dateTime === dateTime) {
+          return { ...data, sessions: selectedSessions[dateTime] };
+        }
+        return data;
+      })
+    );
+  };
 
   const navigate = useNavigate();
 
@@ -71,9 +100,9 @@ const SessionListContainer = () => {
               </AccordionSummary>
               <AccordionDetails sx={{ p: 2 }}>
                 <FormGroup>
-                  <FormControlLabel control={<Checkbox defaultChecked={data.sessions.includes(1)} />} label="セッション1" sx={{ m: "0 auto" }} />
-                  <FormControlLabel control={<Checkbox defaultChecked={data.sessions.includes(2)} />} label="セッション2" sx={{ m: "0 auto" }} />
-                  <FormControlLabel control={<Checkbox defaultChecked={data.sessions.includes(3)} />} label="セッション3" sx={{ m: "0 auto" }} />
+                  <FormControlLabel control={<Checkbox checked={selectedSessions[data.dateTime]?.includes(1)} onChange={() => handleCheckboxChange(data.dateTime, 1)} />} label="セッション1" sx={{ m: "0 auto" }} />
+                  <FormControlLabel control={<Checkbox checked={selectedSessions[data.dateTime]?.includes(2)} onChange={() => handleCheckboxChange(data.dateTime, 2)} />} label="セッション2" sx={{ m: "0 auto" }} />
+                  <FormControlLabel control={<Checkbox checked={selectedSessions[data.dateTime]?.includes(3)} onChange={() => handleCheckboxChange(data.dateTime, 3)} />} label="セッション3" sx={{ m: "0 auto" }} />
                   <Button
                     variant="contained"
                     fullWidth
@@ -86,10 +115,11 @@ const SessionListContainer = () => {
                         backgroundColor: "#FF3399",
                       },
                     }}
+                    onClick={() => handleSave(data.dateTime)}
                   >
                     保存
                   </Button>
-                </FormGroup>
+                </FormGroup>{" "}
               </AccordionDetails>
             </Accordion>
           ))}{" "}
