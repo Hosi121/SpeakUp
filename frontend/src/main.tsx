@@ -7,7 +7,7 @@ import { Home } from "./components/pages/Home.tsx";
 import { SessionList } from "./components/pages/SessionList.tsx";
 import { Waiting } from "./components/pages/Waiting.tsx";
 import { MicCheck } from "./components/pages/MicCheck.tsx";
-import { Session } from "./components/pages/Session.tsx";
+import Session from "./components/pages/Session.tsx";
 import { SessionInterval } from "./components/pages/SessionInterval.tsx";
 import { SessionFinished } from "./components/pages/SessionFinished.tsx";
 import SignUp from "./components/pages/SignUp.tsx";
