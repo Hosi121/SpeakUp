@@ -47,6 +47,20 @@ func (uu *USERSUpdate) SetNillableUsername(s *string) *USERSUpdate {
 	return uu
 }
 
+// SetEmail sets the "email" field.
+func (uu *USERSUpdate) SetEmail(s string) *USERSUpdate {
+	uu.mutation.SetEmail(s)
+	return uu
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uu *USERSUpdate) SetNillableEmail(s *string) *USERSUpdate {
+	if s != nil {
+		uu.SetEmail(*s)
+	}
+	return uu
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (uu *USERSUpdate) SetAvatarURL(s string) *USERSUpdate {
 	uu.mutation.SetAvatarURL(s)
@@ -320,6 +334,11 @@ func (uu *USERSUpdate) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "USERS.username": %w`, err)}
 		}
 	}
+	if v, ok := uu.mutation.Email(); ok {
+		if err := users.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
+		}
+	}
 	if v, ok := uu.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -342,6 +361,9 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.Email(); ok {
+		_spec.SetField(users.FieldEmail, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
@@ -584,6 +606,20 @@ func (uuo *USERSUpdateOne) SetUsername(s string) *USERSUpdateOne {
 func (uuo *USERSUpdateOne) SetNillableUsername(s *string) *USERSUpdateOne {
 	if s != nil {
 		uuo.SetUsername(*s)
+	}
+	return uuo
+}
+
+// SetEmail sets the "email" field.
+func (uuo *USERSUpdateOne) SetEmail(s string) *USERSUpdateOne {
+	uuo.mutation.SetEmail(s)
+	return uuo
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableEmail(s *string) *USERSUpdateOne {
+	if s != nil {
+		uuo.SetEmail(*s)
 	}
 	return uuo
 }
@@ -874,6 +910,11 @@ func (uuo *USERSUpdateOne) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "USERS.username": %w`, err)}
 		}
 	}
+	if v, ok := uuo.mutation.Email(); ok {
+		if err := users.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
+		}
+	}
 	if v, ok := uuo.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -913,6 +954,9 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 	}
 	if value, ok := uuo.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.Email(); ok {
+		_spec.SetField(users.FieldEmail, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)

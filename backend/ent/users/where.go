@@ -60,6 +60,11 @@ func Username(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldUsername, v))
 }
 
+// Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
+func Email(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldEmail, v))
+}
+
 // AvatarURL applies equality check predicate on the "avatar_url" field. It's identical to AvatarURLEQ.
 func AvatarURL(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldAvatarURL, v))
@@ -143,6 +148,71 @@ func UsernameEqualFold(v string) predicate.USERS {
 // UsernameContainsFold applies the ContainsFold predicate on the "username" field.
 func UsernameContainsFold(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldContainsFold(FieldUsername, v))
+}
+
+// EmailEQ applies the EQ predicate on the "email" field.
+func EmailEQ(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldEmail, v))
+}
+
+// EmailNEQ applies the NEQ predicate on the "email" field.
+func EmailNEQ(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldNEQ(FieldEmail, v))
+}
+
+// EmailIn applies the In predicate on the "email" field.
+func EmailIn(vs ...string) predicate.USERS {
+	return predicate.USERS(sql.FieldIn(FieldEmail, vs...))
+}
+
+// EmailNotIn applies the NotIn predicate on the "email" field.
+func EmailNotIn(vs ...string) predicate.USERS {
+	return predicate.USERS(sql.FieldNotIn(FieldEmail, vs...))
+}
+
+// EmailGT applies the GT predicate on the "email" field.
+func EmailGT(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldGT(FieldEmail, v))
+}
+
+// EmailGTE applies the GTE predicate on the "email" field.
+func EmailGTE(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldGTE(FieldEmail, v))
+}
+
+// EmailLT applies the LT predicate on the "email" field.
+func EmailLT(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldLT(FieldEmail, v))
+}
+
+// EmailLTE applies the LTE predicate on the "email" field.
+func EmailLTE(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldLTE(FieldEmail, v))
+}
+
+// EmailContains applies the Contains predicate on the "email" field.
+func EmailContains(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldContains(FieldEmail, v))
+}
+
+// EmailHasPrefix applies the HasPrefix predicate on the "email" field.
+func EmailHasPrefix(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldHasPrefix(FieldEmail, v))
+}
+
+// EmailHasSuffix applies the HasSuffix predicate on the "email" field.
+func EmailHasSuffix(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldHasSuffix(FieldEmail, v))
+}
+
+// EmailEqualFold applies the EqualFold predicate on the "email" field.
+func EmailEqualFold(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldEqualFold(FieldEmail, v))
+}
+
+// EmailContainsFold applies the ContainsFold predicate on the "email" field.
+func EmailContainsFold(v string) predicate.USERS {
+	return predicate.USERS(sql.FieldContainsFold(FieldEmail, v))
 }
 
 // AvatarURLEQ applies the EQ predicate on the "avatar_url" field.

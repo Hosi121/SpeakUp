@@ -75,90 +75,67 @@ func SignUp(c *gin.Context) {
 }
 
 // SignIn ハンドラ関数
-func SignIn(c *gin.Context) {
-	// リクエストボディからemailとpasswordを取得
-	var request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+func SignIn(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}
+
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			return
+		}
+
+		// Supabase authentication
+		supabaseAPI.InitSupabase()
+		supabaseClient := supabaseAPI.SupabaseClient
+
+		signinReq := types.TokenRequest{
+			GrantType: "password",
+			Email:     request.Email,
+			Password:  request.Password,
+		}
+		_, err := supabaseClient.Token(signinReq)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+			return
+		}
+
+		// Use request context
+		ctx := c.Request.Context()
+
+		// Fetch user from database
+		user, err := client.USERS.
+			Query().
+			Where(users.EmailEQ(request.Email)).
+			First(ctx)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+			return
+		}
+
+		// Update updated_at field
+		err = client.USERS.
+			UpdateOneID(user.ID).
+			SetUpdatedAt(time.Now()).
+			Exec(ctx)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+			return
+		}
+
+		// Generate JWT token
+		jwtToken, err := utils.GenerateJWT(strconv.Itoa(user.ID))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
+			return
+		}
+
+		// Return success response
+		c.JSON(http.StatusOK, gin.H{
+			"message":     "User signed in successfully",
+			"accessToken": jwtToken,
+		})
 	}
-
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
-		return
-	}
-
-	// Supabaseクライアントの初期化
-	supabaseAPI.InitSupabase()
-	client := supabaseAPI.SupabaseClient
-
-	// サインインリクエストの作成
-	signinReq := types.TokenRequest{
-		GrantType: "password",
-		Email:     request.Email,
-		Password:  request.Password,
-	}
-	resp, err := client.Token(signinReq)
-	if err != nil {
-		// エラーハンドリングとレスポンス
-		slog.Error("Error signing in", slog.String("error", err.Error()))
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// DBの用意
-	dsn := config.GetDSN()
-	db_client, err := ent.Open("mysql", dsn)
-	if err != nil {
-		slog.Error("Failed to open connection to database: %v", err)
-		return
-	}
-	defer db_client.Close()
-
-	ctx := context.Background()
-	// emailが一致するユーザを取得
-	user, err := db_client.USERS.
-		Query().
-		Where(
-			users.EmailEQ(request.Email), // Emailが一致する行を検索
-		).
-		Order(ent.Desc(users.FieldCreatedAt)). // created_atで結果を降順ソート
-		First(ctx)                             // 最初の1件を取得
-	if err != nil {
-		slog.Error("Not found this email: %v", err)
-		// fmt.Println("Not found this email: %v", err)
-		return
-	}
-
-	// アクセストークンを登録
-	err = db_client.USERS.
-		UpdateOneID(user.ID).
-		SetAccessToken(resp.AccessToken).
-		Exec(ctx)
-	if err != nil {
-		slog.Error("Failed to update access token: %v", err)
-		// fmt.Println("Failed to update access token: %v", err)
-		return
-	}
-
-	// updated_atを更新
-	err = db_client.USERS.
-		UpdateOneID(user.ID).
-		SetUpdatedAt(time.Now()).
-		Exec(ctx)
-	if err != nil {
-		slog.Error("Failed to update created_at: %v", err)
-		// fmt.Println("Failed to update created_at: %v", err)
-		return
-	}
-
-	// JWTトークンを生成
-	jwt_token, err := utils.GenerateJWT(strconv.Itoa(user.ID))
-	if err != nil {
-		slog.Error("Failed to generate JWT: %v", err)
-	}
-
-	// 成功レスポンス
-	slog.Info("User signed in successfully", slog.String("email", request.Email))
-	c.JSON(http.StatusOK, gin.H{"message": "User signed in successfully", "accessToken": jwt_token})
-
 }

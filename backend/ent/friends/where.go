@@ -233,6 +233,29 @@ func HasConnectsWith(preds ...predicate.USERS) predicate.FRIENDS {
 	})
 }
 
+// HasHas applies the HasEdge predicate on the "has" edge.
+func HasHas() predicate.FRIENDS {
+	return predicate.FRIENDS(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, HasTable, HasColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasHasWith applies the HasEdge predicate on the "has" edge with a given conditions (other predicates).
+func HasHasWith(preds ...predicate.CHATS) predicate.FRIENDS {
+	return predicate.FRIENDS(func(s *sql.Selector) {
+		step := newHasStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.FRIENDS) predicate.FRIENDS {
 	return predicate.FRIENDS(sql.AndPredicates(predicates...))

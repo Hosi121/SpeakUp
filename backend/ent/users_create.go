@@ -31,6 +31,12 @@ func (uc *USERSCreate) SetUsername(s string) *USERSCreate {
 	return uc
 }
 
+// SetEmail sets the "email" field.
+func (uc *USERSCreate) SetEmail(s string) *USERSCreate {
+	uc.mutation.SetEmail(s)
+	return uc
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (uc *USERSCreate) SetAvatarURL(s string) *USERSCreate {
 	uc.mutation.SetAvatarURL(s)
@@ -235,6 +241,14 @@ func (uc *USERSCreate) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "USERS.username": %w`, err)}
 		}
 	}
+	if _, ok := uc.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "USERS.email"`)}
+	}
+	if v, ok := uc.mutation.Email(); ok {
+		if err := users.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
+		}
+	}
 	if _, ok := uc.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "USERS.role"`)}
 	}
@@ -281,6 +295,10 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Username(); ok {
 		_spec.SetField(users.FieldUsername, field.TypeString, value)
 		_node.Username = value
+	}
+	if value, ok := uc.mutation.Email(); ok {
+		_spec.SetField(users.FieldEmail, field.TypeString, value)
+		_node.Email = value
 	}
 	if value, ok := uc.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
