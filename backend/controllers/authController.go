@@ -97,7 +97,7 @@ func SignIn(c *gin.Context) {
 		Email:     request.Email,
 		Password:  request.Password,
 	}
-	resp, err := client.Token(signinReq)
+	_, err := client.Token(signinReq)
 	if err != nil {
 		// エラーハンドリングとレスポンス
 		slog.Error("Error signing in", slog.String("error", err.Error()))
@@ -126,17 +126,6 @@ func SignIn(c *gin.Context) {
 	if err != nil {
 		slog.Error("Not found this email: %v", err)
 		// fmt.Println("Not found this email: %v", err)
-		return
-	}
-
-	// アクセストークンを登録
-	err = db_client.USERS.
-		UpdateOneID(user.ID).
-		SetAccessToken(resp.AccessToken).
-		Exec(ctx)
-	if err != nil {
-		slog.Error("Failed to update access token: %v", err)
-		// fmt.Println("Failed to update access token: %v", err)
 		return
 	}
 
