@@ -9,16 +9,16 @@ import (
 )
 
 // MATCHINGS holds the schema definition for the MATCHINGS entity.
-type MATCHINGS struct {
+type SESSIONS struct {
 	ent.Schema
 }
 
 // Fields of the MATCHINGS.
-func (MATCHINGS) Fields() []ent.Field {
+func (SESSIONS) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id"),
 		field.Int("matched_user_id"),
-		field.Int("session_id"),
+		field.Int("record_id"),
 		field.Time("matched_at").
 			Default(time.Now()),
 		field.Enum("status").
@@ -27,12 +27,11 @@ func (MATCHINGS) Fields() []ent.Field {
 }
 
 // Edges of the MATCHINGS.
-func (MATCHINGS) Edges() []ent.Edge {
+func (SESSIONS) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("member", USERS.Type).
-			Ref("participates"),
-		edge.From("had", SESSIONS.Type).
-			Ref("has").Unique(),
+		edge.From("had", EVENT_RECORDS.Type).
+			Ref("has").
+			Unique(),
 		edge.To("makes", CALLS.Type).
 			Unique(),
 	}
