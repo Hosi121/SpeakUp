@@ -46,7 +46,7 @@ export const signUp = async (username: string, email: string, password: string):
 };
 
 // ログイン関数
-export const signIn = async (email: string, password: string): Promise<SignInResponse> => {
+export const signIn = async (email: string, password: string): Promise<void> => {
   const requestData: SignInRequest = {
     email,
     password,
@@ -54,7 +54,10 @@ export const signIn = async (email: string, password: string): Promise<SignInRes
 
   try {
     const response = await api.post<SignInResponse>('/signin', requestData);
-    return response.data;
+    // バックエンドから受け取ったトークンをlocalStorageに保存
+    localStorage.setItem("token", response.data.accessToken);
+    // 必要に応じてメッセージを表示
+    console.log(response.data.message);
   } catch (err) {
     throw new Error('ログインに失敗しました。');
   }

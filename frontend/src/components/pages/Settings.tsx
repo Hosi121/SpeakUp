@@ -1,5 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, IconButton, Avatar, TextField, Button, Switch, Paper, Grid, Divider, useTheme, styled, Container } from "@mui/material";
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Avatar,
+  TextField,
+  Button,
+  Switch,
+  Paper,
+  Grid,
+  Divider,
+  useTheme,
+  styled,
+  Container,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -7,10 +21,16 @@ import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
-
-// Mock data files
-import userData from "../../mock/user.json";
-import creditData from "../../assets/credit.json";
+import api from "../../services/api";
+interface UserData {
+  id: number;
+  username: string;
+  email: string;
+  avatar_url: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -44,46 +64,88 @@ const UploadButton = styled(IconButton)(({ theme }) => ({
 
 const SettingsContainer = () => {
   const theme = useTheme();
-  const [user, setUser] = useState({ name: "", email: "", avatar: "" });
-  const [creditInfo, setCreditInfo] = useState("");
+  const [user, setUser] = useState<UserData | null>(null);
   const [editName, setEditName] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
 
   useEffect(() => {
-    setUser(userData);
-    setCreditInfo(creditData.creditInfo);
-    setNewName(userData.name);
-    setNewEmail(userData.email);
+    // Fetch user data when the component mounts
+    const fetchUserData = async () => {
+      try {
+        const response = await api.get<UserData>("/user/info");
+        setUser(response.data);
+        setNewName(response.data.username);
+        setNewEmail(response.data.email);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+        // Handle error (e.g., show notification or redirect to login)
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target && e.target.result) {
-          setUser((prevUser) => ({ ...prevUser, avatar: e.target.result as string }));
-        }
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
+    // Handle avatar upload logic here
+    // You may need to implement an API endpoint to handle avatar uploads
   };
 
   const handleSaveName = () => {
-    setUser({ ...user, name: newName });
-    setEditName(false);
+    if (user) {
+      // Update the user's name via API
+      const updateUser = async () => {
+        try {
+          await api.put(`/user/update`, { username: newName });
+          setUser({ ...user, username: newName });
+          setEditName(false);
+        } catch (error) {
+          console.error("Failed to update username:", error);
+          // Handle error
+        }
+      };
+      updateUser();
+    }
   };
 
   const handleSaveEmail = () => {
-    setUser({ ...user, email: newEmail });
-    setEditEmail(false);
+    if (user) {
+      // Update the user's email via API
+      const updateUser = async () => {
+        try {
+          await api.put(`/user/update`, { email: newEmail });
+          setUser({ ...user, email: newEmail });
+          setEditEmail(false);
+        } catch (error) {
+          console.error("Failed to update email:", error);
+          // Handle error
+        }
+      };
+      updateUser();
+    }
   };
 
+  const handleLogout = () => {
+    // Implement logout logic
+    localStorage.removeItem("token"); // Remove the token
+    // Redirect to login page or update state accordingly
+  };
+
+  if (!user) {
+    // Show a loading state or skeleton until user data is fetched
+    return <Typography>Loading...</Typography>;
+  }
+
   return (
-    <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
+    <Container
+      sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}
+    >
       <Container sx={{ pt: 3 }}>
-        <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
+        <Typography
+          variant="h4"
+          sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}
+        >
           <SettingsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
           設定
         </Typography>
@@ -93,7 +155,7 @@ const SettingsContainer = () => {
             <StyledPaper elevation={0}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                 <AvatarUpload>
-                  <Avatar src={user.avatar} sx={{ width: 100, height: 100 }} />
+                  <Avatar src={user.avatar_url} sx={{ width: 100, height: 100 }} />
                   <UploadButton component="label" size="small">
                     <AddIcon />
                     <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} />
@@ -102,7 +164,12 @@ const SettingsContainer = () => {
                 <Box>
                   {editName ? (
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <StyledTextField value={newName} onChange={(e) => setNewName(e.target.value)} variant="outlined" size="small" />
+                      <StyledTextField
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                      />
                       <IconButton onClick={handleSaveName} size="small" sx={{ ml: 1 }}>
                         <CheckIcon />
                       </IconButton>
@@ -112,7 +179,7 @@ const SettingsContainer = () => {
                     </Box>
                   ) : (
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <Typography variant="h6">{user.name}</Typography>
+                      <Typography variant="h6">{user.username}</Typography>
                       <IconButton onClick={() => setEditName(true)} size="small" sx={{ ml: 1 }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
@@ -120,7 +187,12 @@ const SettingsContainer = () => {
                   )}
                   {editEmail ? (
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <StyledTextField value={newEmail} onChange={(e) => setNewEmail(e.target.value)} variant="outlined" size="small" />
+                      <StyledTextField
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                      />
                       <IconButton onClick={handleSaveEmail} size="small" sx={{ ml: 1 }}>
                         <CheckIcon />
                       </IconButton>
@@ -148,20 +220,13 @@ const SettingsContainer = () => {
               <Typography variant="h6" sx={{ mb: 2 }}>
                 アカウント設定
               </Typography>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Typography variant="body1">通知</Typography>
-                <Switch />
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Typography variant="body1">ダークモード</Typography>
-                <Switch />
-              </Box>
+              {/* Additional settings can go here */}
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" sx={{ mb: 2 }}>
                 クレジット情報
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {creditInfo}
+                {/* Display credit information if applicable */}
               </Typography>
             </StyledPaper>
           </Grid>
@@ -177,6 +242,7 @@ const SettingsContainer = () => {
               px: 4,
               py: 1,
             }}
+            onClick={handleLogout}
           >
             ログアウト
           </Button>
@@ -185,6 +251,7 @@ const SettingsContainer = () => {
     </Container>
   );
 };
+
 export const Settings = () => {
   return (
     <BottomNavigationTemplate value="other">
