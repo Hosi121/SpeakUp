@@ -17,17 +17,22 @@ import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import api from "../../services/api";
 
-const MessageContainer = () => {
-  const { friendname } = useParams(); // URLパラメータからfriendnameを取得
-  const [friendInfo, setFriendInfo] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState("");
+interface FriendInfo {
+  avatar: string;
+  username: string;
+}
+
+const MessageContainer: React.FC = () => {
+  const { friendname } = useParams<{ friendname: string }>(); // URLパラメータからfriendnameを取得
+  const [friendInfo, setFriendInfo] = useState<FriendInfo | null>(null);
+  const [messages, setMessages] = useState<string[]>([]);
+  const [inputMessage, setInputMessage] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
     // 友達の情報を取得
     api
-      .get(`/friend/${friendname}`)
+      .get<FriendInfo>(`/friend/${friendname}`)
       .then((response) => {
         setFriendInfo(response.data);
       })
@@ -36,17 +41,17 @@ const MessageContainer = () => {
       });
   }, [friendname]);
 
-  // Function to handle sending the message
+  // メッセージ送信処理
   const handleSendMessage = () => {
     if (inputMessage.trim() !== "") {
       setMessages([...messages, inputMessage]);
-      setInputMessage(""); // Clear the input field after sending
+      setInputMessage(""); // 送信後に入力フィールドをクリア
     }
   };
 
-  // Function to go back to the previous page
+  // 前のページに戻る処理
   const handleGoBack = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1); // 前のページに戻る
   };
 
   if (!friendInfo) {
@@ -65,7 +70,7 @@ const MessageContainer = () => {
     >
       <Container sx={{ pt: 3 }}>
         <TopSection />
-        {/* Back Button at the top-left corner */}
+        {/* 左上の戻るボタン */}
         <Box
           sx={{
             position: "relative",
@@ -106,7 +111,7 @@ const MessageContainer = () => {
           </Container>
         </Box>
 
-        {/* Chat Messages */}
+        {/* チャットメッセージ */}
         <Box
           sx={{
             mt: 4,
@@ -162,7 +167,7 @@ const MessageContainer = () => {
           </List>
         </Box>
       </Container>
-      {/* Message Input */}
+      {/* メッセージ入力 */}
       <Box
         sx={{
           display: "flex",
@@ -187,7 +192,7 @@ const MessageContainer = () => {
   );
 };
 
-export const Message = () => {
+export const Message: React.FC = () => {
   return (
     <BottomNavigationTemplate value="other">
       <MessageContainer />

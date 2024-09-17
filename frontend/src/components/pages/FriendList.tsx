@@ -12,14 +12,20 @@ import {
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
-const FriendList = () => {
-  const [friends, setFriends] = useState([]);
+interface Friend {
+  id: number;
+  username: string;
+  avatar: string;
+}
+
+const FriendList: React.FC = () => {
+  const [friends, setFriends] = useState<Friend[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     // フレンドリストを取得
     api
-      .get("/friend/me")
+      .get<{ friends: Friend[] }>("/friend/me")
       .then((response) => {
         setFriends(response.data.friends);
       })
@@ -28,7 +34,7 @@ const FriendList = () => {
       });
   }, []);
 
-  const handleMessage = (friendName) => {
+  const handleMessage = (friendName: string) => {
     // メッセージページに遷移
     navigate(`/message/${friendName}`);
   };
