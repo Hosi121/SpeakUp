@@ -3,6 +3,8 @@ import { Favorite, Person } from "@mui/icons-material";
 import TopSection from "../utils/TopSection";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionCountDownModal from "../utils/SessionCountDownModal";
+import { HalfModal } from "../utils/HalfModal";
+import { useState } from "react";
 
 const SessionContainer = () => {
   const users = [
@@ -64,9 +66,22 @@ const SessionContainer = () => {
 };
 
 export const Session = () => {
+  const [memoOpen, setMemoOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const handleMemoClose = () => setMemoOpen(false);
+  const handleAssistantClose = () => setAssistantOpen(false);
+  const memo = "I'm Hanako. Please call me Hanako.";
+
   return (
-    <SessionBottomNavigationTemplate value="other" isMute={false}>
+    <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen}>
       <SessionContainer />
+      <HalfModal open={memoOpen} handleClose={handleMemoClose} title="持ち込みメモ">
+        <Typography variant="body1">{memo}</Typography>
+      </HalfModal>
+
+      <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
+        <Typography variant="body1">アシスタント画面</Typography>
+      </HalfModal>
     </SessionBottomNavigationTemplate>
   );
 };

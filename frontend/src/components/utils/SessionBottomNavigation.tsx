@@ -6,9 +6,11 @@ export type sessionBottomNavigation = "wordList" | "assistance" | "topic" | "oth
 type sessionBottomNavigationProps = {
   value: sessionBottomNavigation;
   isMute: boolean;
+  setMemoOpen: (open: boolean) => void;
+  setAssistantOpen: (open: boolean) => void;
 };
 
-export const SessionBottomNavigation = ({ value, isMute }: sessionBottomNavigationProps) => {
+export const SessionBottomNavigation = ({ value, isMute, setMemoOpen, setAssistantOpen }: sessionBottomNavigationProps) => {
   const navigate = useNavigate();
   const sessionBottomNavigationToIndex = (value: sessionBottomNavigation): number => {
     switch (value) {
@@ -39,8 +41,8 @@ export const SessionBottomNavigation = ({ value, isMute }: sessionBottomNavigati
         }}
       >
         <BottomNavigationAction onClick={() => navigate("")} icon={isMute ? <MicOff fontSize="large" /> : <Mic fontSize="large" />} />
-        <BottomNavigationAction onClick={() => navigate("")} icon={<Message fontSize="large" />} />
-        <BottomNavigationAction onClick={() => navigate("")} icon={<Search fontSize="large" />} />
+        <BottomNavigationAction onClick={() => setMemoOpen(true)} icon={<Message fontSize="large" />} />
+        <BottomNavigationAction onClick={() => setAssistantOpen(true)} icon={<Search fontSize="large" />} />
         <BottomNavigationAction onClick={() => navigate("")} icon={<PriorityHigh fontSize="large" />} />
       </BottomNavigation>
     </Box>
