@@ -33,12 +33,14 @@ const (
 	FieldAccessToken = "access_token"
 	// EdgeConnects holds the string denoting the connects edge name in mutations.
 	EdgeConnects = "connects"
-	// EdgeParticipates holds the string denoting the participates edge name in mutations.
-	EdgeParticipates = "participates"
+	// EdgeMakes holds the string denoting the makes edge name in mutations.
+	EdgeMakes = "makes"
 	// EdgePrepares holds the string denoting the prepares edge name in mutations.
 	EdgePrepares = "prepares"
 	// EdgeAcquires holds the string denoting the acquires edge name in mutations.
 	EdgeAcquires = "acquires"
+	// EdgeRecords holds the string denoting the records edge name in mutations.
+	EdgeRecords = "records"
 	// Table holds the table name of the users in the database.
 	Table = "user_ss"
 	// ConnectsTable is the table that holds the connects relation/edge. The primary key declared below.
@@ -46,11 +48,13 @@ const (
 	// ConnectsInverseTable is the table name for the FRIENDS entity.
 	// It exists in this package in order to avoid circular dependency with the "friends" package.
 	ConnectsInverseTable = "friend_ss"
-	// ParticipatesTable is the table that holds the participates relation/edge. The primary key declared below.
-	ParticipatesTable = "users_participates"
-	// ParticipatesInverseTable is the table name for the MATCHINGS entity.
-	// It exists in this package in order to avoid circular dependency with the "matchings" package.
-	ParticipatesInverseTable = "matching_ss"
+	// MakesTable is the table that holds the makes relation/edge.
+	MakesTable = "event_record_ss"
+	// MakesInverseTable is the table name for the EVENT_RECORDS entity.
+	// It exists in this package in order to avoid circular dependency with the "event_records" package.
+	MakesInverseTable = "event_record_ss"
+	// MakesColumn is the table column denoting the makes relation/edge.
+	MakesColumn = "users_makes"
 	// PreparesTable is the table that holds the prepares relation/edge.
 	PreparesTable = "memo_ss"
 	// PreparesInverseTable is the table name for the MEMOS entity.
@@ -65,6 +69,13 @@ const (
 	AcquiresInverseTable = "achievement_ss"
 	// AcquiresColumn is the table column denoting the acquires relation/edge.
 	AcquiresColumn = "users_acquires"
+	// RecordsTable is the table that holds the records relation/edge.
+	RecordsTable = "progres_ss"
+	// RecordsInverseTable is the table name for the PROGRESS entity.
+	// It exists in this package in order to avoid circular dependency with the "progress" package.
+	RecordsInverseTable = "progres_ss"
+	// RecordsColumn is the table column denoting the records relation/edge.
+	RecordsColumn = "users_records"
 )
 
 // Columns holds all SQL columns for users fields.
@@ -84,9 +95,6 @@ var (
 	// ConnectsPrimaryKey and ConnectsColumn2 are the table columns denoting the
 	// primary key for the connects relation (M2M).
 	ConnectsPrimaryKey = []string{"users_id", "friends_id"}
-	// ParticipatesPrimaryKey and ParticipatesColumn2 are the table columns denoting the
-	// primary key for the participates relation (M2M).
-	ParticipatesPrimaryKey = []string{"users_id", "matchings_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -200,17 +208,17 @@ func ByConnects(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByParticipatesCount orders the results by participates count.
-func ByParticipatesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByMakesCount orders the results by makes count.
+func ByMakesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newParticipatesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newMakesStep(), opts...)
 	}
 }
 
-// ByParticipates orders the results by participates terms.
-func ByParticipates(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByMakes orders the results by makes terms.
+func ByMakes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newParticipatesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newMakesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -234,6 +242,13 @@ func ByAcquires(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAcquiresStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByRecordsField orders the results by records field.
+func ByRecordsField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRecordsStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newConnectsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -241,11 +256,11 @@ func newConnectsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, ConnectsTable, ConnectsPrimaryKey...),
 	)
 }
-func newParticipatesStep() *sqlgraph.Step {
+func newMakesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ParticipatesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ParticipatesTable, ParticipatesPrimaryKey...),
+		sqlgraph.To(MakesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, MakesTable, MakesColumn),
 	)
 }
 func newPreparesStep() *sqlgraph.Step {
@@ -260,5 +275,12 @@ func newAcquiresStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AcquiresInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AcquiresTable, AcquiresColumn),
+	)
+}
+func newRecordsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RecordsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, RecordsTable, RecordsColumn),
 	)
 }
