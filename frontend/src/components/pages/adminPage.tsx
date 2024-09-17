@@ -3,11 +3,10 @@ import {
   Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, 
   TextField, Typography, Snackbar, Tab, Tabs, Paper 
 } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 function AdminPage() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [dateTime, setDateTime] = useState(null);
+  const [dateTime, setDateTime] = useState('');
   const [theme, setTheme] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [eventDetails, setEventDetails] = useState(null);
@@ -21,7 +20,7 @@ function AdminPage() {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setDateTime(null);
+    setDateTime('');
     setTheme('');
   };
 
@@ -67,7 +66,7 @@ function AdminPage() {
             <Paper sx={{ mt: 4, p: 2 }}>
               <Typography variant="h6">イベント内容</Typography>
               <Typography variant="body1">
-                予定日時: {eventDetails.dateTime?.format('YYYY-MM-DD HH:mm')}
+                予定日時: {new Date(eventDetails.dateTime).toLocaleString()}
               </Typography>
               <Typography variant="body1">テーマ: {eventDetails.theme}</Typography>
             </Paper>
@@ -77,11 +76,15 @@ function AdminPage() {
             <DialogTitle>イベント作成</DialogTitle>
             <DialogContent>
               <Box sx={{ mt: 2 }}>
-                <DateTimePicker
+                <TextField
+                  fullWidth
                   label="予定日時"
+                  type="datetime-local"
                   value={dateTime}
-                  onChange={(newValue) => setDateTime(newValue)}
-                  renderInput={(params) => <TextField fullWidth {...params} />}
+                  onChange={(e) => setDateTime(e.target.value)}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
               </Box>
               <Box sx={{ mt: 2 }}>
