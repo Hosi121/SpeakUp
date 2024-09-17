@@ -9,11 +9,9 @@ import (
 func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
 	// Existing routes
 	router.GET("/user/info", controllers.GetUserInfo(client))
-
-	// Add this line
 	router.PUT("/user/update", controllers.UpdateUserInfo(client))
 
-	// メモのルート
+	// Memo routes
 	router.GET("/memo", controllers.GetMemo(client))
 	router.PUT("/memo", controllers.UpdateMemo(client))
 }
