@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
@@ -25,22 +24,26 @@ func GetMemo(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
-		userIDStr, ok := userIDInterface.(string)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		var userID int
+		switch v := userIDInterface.(type) {
+		case int:
+			userID = v
+		case string:
+			var err error
+			userID, err = strconv.Atoi(v)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID conversion error"})
+				return
+			}
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
 			return
 		}
 
-		userID, err := strconv.Atoi(userIDStr)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID conversion error"})
-			return
-		}
-
-		ctx := context.Background()
+		ctx := c.Request.Context()
 
 		// Query the memo from the database
-		m, err := client.Memos.
+		m, err := client.MEMOS.
 			Query().
 			Where(memos.UserIDEQ(userID)).
 			Only(ctx)
@@ -69,15 +72,19 @@ func UpdateMemo(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
-		userIDStr, ok := userIDInterface.(string)
-		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
-			return
-		}
-
-		userID, err := strconv.Atoi(userIDStr)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID conversion error"})
+		var userID int
+		switch v := userIDInterface.(type) {
+		case int:
+			userID = v
+		case string:
+			var err error
+			userID, err = strconv.Atoi(v)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID conversion error"})
+				return
+			}
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
 			return
 		}
 
@@ -87,17 +94,17 @@ func UpdateMemo(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
-		ctx := context.Background()
+		ctx := c.Request.Context()
 
 		// Check if memo exists
-		m, err := client.Memos.
+		m, err := client.MEMOS.
 			Query().
 			Where(memos.UserIDEQ(userID)).
 			Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				// Create a new memo
-				_, err = client.Memos.
+				_, err = client.MEMOS.
 					Create().
 					SetUserID(userID).
 					SetMemo1(req.Memo1).
