@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Hosi121/SpeakUp/ent/chats"
 	"github.com/Hosi121/SpeakUp/ent/friends"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
 	"github.com/Hosi121/SpeakUp/ent/users"
@@ -114,6 +115,21 @@ func (fu *FRIENDSUpdate) AddConnects(u ...*USERS) *FRIENDSUpdate {
 	return fu.AddConnectIDs(ids...)
 }
 
+// AddHaIDs adds the "has" edge to the CHATS entity by IDs.
+func (fu *FRIENDSUpdate) AddHaIDs(ids ...int) *FRIENDSUpdate {
+	fu.mutation.AddHaIDs(ids...)
+	return fu
+}
+
+// AddHas adds the "has" edges to the CHATS entity.
+func (fu *FRIENDSUpdate) AddHas(c ...*CHATS) *FRIENDSUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return fu.AddHaIDs(ids...)
+}
+
 // Mutation returns the FRIENDSMutation object of the builder.
 func (fu *FRIENDSUpdate) Mutation() *FRIENDSMutation {
 	return fu.mutation
@@ -138,6 +154,27 @@ func (fu *FRIENDSUpdate) RemoveConnects(u ...*USERS) *FRIENDSUpdate {
 		ids[i] = u[i].ID
 	}
 	return fu.RemoveConnectIDs(ids...)
+}
+
+// ClearHas clears all "has" edges to the CHATS entity.
+func (fu *FRIENDSUpdate) ClearHas() *FRIENDSUpdate {
+	fu.mutation.ClearHas()
+	return fu
+}
+
+// RemoveHaIDs removes the "has" edge to CHATS entities by IDs.
+func (fu *FRIENDSUpdate) RemoveHaIDs(ids ...int) *FRIENDSUpdate {
+	fu.mutation.RemoveHaIDs(ids...)
+	return fu
+}
+
+// RemoveHas removes "has" edges to CHATS entities.
+func (fu *FRIENDSUpdate) RemoveHas(c ...*CHATS) *FRIENDSUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return fu.RemoveHaIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -252,6 +289,51 @@ func (fu *FRIENDSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if fu.mutation.HasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   friends.HasTable,
+			Columns: []string{friends.HasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chats.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.RemovedHasIDs(); len(nodes) > 0 && !fu.mutation.HasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   friends.HasTable,
+			Columns: []string{friends.HasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chats.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.HasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   friends.HasTable,
+			Columns: []string{friends.HasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chats.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, fu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{friends.Label}
@@ -357,6 +439,21 @@ func (fuo *FRIENDSUpdateOne) AddConnects(u ...*USERS) *FRIENDSUpdateOne {
 	return fuo.AddConnectIDs(ids...)
 }
 
+// AddHaIDs adds the "has" edge to the CHATS entity by IDs.
+func (fuo *FRIENDSUpdateOne) AddHaIDs(ids ...int) *FRIENDSUpdateOne {
+	fuo.mutation.AddHaIDs(ids...)
+	return fuo
+}
+
+// AddHas adds the "has" edges to the CHATS entity.
+func (fuo *FRIENDSUpdateOne) AddHas(c ...*CHATS) *FRIENDSUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return fuo.AddHaIDs(ids...)
+}
+
 // Mutation returns the FRIENDSMutation object of the builder.
 func (fuo *FRIENDSUpdateOne) Mutation() *FRIENDSMutation {
 	return fuo.mutation
@@ -381,6 +478,27 @@ func (fuo *FRIENDSUpdateOne) RemoveConnects(u ...*USERS) *FRIENDSUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return fuo.RemoveConnectIDs(ids...)
+}
+
+// ClearHas clears all "has" edges to the CHATS entity.
+func (fuo *FRIENDSUpdateOne) ClearHas() *FRIENDSUpdateOne {
+	fuo.mutation.ClearHas()
+	return fuo
+}
+
+// RemoveHaIDs removes the "has" edge to CHATS entities by IDs.
+func (fuo *FRIENDSUpdateOne) RemoveHaIDs(ids ...int) *FRIENDSUpdateOne {
+	fuo.mutation.RemoveHaIDs(ids...)
+	return fuo
+}
+
+// RemoveHas removes "has" edges to CHATS entities.
+func (fuo *FRIENDSUpdateOne) RemoveHas(c ...*CHATS) *FRIENDSUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return fuo.RemoveHaIDs(ids...)
 }
 
 // Where appends a list predicates to the FRIENDSUpdate builder.
@@ -518,6 +636,51 @@ func (fuo *FRIENDSUpdateOne) sqlSave(ctx context.Context) (_node *FRIENDS, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(users.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if fuo.mutation.HasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   friends.HasTable,
+			Columns: []string{friends.HasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chats.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.RemovedHasIDs(); len(nodes) > 0 && !fuo.mutation.HasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   friends.HasTable,
+			Columns: []string{friends.HasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chats.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.HasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   friends.HasTable,
+			Columns: []string{friends.HasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chats.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -35,9 +35,11 @@ type FRIENDS struct {
 type FRIENDSEdges struct {
 	// Connects holds the value of the connects edge.
 	Connects []*USERS `json:"connects,omitempty"`
+	// Has holds the value of the has edge.
+	Has []*CHATS `json:"has,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ConnectsOrErr returns the Connects value or an error if the edge
@@ -47,6 +49,15 @@ func (e FRIENDSEdges) ConnectsOrErr() ([]*USERS, error) {
 		return e.Connects, nil
 	}
 	return nil, &NotLoadedError{edge: "connects"}
+}
+
+// HasOrErr returns the Has value or an error if the edge
+// was not loaded in eager-loading.
+func (e FRIENDSEdges) HasOrErr() ([]*CHATS, error) {
+	if e.loadedTypes[1] {
+		return e.Has, nil
+	}
+	return nil, &NotLoadedError{edge: "has"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -121,6 +132,11 @@ func (f *FRIENDS) Value(name string) (ent.Value, error) {
 // QueryConnects queries the "connects" edge of the FRIENDS entity.
 func (f *FRIENDS) QueryConnects() *USERSQuery {
 	return NewFRIENDSClient(f.config).QueryConnects(f)
+}
+
+// QueryHas queries the "has" edge of the FRIENDS entity.
+func (f *FRIENDS) QueryHas() *CHATSQuery {
+	return NewFRIENDSClient(f.config).QueryHas(f)
 }
 
 // Update returns a builder for updating this FRIENDS.

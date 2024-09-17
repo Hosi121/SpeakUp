@@ -45,6 +45,18 @@ func (f CALLSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CALLSMutation", m)
 }
 
+// The CHATSFunc type is an adapter to allow the use of ordinary
+// function as CHATS mutator.
+type CHATSFunc func(context.Context, *ent.CHATSMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CHATSFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CHATSMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CHATSMutation", m)
+}
+
 // The EVENTSFunc type is an adapter to allow the use of ordinary
 // function as EVENTS mutator.
 type EVENTSFunc func(context.Context, *ent.EVENTSMutation) (ent.Value, error)

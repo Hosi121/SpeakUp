@@ -66,6 +66,29 @@ var (
 			},
 		},
 	}
+	// ChatSsColumns holds the columns for the "chat_ss" table.
+	ChatSsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "friend_id", Type: field.TypeInt},
+		{Name: "message", Type: field.TypeString, Size: 255},
+		{Name: "is_recieved", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "friends_has", Type: field.TypeInt, Nullable: true},
+	}
+	// ChatSsTable holds the schema information for the "chat_ss" table.
+	ChatSsTable = &schema.Table{
+		Name:       "chat_ss",
+		Columns:    ChatSsColumns,
+		PrimaryKey: []*schema.Column{ChatSsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "chat_ss_friend_ss_has",
+				Columns:    []*schema.Column{ChatSsColumns[5]},
+				RefColumns: []*schema.Column{FriendSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// EventSsColumns holds the columns for the "event_ss" table.
 	EventSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -247,6 +270,7 @@ var (
 		AchievementSsTable,
 		AiThemeSsTable,
 		CallSsTable,
+		ChatSsTable,
 		EventSsTable,
 		EventRecordSsTable,
 		FriendSsTable,
@@ -261,6 +285,7 @@ var (
 func init() {
 	AchievementSsTable.ForeignKeys[0].RefTable = UserSsTable
 	CallSsTable.ForeignKeys[0].RefTable = SessionSsTable
+	ChatSsTable.ForeignKeys[0].RefTable = FriendSsTable
 	EventSsTable.ForeignKeys[0].RefTable = AiThemeSsTable
 	EventRecordSsTable.ForeignKeys[0].RefTable = EventSsTable
 	EventRecordSsTable.ForeignKeys[1].RefTable = UserSsTable

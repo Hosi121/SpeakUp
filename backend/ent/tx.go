@@ -18,6 +18,8 @@ type Tx struct {
 	AI_THEMES *AITHEMESClient
 	// CALLS is the client for interacting with the CALLS builders.
 	CALLS *CALLSClient
+	// CHATS is the client for interacting with the CHATS builders.
+	CHATS *CHATSClient
 	// EVENTS is the client for interacting with the EVENTS builders.
 	EVENTS *EVENTSClient
 	// EVENT_RECORDS is the client for interacting with the EVENT_RECORDS builders.
@@ -166,6 +168,7 @@ func (tx *Tx) init() {
 	tx.ACHIEVEMENTS = NewACHIEVEMENTSClient(tx.config)
 	tx.AI_THEMES = NewAITHEMESClient(tx.config)
 	tx.CALLS = NewCALLSClient(tx.config)
+	tx.CHATS = NewCHATSClient(tx.config)
 	tx.EVENTS = NewEVENTSClient(tx.config)
 	tx.EVENT_RECORDS = NewEVENTRECORDSClient(tx.config)
 	tx.FRIENDS = NewFRIENDSClient(tx.config)
