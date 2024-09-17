@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -33,7 +34,7 @@ func GetSupabaseAPI() (string, string) {
 }
 
 func GetKey() ([]byte, []byte) {
-	publicKey := []byte(os.Getenv("PUBLIC_KEY"))
-	secretKey := []byte(os.Getenv("SECRET_KEY"))
+	publicKey := []byte(strings.ReplaceAll(os.Getenv("PUBLIC_KEY"), "\\n", "\n"))
+	secretKey := []byte(strings.ReplaceAll(os.Getenv("SECRET_KEY"), "\\n", "\n"))
 	return publicKey, secretKey
 }
