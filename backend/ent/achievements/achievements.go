@@ -16,14 +16,12 @@ const (
 	FieldID = "id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
-	// FieldTrophyID holds the string denoting the trophy_id field in the database.
-	FieldTrophyID = "trophy_id"
+	// FieldTitle holds the string denoting the title field in the database.
+	FieldTitle = "title"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeGranted holds the string denoting the granted edge name in mutations.
 	EdgeGranted = "granted"
-	// EdgeRefers holds the string denoting the refers edge name in mutations.
-	EdgeRefers = "refers"
 	// Table holds the table name of the achievements in the database.
 	Table = "achievement_ss"
 	// GrantedTable is the table that holds the granted relation/edge.
@@ -33,27 +31,19 @@ const (
 	GrantedInverseTable = "user_ss"
 	// GrantedColumn is the table column denoting the granted relation/edge.
 	GrantedColumn = "users_acquires"
-	// RefersTable is the table that holds the refers relation/edge.
-	RefersTable = "achievement_ss"
-	// RefersInverseTable is the table name for the TROPHIES entity.
-	// It exists in this package in order to avoid circular dependency with the "trophies" package.
-	RefersInverseTable = "trophie_ss"
-	// RefersColumn is the table column denoting the refers relation/edge.
-	RefersColumn = "achievements_refers"
 )
 
 // Columns holds all SQL columns for achievements fields.
 var Columns = []string{
 	FieldID,
 	FieldUserID,
-	FieldTrophyID,
+	FieldTitle,
 	FieldCreatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "achievement_ss"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"achievements_refers",
 	"users_acquires",
 }
 
@@ -90,9 +80,9 @@ func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
-// ByTrophyID orders the results by the trophy_id field.
-func ByTrophyID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTrophyID, opts...).ToFunc()
+// ByTitle orders the results by the title field.
+func ByTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTitle, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
@@ -106,24 +96,10 @@ func ByGrantedField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newGrantedStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByRefersField orders the results by refers field.
-func ByRefersField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRefersStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newGrantedStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(GrantedInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, GrantedTable, GrantedColumn),
-	)
-}
-func newRefersStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RefersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, RefersTable, RefersColumn),
 	)
 }

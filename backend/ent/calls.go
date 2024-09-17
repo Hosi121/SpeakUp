@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Hosi121/SpeakUp/ent/calls"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
 // CALLS is the model entity for the CALLS schema.
@@ -30,15 +30,15 @@ type CALLS struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CALLSQuery when eager-loading is set.
-	Edges           CALLSEdges `json:"edges"`
-	matchings_makes *int
-	selectValues    sql.SelectValues
+	Edges          CALLSEdges `json:"edges"`
+	sessions_makes *int
+	selectValues   sql.SelectValues
 }
 
 // CALLSEdges holds the relations/edges for other nodes in the graph.
 type CALLSEdges struct {
 	// Made holds the value of the made edge.
-	Made *MATCHINGS `json:"made,omitempty"`
+	Made *SESSIONS `json:"made,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -46,11 +46,11 @@ type CALLSEdges struct {
 
 // MadeOrErr returns the Made value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CALLSEdges) MadeOrErr() (*MATCHINGS, error) {
+func (e CALLSEdges) MadeOrErr() (*SESSIONS, error) {
 	if e.Made != nil {
 		return e.Made, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: matchings.Label}
+		return nil, &NotFoundError{label: sessions.Label}
 	}
 	return nil, &NotLoadedError{edge: "made"}
 }
@@ -64,7 +64,7 @@ func (*CALLS) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case calls.FieldCallStart, calls.FieldCallEnd, calls.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case calls.ForeignKeys[0]: // matchings_makes
+		case calls.ForeignKeys[0]: // sessions_makes
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -119,10 +119,10 @@ func (c *CALLS) assignValues(columns []string, values []any) error {
 			}
 		case calls.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field matchings_makes", value)
+				return fmt.Errorf("unexpected type %T for edge-field sessions_makes", value)
 			} else if value.Valid {
-				c.matchings_makes = new(int)
-				*c.matchings_makes = int(value.Int64)
+				c.sessions_makes = new(int)
+				*c.sessions_makes = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -138,7 +138,7 @@ func (c *CALLS) Value(name string) (ent.Value, error) {
 }
 
 // QueryMade queries the "made" edge of the CALLS entity.
-func (c *CALLS) QueryMade() *MATCHINGSQuery {
+func (c *CALLS) QueryMade() *SESSIONSQuery {
 	return NewCALLSClient(c.config).QueryMade(c)
 }
 

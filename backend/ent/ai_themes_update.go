@@ -11,12 +11,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
+	"github.com/Hosi121/SpeakUp/ent/ai_themes"
+	"github.com/Hosi121/SpeakUp/ent/events"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
-	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
-// AITHEMESUpdate is the builder for updating AITHEMES entities.
+// AITHEMESUpdate is the builder for updating AI_THEMES entities.
 type AITHEMESUpdate struct {
 	config
 	hooks    []Hook
@@ -24,7 +24,7 @@ type AITHEMESUpdate struct {
 }
 
 // Where appends a list predicates to the AITHEMESUpdate builder.
-func (au *AITHEMESUpdate) Where(ps ...predicate.AITHEMES) *AITHEMESUpdate {
+func (au *AITHEMESUpdate) Where(ps ...predicate.AI_THEMES) *AITHEMESUpdate {
 	au.mutation.Where(ps...)
 	return au
 }
@@ -57,17 +57,17 @@ func (au *AITHEMESUpdate) SetNillableCreatedAt(t *time.Time) *AITHEMESUpdate {
 	return au
 }
 
-// AddUsedIDs adds the "used" edge to the SESSIONS entity by IDs.
+// AddUsedIDs adds the "used" edge to the EVENTS entity by IDs.
 func (au *AITHEMESUpdate) AddUsedIDs(ids ...int) *AITHEMESUpdate {
 	au.mutation.AddUsedIDs(ids...)
 	return au
 }
 
-// AddUsed adds the "used" edges to the SESSIONS entity.
-func (au *AITHEMESUpdate) AddUsed(s ...*SESSIONS) *AITHEMESUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// AddUsed adds the "used" edges to the EVENTS entity.
+func (au *AITHEMESUpdate) AddUsed(e ...*EVENTS) *AITHEMESUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
 	return au.AddUsedIDs(ids...)
 }
@@ -77,23 +77,23 @@ func (au *AITHEMESUpdate) Mutation() *AITHEMESMutation {
 	return au.mutation
 }
 
-// ClearUsed clears all "used" edges to the SESSIONS entity.
+// ClearUsed clears all "used" edges to the EVENTS entity.
 func (au *AITHEMESUpdate) ClearUsed() *AITHEMESUpdate {
 	au.mutation.ClearUsed()
 	return au
 }
 
-// RemoveUsedIDs removes the "used" edge to SESSIONS entities by IDs.
+// RemoveUsedIDs removes the "used" edge to EVENTS entities by IDs.
 func (au *AITHEMESUpdate) RemoveUsedIDs(ids ...int) *AITHEMESUpdate {
 	au.mutation.RemoveUsedIDs(ids...)
 	return au
 }
 
-// RemoveUsed removes "used" edges to SESSIONS entities.
-func (au *AITHEMESUpdate) RemoveUsed(s ...*SESSIONS) *AITHEMESUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// RemoveUsed removes "used" edges to EVENTS entities.
+func (au *AITHEMESUpdate) RemoveUsed(e ...*EVENTS) *AITHEMESUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
 	return au.RemoveUsedIDs(ids...)
 }
@@ -126,7 +126,7 @@ func (au *AITHEMESUpdate) ExecX(ctx context.Context) {
 }
 
 func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(aithemes.Table, aithemes.Columns, sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(ai_themes.Table, ai_themes.Columns, sqlgraph.NewFieldSpec(ai_themes.FieldID, field.TypeInt))
 	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -135,20 +135,20 @@ func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := au.mutation.ThemeText(); ok {
-		_spec.SetField(aithemes.FieldThemeText, field.TypeString, value)
+		_spec.SetField(ai_themes.FieldThemeText, field.TypeString, value)
 	}
 	if value, ok := au.mutation.CreatedAt(); ok {
-		_spec.SetField(aithemes.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(ai_themes.FieldCreatedAt, field.TypeTime, value)
 	}
 	if au.mutation.UsedCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   aithemes.UsedTable,
-			Columns: []string{aithemes.UsedColumn},
+			Table:   ai_themes.UsedTable,
+			Columns: []string{ai_themes.UsedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(events.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -157,11 +157,11 @@ func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   aithemes.UsedTable,
-			Columns: []string{aithemes.UsedColumn},
+			Table:   ai_themes.UsedTable,
+			Columns: []string{ai_themes.UsedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(events.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -173,11 +173,11 @@ func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   aithemes.UsedTable,
-			Columns: []string{aithemes.UsedColumn},
+			Table:   ai_themes.UsedTable,
+			Columns: []string{ai_themes.UsedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(events.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -187,7 +187,7 @@ func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{aithemes.Label}
+			err = &NotFoundError{ai_themes.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -197,7 +197,7 @@ func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	return n, nil
 }
 
-// AITHEMESUpdateOne is the builder for updating a single AITHEMES entity.
+// AITHEMESUpdateOne is the builder for updating a single AI_THEMES entity.
 type AITHEMESUpdateOne struct {
 	config
 	fields   []string
@@ -233,17 +233,17 @@ func (auo *AITHEMESUpdateOne) SetNillableCreatedAt(t *time.Time) *AITHEMESUpdate
 	return auo
 }
 
-// AddUsedIDs adds the "used" edge to the SESSIONS entity by IDs.
+// AddUsedIDs adds the "used" edge to the EVENTS entity by IDs.
 func (auo *AITHEMESUpdateOne) AddUsedIDs(ids ...int) *AITHEMESUpdateOne {
 	auo.mutation.AddUsedIDs(ids...)
 	return auo
 }
 
-// AddUsed adds the "used" edges to the SESSIONS entity.
-func (auo *AITHEMESUpdateOne) AddUsed(s ...*SESSIONS) *AITHEMESUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// AddUsed adds the "used" edges to the EVENTS entity.
+func (auo *AITHEMESUpdateOne) AddUsed(e ...*EVENTS) *AITHEMESUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
 	return auo.AddUsedIDs(ids...)
 }
@@ -253,29 +253,29 @@ func (auo *AITHEMESUpdateOne) Mutation() *AITHEMESMutation {
 	return auo.mutation
 }
 
-// ClearUsed clears all "used" edges to the SESSIONS entity.
+// ClearUsed clears all "used" edges to the EVENTS entity.
 func (auo *AITHEMESUpdateOne) ClearUsed() *AITHEMESUpdateOne {
 	auo.mutation.ClearUsed()
 	return auo
 }
 
-// RemoveUsedIDs removes the "used" edge to SESSIONS entities by IDs.
+// RemoveUsedIDs removes the "used" edge to EVENTS entities by IDs.
 func (auo *AITHEMESUpdateOne) RemoveUsedIDs(ids ...int) *AITHEMESUpdateOne {
 	auo.mutation.RemoveUsedIDs(ids...)
 	return auo
 }
 
-// RemoveUsed removes "used" edges to SESSIONS entities.
-func (auo *AITHEMESUpdateOne) RemoveUsed(s ...*SESSIONS) *AITHEMESUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// RemoveUsed removes "used" edges to EVENTS entities.
+func (auo *AITHEMESUpdateOne) RemoveUsed(e ...*EVENTS) *AITHEMESUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
 	return auo.RemoveUsedIDs(ids...)
 }
 
 // Where appends a list predicates to the AITHEMESUpdate builder.
-func (auo *AITHEMESUpdateOne) Where(ps ...predicate.AITHEMES) *AITHEMESUpdateOne {
+func (auo *AITHEMESUpdateOne) Where(ps ...predicate.AI_THEMES) *AITHEMESUpdateOne {
 	auo.mutation.Where(ps...)
 	return auo
 }
@@ -287,13 +287,13 @@ func (auo *AITHEMESUpdateOne) Select(field string, fields ...string) *AITHEMESUp
 	return auo
 }
 
-// Save executes the query and returns the updated AITHEMES entity.
-func (auo *AITHEMESUpdateOne) Save(ctx context.Context) (*AITHEMES, error) {
+// Save executes the query and returns the updated AI_THEMES entity.
+func (auo *AITHEMESUpdateOne) Save(ctx context.Context) (*AI_THEMES, error) {
 	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (auo *AITHEMESUpdateOne) SaveX(ctx context.Context) *AITHEMES {
+func (auo *AITHEMESUpdateOne) SaveX(ctx context.Context) *AI_THEMES {
 	node, err := auo.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -314,21 +314,21 @@ func (auo *AITHEMESUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AITHEMES, err error) {
-	_spec := sqlgraph.NewUpdateSpec(aithemes.Table, aithemes.Columns, sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt))
+func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AI_THEMES, err error) {
+	_spec := sqlgraph.NewUpdateSpec(ai_themes.Table, ai_themes.Columns, sqlgraph.NewFieldSpec(ai_themes.FieldID, field.TypeInt))
 	id, ok := auo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AITHEMES.id" for update`)}
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AI_THEMES.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := auo.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, aithemes.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, ai_themes.FieldID)
 		for _, f := range fields {
-			if !aithemes.ValidColumn(f) {
+			if !ai_themes.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != aithemes.FieldID {
+			if f != ai_themes.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, f)
 			}
 		}
@@ -341,20 +341,20 @@ func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AITHEMES, err
 		}
 	}
 	if value, ok := auo.mutation.ThemeText(); ok {
-		_spec.SetField(aithemes.FieldThemeText, field.TypeString, value)
+		_spec.SetField(ai_themes.FieldThemeText, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.CreatedAt(); ok {
-		_spec.SetField(aithemes.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(ai_themes.FieldCreatedAt, field.TypeTime, value)
 	}
 	if auo.mutation.UsedCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   aithemes.UsedTable,
-			Columns: []string{aithemes.UsedColumn},
+			Table:   ai_themes.UsedTable,
+			Columns: []string{ai_themes.UsedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(events.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -363,11 +363,11 @@ func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AITHEMES, err
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   aithemes.UsedTable,
-			Columns: []string{aithemes.UsedColumn},
+			Table:   ai_themes.UsedTable,
+			Columns: []string{ai_themes.UsedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(events.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -379,11 +379,11 @@ func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AITHEMES, err
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   aithemes.UsedTable,
-			Columns: []string{aithemes.UsedColumn},
+			Table:   ai_themes.UsedTable,
+			Columns: []string{ai_themes.UsedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(events.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -391,12 +391,12 @@ func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AITHEMES, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &AITHEMES{config: auo.config}
+	_node = &AI_THEMES{config: auo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, auo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{aithemes.Label}
+			err = &NotFoundError{ai_themes.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}

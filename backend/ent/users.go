@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Hosi121/SpeakUp/ent/memos"
+	"github.com/Hosi121/SpeakUp/ent/progress"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -20,8 +21,6 @@ type USERS struct {
 	ID int `json:"id,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
-	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
 	// AvatarURL holds the value of the "avatar_url" field.
 	AvatarURL string `json:"avatar_url,omitempty"`
 	// Role holds the value of the "role" field.
@@ -32,8 +31,6 @@ type USERS struct {
 	IsDeleted bool `json:"is_deleted,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// AccessToken holds the value of the "access_token" field.
-	AccessToken string `json:"access_token,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the USERSQuery when eager-loading is set.
 	Edges        USERSEdges `json:"edges"`
@@ -44,15 +41,17 @@ type USERS struct {
 type USERSEdges struct {
 	// Connects holds the value of the connects edge.
 	Connects []*FRIENDS `json:"connects,omitempty"`
-	// Participates holds the value of the participates edge.
-	Participates []*MATCHINGS `json:"participates,omitempty"`
+	// Makes holds the value of the makes edge.
+	Makes []*EVENT_RECORDS `json:"makes,omitempty"`
 	// Prepares holds the value of the prepares edge.
 	Prepares *MEMOS `json:"prepares,omitempty"`
 	// Acquires holds the value of the acquires edge.
 	Acquires []*ACHIEVEMENTS `json:"acquires,omitempty"`
+	// Records holds the value of the records edge.
+	Records *PROGRESS `json:"records,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // ConnectsOrErr returns the Connects value or an error if the edge
@@ -64,13 +63,13 @@ func (e USERSEdges) ConnectsOrErr() ([]*FRIENDS, error) {
 	return nil, &NotLoadedError{edge: "connects"}
 }
 
-// ParticipatesOrErr returns the Participates value or an error if the edge
+// MakesOrErr returns the Makes value or an error if the edge
 // was not loaded in eager-loading.
-func (e USERSEdges) ParticipatesOrErr() ([]*MATCHINGS, error) {
+func (e USERSEdges) MakesOrErr() ([]*EVENT_RECORDS, error) {
 	if e.loadedTypes[1] {
-		return e.Participates, nil
+		return e.Makes, nil
 	}
-	return nil, &NotLoadedError{edge: "participates"}
+	return nil, &NotLoadedError{edge: "makes"}
 }
 
 // PreparesOrErr returns the Prepares value or an error if the edge
@@ -93,6 +92,17 @@ func (e USERSEdges) AcquiresOrErr() ([]*ACHIEVEMENTS, error) {
 	return nil, &NotLoadedError{edge: "acquires"}
 }
 
+// RecordsOrErr returns the Records value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e USERSEdges) RecordsOrErr() (*PROGRESS, error) {
+	if e.Records != nil {
+		return e.Records, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: progress.Label}
+	}
+	return nil, &NotLoadedError{edge: "records"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*USERS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -102,7 +112,7 @@ func (*USERS) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case users.FieldID:
 			values[i] = new(sql.NullInt64)
-		case users.FieldUsername, users.FieldEmail, users.FieldAvatarURL, users.FieldRole, users.FieldAccessToken:
+		case users.FieldUsername, users.FieldAvatarURL, users.FieldRole:
 			values[i] = new(sql.NullString)
 		case users.FieldCreatedAt, users.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -132,12 +142,6 @@ func (u *USERS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field username", values[i])
 			} else if value.Valid {
 				u.Username = value.String
-			}
-		case users.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
-			} else if value.Valid {
-				u.Email = value.String
 			}
 		case users.FieldAvatarURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -169,12 +173,6 @@ func (u *USERS) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.UpdatedAt = value.Time
 			}
-		case users.FieldAccessToken:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field access_token", values[i])
-			} else if value.Valid {
-				u.AccessToken = value.String
-			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -193,9 +191,9 @@ func (u *USERS) QueryConnects() *FRIENDSQuery {
 	return NewUSERSClient(u.config).QueryConnects(u)
 }
 
-// QueryParticipates queries the "participates" edge of the USERS entity.
-func (u *USERS) QueryParticipates() *MATCHINGSQuery {
-	return NewUSERSClient(u.config).QueryParticipates(u)
+// QueryMakes queries the "makes" edge of the USERS entity.
+func (u *USERS) QueryMakes() *EVENTRECORDSQuery {
+	return NewUSERSClient(u.config).QueryMakes(u)
 }
 
 // QueryPrepares queries the "prepares" edge of the USERS entity.
@@ -206,6 +204,11 @@ func (u *USERS) QueryPrepares() *MEMOSQuery {
 // QueryAcquires queries the "acquires" edge of the USERS entity.
 func (u *USERS) QueryAcquires() *ACHIEVEMENTSQuery {
 	return NewUSERSClient(u.config).QueryAcquires(u)
+}
+
+// QueryRecords queries the "records" edge of the USERS entity.
+func (u *USERS) QueryRecords() *PROGRESSQuery {
+	return NewUSERSClient(u.config).QueryRecords(u)
 }
 
 // Update returns a builder for updating this USERS.
@@ -234,9 +237,6 @@ func (u *USERS) String() string {
 	builder.WriteString("username=")
 	builder.WriteString(u.Username)
 	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(u.Email)
-	builder.WriteString(", ")
 	builder.WriteString("avatar_url=")
 	builder.WriteString(u.AvatarURL)
 	builder.WriteString(", ")
@@ -251,9 +251,6 @@ func (u *USERS) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("access_token=")
-	builder.WriteString(u.AccessToken)
 	builder.WriteByte(')')
 	return builder.String()
 }

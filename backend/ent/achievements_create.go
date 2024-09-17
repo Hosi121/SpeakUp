@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
-	"github.com/Hosi121/SpeakUp/ent/trophies"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -28,9 +27,9 @@ func (ac *ACHIEVEMENTSCreate) SetUserID(i int) *ACHIEVEMENTSCreate {
 	return ac
 }
 
-// SetTrophyID sets the "trophy_id" field.
-func (ac *ACHIEVEMENTSCreate) SetTrophyID(i int) *ACHIEVEMENTSCreate {
-	ac.mutation.SetTrophyID(i)
+// SetTitle sets the "title" field.
+func (ac *ACHIEVEMENTSCreate) SetTitle(s string) *ACHIEVEMENTSCreate {
+	ac.mutation.SetTitle(s)
 	return ac
 }
 
@@ -65,25 +64,6 @@ func (ac *ACHIEVEMENTSCreate) SetNillableGrantedID(id *int) *ACHIEVEMENTSCreate 
 // SetGranted sets the "granted" edge to the USERS entity.
 func (ac *ACHIEVEMENTSCreate) SetGranted(u *USERS) *ACHIEVEMENTSCreate {
 	return ac.SetGrantedID(u.ID)
-}
-
-// SetRefersID sets the "refers" edge to the TROPHIES entity by ID.
-func (ac *ACHIEVEMENTSCreate) SetRefersID(id int) *ACHIEVEMENTSCreate {
-	ac.mutation.SetRefersID(id)
-	return ac
-}
-
-// SetNillableRefersID sets the "refers" edge to the TROPHIES entity by ID if the given value is not nil.
-func (ac *ACHIEVEMENTSCreate) SetNillableRefersID(id *int) *ACHIEVEMENTSCreate {
-	if id != nil {
-		ac = ac.SetRefersID(*id)
-	}
-	return ac
-}
-
-// SetRefers sets the "refers" edge to the TROPHIES entity.
-func (ac *ACHIEVEMENTSCreate) SetRefers(t *TROPHIES) *ACHIEVEMENTSCreate {
-	return ac.SetRefersID(t.ID)
 }
 
 // Mutation returns the ACHIEVEMENTSMutation object of the builder.
@@ -132,8 +112,8 @@ func (ac *ACHIEVEMENTSCreate) check() error {
 	if _, ok := ac.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "ACHIEVEMENTS.user_id"`)}
 	}
-	if _, ok := ac.mutation.TrophyID(); !ok {
-		return &ValidationError{Name: "trophy_id", err: errors.New(`ent: missing required field "ACHIEVEMENTS.trophy_id"`)}
+	if _, ok := ac.mutation.Title(); !ok {
+		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "ACHIEVEMENTS.title"`)}
 	}
 	if _, ok := ac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ACHIEVEMENTS.created_at"`)}
@@ -168,9 +148,9 @@ func (ac *ACHIEVEMENTSCreate) createSpec() (*ACHIEVEMENTS, *sqlgraph.CreateSpec)
 		_spec.SetField(achievements.FieldUserID, field.TypeInt, value)
 		_node.UserID = value
 	}
-	if value, ok := ac.mutation.TrophyID(); ok {
-		_spec.SetField(achievements.FieldTrophyID, field.TypeInt, value)
-		_node.TrophyID = value
+	if value, ok := ac.mutation.Title(); ok {
+		_spec.SetField(achievements.FieldTitle, field.TypeString, value)
+		_node.Title = value
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(achievements.FieldCreatedAt, field.TypeTime, value)
@@ -191,23 +171,6 @@ func (ac *ACHIEVEMENTSCreate) createSpec() (*ACHIEVEMENTS, *sqlgraph.CreateSpec)
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.users_acquires = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.RefersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   achievements.RefersTable,
-			Columns: []string{achievements.RefersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(trophies.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.achievements_refers = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

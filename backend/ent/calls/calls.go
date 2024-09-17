@@ -30,11 +30,11 @@ const (
 	Table = "call_ss"
 	// MadeTable is the table that holds the made relation/edge.
 	MadeTable = "call_ss"
-	// MadeInverseTable is the table name for the MATCHINGS entity.
-	// It exists in this package in order to avoid circular dependency with the "matchings" package.
-	MadeInverseTable = "matching_ss"
+	// MadeInverseTable is the table name for the SESSIONS entity.
+	// It exists in this package in order to avoid circular dependency with the "sessions" package.
+	MadeInverseTable = "session_ss"
 	// MadeColumn is the table column denoting the made relation/edge.
-	MadeColumn = "matchings_makes"
+	MadeColumn = "sessions_makes"
 )
 
 // Columns holds all SQL columns for calls fields.
@@ -50,7 +50,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "call_ss"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"matchings_makes",
+	"sessions_makes",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/achievements"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
-	"github.com/Hosi121/SpeakUp/ent/trophies"
 	"github.com/Hosi121/SpeakUp/ent/users"
 )
 
@@ -25,7 +24,6 @@ type ACHIEVEMENTSQuery struct {
 	inters      []Interceptor
 	predicates  []predicate.ACHIEVEMENTS
 	withGranted *USERSQuery
-	withRefers  *TROPHIESQuery
 	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -78,28 +76,6 @@ func (aq *ACHIEVEMENTSQuery) QueryGranted() *USERSQuery {
 			sqlgraph.From(achievements.Table, achievements.FieldID, selector),
 			sqlgraph.To(users.Table, users.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, achievements.GrantedTable, achievements.GrantedColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryRefers chains the current query on the "refers" edge.
-func (aq *ACHIEVEMENTSQuery) QueryRefers() *TROPHIESQuery {
-	query := (&TROPHIESClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(achievements.Table, achievements.FieldID, selector),
-			sqlgraph.To(trophies.Table, trophies.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, achievements.RefersTable, achievements.RefersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,7 +276,6 @@ func (aq *ACHIEVEMENTSQuery) Clone() *ACHIEVEMENTSQuery {
 		inters:      append([]Interceptor{}, aq.inters...),
 		predicates:  append([]predicate.ACHIEVEMENTS{}, aq.predicates...),
 		withGranted: aq.withGranted.Clone(),
-		withRefers:  aq.withRefers.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -315,17 +290,6 @@ func (aq *ACHIEVEMENTSQuery) WithGranted(opts ...func(*USERSQuery)) *ACHIEVEMENT
 		opt(query)
 	}
 	aq.withGranted = query
-	return aq
-}
-
-// WithRefers tells the query-builder to eager-load the nodes that are connected to
-// the "refers" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *ACHIEVEMENTSQuery) WithRefers(opts ...func(*TROPHIESQuery)) *ACHIEVEMENTSQuery {
-	query := (&TROPHIESClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withRefers = query
 	return aq
 }
 
@@ -408,12 +372,11 @@ func (aq *ACHIEVEMENTSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		nodes       = []*ACHIEVEMENTS{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [1]bool{
 			aq.withGranted != nil,
-			aq.withRefers != nil,
 		}
 	)
-	if aq.withGranted != nil || aq.withRefers != nil {
+	if aq.withGranted != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -440,12 +403,6 @@ func (aq *ACHIEVEMENTSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if query := aq.withGranted; query != nil {
 		if err := aq.loadGranted(ctx, query, nodes, nil,
 			func(n *ACHIEVEMENTS, e *USERS) { n.Edges.Granted = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := aq.withRefers; query != nil {
-		if err := aq.loadRefers(ctx, query, nodes, nil,
-			func(n *ACHIEVEMENTS, e *TROPHIES) { n.Edges.Refers = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -477,38 +434,6 @@ func (aq *ACHIEVEMENTSQuery) loadGranted(ctx context.Context, query *USERSQuery,
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "users_acquires" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (aq *ACHIEVEMENTSQuery) loadRefers(ctx context.Context, query *TROPHIESQuery, nodes []*ACHIEVEMENTS, init func(*ACHIEVEMENTS), assign func(*ACHIEVEMENTS, *TROPHIES)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*ACHIEVEMENTS)
-	for i := range nodes {
-		if nodes[i].achievements_refers == nil {
-			continue
-		}
-		fk := *nodes[i].achievements_refers
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(trophies.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "achievements_refers" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

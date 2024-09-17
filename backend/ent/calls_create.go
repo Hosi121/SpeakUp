@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/calls"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
 // CALLSCreate is the builder for creating a CALLS entity.
@@ -75,13 +75,13 @@ func (cc *CALLSCreate) SetNillableCreatedAt(t *time.Time) *CALLSCreate {
 	return cc
 }
 
-// SetMadeID sets the "made" edge to the MATCHINGS entity by ID.
+// SetMadeID sets the "made" edge to the SESSIONS entity by ID.
 func (cc *CALLSCreate) SetMadeID(id int) *CALLSCreate {
 	cc.mutation.SetMadeID(id)
 	return cc
 }
 
-// SetNillableMadeID sets the "made" edge to the MATCHINGS entity by ID if the given value is not nil.
+// SetNillableMadeID sets the "made" edge to the SESSIONS entity by ID if the given value is not nil.
 func (cc *CALLSCreate) SetNillableMadeID(id *int) *CALLSCreate {
 	if id != nil {
 		cc = cc.SetMadeID(*id)
@@ -89,9 +89,9 @@ func (cc *CALLSCreate) SetNillableMadeID(id *int) *CALLSCreate {
 	return cc
 }
 
-// SetMade sets the "made" edge to the MATCHINGS entity.
-func (cc *CALLSCreate) SetMade(m *MATCHINGS) *CALLSCreate {
-	return cc.SetMadeID(m.ID)
+// SetMade sets the "made" edge to the SESSIONS entity.
+func (cc *CALLSCreate) SetMade(s *SESSIONS) *CALLSCreate {
+	return cc.SetMadeID(s.ID)
 }
 
 // Mutation returns the CALLSMutation object of the builder.
@@ -214,13 +214,13 @@ func (cc *CALLSCreate) createSpec() (*CALLS, *sqlgraph.CreateSpec) {
 			Columns: []string{calls.MadeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.matchings_makes = &nodes[0]
+		_node.sessions_makes = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

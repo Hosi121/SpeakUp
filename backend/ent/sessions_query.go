@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
@@ -25,8 +25,8 @@ type SESSIONSQuery struct {
 	order      []sessions.OrderOption
 	inters     []Interceptor
 	predicates []predicate.SESSIONS
-	withHas    *MATCHINGSQuery
-	withUses   *AITHEMESQuery
+	withHad    *EVENTRECORDSQuery
+	withMakes  *CALLSQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -64,9 +64,9 @@ func (sq *SESSIONSQuery) Order(o ...sessions.OrderOption) *SESSIONSQuery {
 	return sq
 }
 
-// QueryHas chains the current query on the "has" edge.
-func (sq *SESSIONSQuery) QueryHas() *MATCHINGSQuery {
-	query := (&MATCHINGSClient{config: sq.config}).Query()
+// QueryHad chains the current query on the "had" edge.
+func (sq *SESSIONSQuery) QueryHad() *EVENTRECORDSQuery {
+	query := (&EVENTRECORDSClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -77,8 +77,8 @@ func (sq *SESSIONSQuery) QueryHas() *MATCHINGSQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(sessions.Table, sessions.FieldID, selector),
-			sqlgraph.To(matchings.Table, matchings.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, sessions.HasTable, sessions.HasColumn),
+			sqlgraph.To(event_records.Table, event_records.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sessions.HadTable, sessions.HadColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -86,9 +86,9 @@ func (sq *SESSIONSQuery) QueryHas() *MATCHINGSQuery {
 	return query
 }
 
-// QueryUses chains the current query on the "uses" edge.
-func (sq *SESSIONSQuery) QueryUses() *AITHEMESQuery {
-	query := (&AITHEMESClient{config: sq.config}).Query()
+// QueryMakes chains the current query on the "makes" edge.
+func (sq *SESSIONSQuery) QueryMakes() *CALLSQuery {
+	query := (&CALLSClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -99,8 +99,8 @@ func (sq *SESSIONSQuery) QueryUses() *AITHEMESQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(sessions.Table, sessions.FieldID, selector),
-			sqlgraph.To(aithemes.Table, aithemes.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, sessions.UsesTable, sessions.UsesColumn),
+			sqlgraph.To(calls.Table, calls.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, sessions.MakesTable, sessions.MakesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,33 +300,33 @@ func (sq *SESSIONSQuery) Clone() *SESSIONSQuery {
 		order:      append([]sessions.OrderOption{}, sq.order...),
 		inters:     append([]Interceptor{}, sq.inters...),
 		predicates: append([]predicate.SESSIONS{}, sq.predicates...),
-		withHas:    sq.withHas.Clone(),
-		withUses:   sq.withUses.Clone(),
+		withHad:    sq.withHad.Clone(),
+		withMakes:  sq.withMakes.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
 	}
 }
 
-// WithHas tells the query-builder to eager-load the nodes that are connected to
-// the "has" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *SESSIONSQuery) WithHas(opts ...func(*MATCHINGSQuery)) *SESSIONSQuery {
-	query := (&MATCHINGSClient{config: sq.config}).Query()
+// WithHad tells the query-builder to eager-load the nodes that are connected to
+// the "had" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SESSIONSQuery) WithHad(opts ...func(*EVENTRECORDSQuery)) *SESSIONSQuery {
+	query := (&EVENTRECORDSClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withHas = query
+	sq.withHad = query
 	return sq
 }
 
-// WithUses tells the query-builder to eager-load the nodes that are connected to
-// the "uses" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *SESSIONSQuery) WithUses(opts ...func(*AITHEMESQuery)) *SESSIONSQuery {
-	query := (&AITHEMESClient{config: sq.config}).Query()
+// WithMakes tells the query-builder to eager-load the nodes that are connected to
+// the "makes" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SESSIONSQuery) WithMakes(opts ...func(*CALLSQuery)) *SESSIONSQuery {
+	query := (&CALLSClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withUses = query
+	sq.withMakes = query
 	return sq
 }
 
@@ -336,12 +336,12 @@ func (sq *SESSIONSQuery) WithUses(opts ...func(*AITHEMESQuery)) *SESSIONSQuery {
 // Example:
 //
 //	var v []struct {
-//		SessionStart time.Time `json:"session_start,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.SESSIONS.Query().
-//		GroupBy(sessions.FieldSessionStart).
+//		GroupBy(sessions.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (sq *SESSIONSQuery) GroupBy(field string, fields ...string) *SESSIONSGroupBy {
@@ -359,11 +359,11 @@ func (sq *SESSIONSQuery) GroupBy(field string, fields ...string) *SESSIONSGroupB
 // Example:
 //
 //	var v []struct {
-//		SessionStart time.Time `json:"session_start,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //	}
 //
 //	client.SESSIONS.Query().
-//		Select(sessions.FieldSessionStart).
+//		Select(sessions.FieldUserID).
 //		Scan(ctx, &v)
 func (sq *SESSIONSQuery) Select(fields ...string) *SESSIONSSelect {
 	sq.ctx.Fields = append(sq.ctx.Fields, fields...)
@@ -410,11 +410,11 @@ func (sq *SESSIONSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*SES
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [2]bool{
-			sq.withHas != nil,
-			sq.withUses != nil,
+			sq.withHad != nil,
+			sq.withMakes != nil,
 		}
 	)
-	if sq.withUses != nil {
+	if sq.withHad != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -438,61 +438,29 @@ func (sq *SESSIONSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*SES
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := sq.withHas; query != nil {
-		if err := sq.loadHas(ctx, query, nodes,
-			func(n *SESSIONS) { n.Edges.Has = []*MATCHINGS{} },
-			func(n *SESSIONS, e *MATCHINGS) { n.Edges.Has = append(n.Edges.Has, e) }); err != nil {
+	if query := sq.withHad; query != nil {
+		if err := sq.loadHad(ctx, query, nodes, nil,
+			func(n *SESSIONS, e *EVENT_RECORDS) { n.Edges.Had = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := sq.withUses; query != nil {
-		if err := sq.loadUses(ctx, query, nodes, nil,
-			func(n *SESSIONS, e *AITHEMES) { n.Edges.Uses = e }); err != nil {
+	if query := sq.withMakes; query != nil {
+		if err := sq.loadMakes(ctx, query, nodes, nil,
+			func(n *SESSIONS, e *CALLS) { n.Edges.Makes = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (sq *SESSIONSQuery) loadHas(ctx context.Context, query *MATCHINGSQuery, nodes []*SESSIONS, init func(*SESSIONS), assign func(*SESSIONS, *MATCHINGS)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*SESSIONS)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.MATCHINGS(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(sessions.HasColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.sessions_has
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "sessions_has" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "sessions_has" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (sq *SESSIONSQuery) loadUses(ctx context.Context, query *AITHEMESQuery, nodes []*SESSIONS, init func(*SESSIONS), assign func(*SESSIONS, *AITHEMES)) error {
+func (sq *SESSIONSQuery) loadHad(ctx context.Context, query *EVENTRECORDSQuery, nodes []*SESSIONS, init func(*SESSIONS), assign func(*SESSIONS, *EVENT_RECORDS)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*SESSIONS)
 	for i := range nodes {
-		if nodes[i].sessions_uses == nil {
+		if nodes[i].event_records_has == nil {
 			continue
 		}
-		fk := *nodes[i].sessions_uses
+		fk := *nodes[i].event_records_has
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -501,7 +469,7 @@ func (sq *SESSIONSQuery) loadUses(ctx context.Context, query *AITHEMESQuery, nod
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(aithemes.IDIn(ids...))
+	query.Where(event_records.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -509,11 +477,39 @@ func (sq *SESSIONSQuery) loadUses(ctx context.Context, query *AITHEMESQuery, nod
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "sessions_uses" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "event_records_has" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (sq *SESSIONSQuery) loadMakes(ctx context.Context, query *CALLSQuery, nodes []*SESSIONS, init func(*SESSIONS), assign func(*SESSIONS, *CALLS)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*SESSIONS)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.CALLS(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(sessions.MakesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.sessions_makes
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "sessions_makes" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "sessions_makes" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

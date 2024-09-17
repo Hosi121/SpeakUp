@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
+	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
@@ -30,101 +30,133 @@ func (su *SESSIONSUpdate) Where(ps ...predicate.SESSIONS) *SESSIONSUpdate {
 	return su
 }
 
-// SetSessionStart sets the "session_start" field.
-func (su *SESSIONSUpdate) SetSessionStart(t time.Time) *SESSIONSUpdate {
-	su.mutation.SetSessionStart(t)
+// SetUserID sets the "user_id" field.
+func (su *SESSIONSUpdate) SetUserID(i int) *SESSIONSUpdate {
+	su.mutation.ResetUserID()
+	su.mutation.SetUserID(i)
 	return su
 }
 
-// SetNillableSessionStart sets the "session_start" field if the given value is not nil.
-func (su *SESSIONSUpdate) SetNillableSessionStart(t *time.Time) *SESSIONSUpdate {
-	if t != nil {
-		su.SetSessionStart(*t)
-	}
-	return su
-}
-
-// SetSessionEnd sets the "session_end" field.
-func (su *SESSIONSUpdate) SetSessionEnd(t time.Time) *SESSIONSUpdate {
-	su.mutation.SetSessionEnd(t)
-	return su
-}
-
-// SetNillableSessionEnd sets the "session_end" field if the given value is not nil.
-func (su *SESSIONSUpdate) SetNillableSessionEnd(t *time.Time) *SESSIONSUpdate {
-	if t != nil {
-		su.SetSessionEnd(*t)
-	}
-	return su
-}
-
-// SetThemeID sets the "theme_id" field.
-func (su *SESSIONSUpdate) SetThemeID(i int) *SESSIONSUpdate {
-	su.mutation.ResetThemeID()
-	su.mutation.SetThemeID(i)
-	return su
-}
-
-// SetNillableThemeID sets the "theme_id" field if the given value is not nil.
-func (su *SESSIONSUpdate) SetNillableThemeID(i *int) *SESSIONSUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableUserID(i *int) *SESSIONSUpdate {
 	if i != nil {
-		su.SetThemeID(*i)
+		su.SetUserID(*i)
 	}
 	return su
 }
 
-// AddThemeID adds i to the "theme_id" field.
-func (su *SESSIONSUpdate) AddThemeID(i int) *SESSIONSUpdate {
-	su.mutation.AddThemeID(i)
+// AddUserID adds i to the "user_id" field.
+func (su *SESSIONSUpdate) AddUserID(i int) *SESSIONSUpdate {
+	su.mutation.AddUserID(i)
 	return su
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (su *SESSIONSUpdate) SetCreatedAt(t time.Time) *SESSIONSUpdate {
-	su.mutation.SetCreatedAt(t)
+// SetMatchedUserID sets the "matched_user_id" field.
+func (su *SESSIONSUpdate) SetMatchedUserID(i int) *SESSIONSUpdate {
+	su.mutation.ResetMatchedUserID()
+	su.mutation.SetMatchedUserID(i)
 	return su
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (su *SESSIONSUpdate) SetNillableCreatedAt(t *time.Time) *SESSIONSUpdate {
+// SetNillableMatchedUserID sets the "matched_user_id" field if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableMatchedUserID(i *int) *SESSIONSUpdate {
+	if i != nil {
+		su.SetMatchedUserID(*i)
+	}
+	return su
+}
+
+// AddMatchedUserID adds i to the "matched_user_id" field.
+func (su *SESSIONSUpdate) AddMatchedUserID(i int) *SESSIONSUpdate {
+	su.mutation.AddMatchedUserID(i)
+	return su
+}
+
+// SetRecordID sets the "record_id" field.
+func (su *SESSIONSUpdate) SetRecordID(i int) *SESSIONSUpdate {
+	su.mutation.ResetRecordID()
+	su.mutation.SetRecordID(i)
+	return su
+}
+
+// SetNillableRecordID sets the "record_id" field if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableRecordID(i *int) *SESSIONSUpdate {
+	if i != nil {
+		su.SetRecordID(*i)
+	}
+	return su
+}
+
+// AddRecordID adds i to the "record_id" field.
+func (su *SESSIONSUpdate) AddRecordID(i int) *SESSIONSUpdate {
+	su.mutation.AddRecordID(i)
+	return su
+}
+
+// SetMatchedAt sets the "matched_at" field.
+func (su *SESSIONSUpdate) SetMatchedAt(t time.Time) *SESSIONSUpdate {
+	su.mutation.SetMatchedAt(t)
+	return su
+}
+
+// SetNillableMatchedAt sets the "matched_at" field if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableMatchedAt(t *time.Time) *SESSIONSUpdate {
 	if t != nil {
-		su.SetCreatedAt(*t)
+		su.SetMatchedAt(*t)
 	}
 	return su
 }
 
-// AddHaIDs adds the "has" edge to the MATCHINGS entity by IDs.
-func (su *SESSIONSUpdate) AddHaIDs(ids ...int) *SESSIONSUpdate {
-	su.mutation.AddHaIDs(ids...)
+// SetStatus sets the "status" field.
+func (su *SESSIONSUpdate) SetStatus(s sessions.Status) *SESSIONSUpdate {
+	su.mutation.SetStatus(s)
 	return su
 }
 
-// AddHas adds the "has" edges to the MATCHINGS entity.
-func (su *SESSIONSUpdate) AddHas(m ...*MATCHINGS) *SESSIONSUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableStatus(s *sessions.Status) *SESSIONSUpdate {
+	if s != nil {
+		su.SetStatus(*s)
 	}
-	return su.AddHaIDs(ids...)
-}
-
-// SetUsesID sets the "uses" edge to the AITHEMES entity by ID.
-func (su *SESSIONSUpdate) SetUsesID(id int) *SESSIONSUpdate {
-	su.mutation.SetUsesID(id)
 	return su
 }
 
-// SetNillableUsesID sets the "uses" edge to the AITHEMES entity by ID if the given value is not nil.
-func (su *SESSIONSUpdate) SetNillableUsesID(id *int) *SESSIONSUpdate {
+// SetHadID sets the "had" edge to the EVENT_RECORDS entity by ID.
+func (su *SESSIONSUpdate) SetHadID(id int) *SESSIONSUpdate {
+	su.mutation.SetHadID(id)
+	return su
+}
+
+// SetNillableHadID sets the "had" edge to the EVENT_RECORDS entity by ID if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableHadID(id *int) *SESSIONSUpdate {
 	if id != nil {
-		su = su.SetUsesID(*id)
+		su = su.SetHadID(*id)
 	}
 	return su
 }
 
-// SetUses sets the "uses" edge to the AITHEMES entity.
-func (su *SESSIONSUpdate) SetUses(a *AITHEMES) *SESSIONSUpdate {
-	return su.SetUsesID(a.ID)
+// SetHad sets the "had" edge to the EVENT_RECORDS entity.
+func (su *SESSIONSUpdate) SetHad(e *EVENT_RECORDS) *SESSIONSUpdate {
+	return su.SetHadID(e.ID)
+}
+
+// SetMakesID sets the "makes" edge to the CALLS entity by ID.
+func (su *SESSIONSUpdate) SetMakesID(id int) *SESSIONSUpdate {
+	su.mutation.SetMakesID(id)
+	return su
+}
+
+// SetNillableMakesID sets the "makes" edge to the CALLS entity by ID if the given value is not nil.
+func (su *SESSIONSUpdate) SetNillableMakesID(id *int) *SESSIONSUpdate {
+	if id != nil {
+		su = su.SetMakesID(*id)
+	}
+	return su
+}
+
+// SetMakes sets the "makes" edge to the CALLS entity.
+func (su *SESSIONSUpdate) SetMakes(c *CALLS) *SESSIONSUpdate {
+	return su.SetMakesID(c.ID)
 }
 
 // Mutation returns the SESSIONSMutation object of the builder.
@@ -132,30 +164,15 @@ func (su *SESSIONSUpdate) Mutation() *SESSIONSMutation {
 	return su.mutation
 }
 
-// ClearHas clears all "has" edges to the MATCHINGS entity.
-func (su *SESSIONSUpdate) ClearHas() *SESSIONSUpdate {
-	su.mutation.ClearHas()
+// ClearHad clears the "had" edge to the EVENT_RECORDS entity.
+func (su *SESSIONSUpdate) ClearHad() *SESSIONSUpdate {
+	su.mutation.ClearHad()
 	return su
 }
 
-// RemoveHaIDs removes the "has" edge to MATCHINGS entities by IDs.
-func (su *SESSIONSUpdate) RemoveHaIDs(ids ...int) *SESSIONSUpdate {
-	su.mutation.RemoveHaIDs(ids...)
-	return su
-}
-
-// RemoveHas removes "has" edges to MATCHINGS entities.
-func (su *SESSIONSUpdate) RemoveHas(m ...*MATCHINGS) *SESSIONSUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return su.RemoveHaIDs(ids...)
-}
-
-// ClearUses clears the "uses" edge to the AITHEMES entity.
-func (su *SESSIONSUpdate) ClearUses() *SESSIONSUpdate {
-	su.mutation.ClearUses()
+// ClearMakes clears the "makes" edge to the CALLS entity.
+func (su *SESSIONSUpdate) ClearMakes() *SESSIONSUpdate {
+	su.mutation.ClearMakes()
 	return su
 }
 
@@ -186,7 +203,20 @@ func (su *SESSIONSUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (su *SESSIONSUpdate) check() error {
+	if v, ok := su.mutation.Status(); ok {
+		if err := sessions.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "SESSIONS.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (su *SESSIONSUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := su.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(sessions.Table, sessions.Columns, sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -195,59 +225,52 @@ func (su *SESSIONSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := su.mutation.SessionStart(); ok {
-		_spec.SetField(sessions.FieldSessionStart, field.TypeTime, value)
+	if value, ok := su.mutation.UserID(); ok {
+		_spec.SetField(sessions.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := su.mutation.SessionEnd(); ok {
-		_spec.SetField(sessions.FieldSessionEnd, field.TypeTime, value)
+	if value, ok := su.mutation.AddedUserID(); ok {
+		_spec.AddField(sessions.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := su.mutation.ThemeID(); ok {
-		_spec.SetField(sessions.FieldThemeID, field.TypeInt, value)
+	if value, ok := su.mutation.MatchedUserID(); ok {
+		_spec.SetField(sessions.FieldMatchedUserID, field.TypeInt, value)
 	}
-	if value, ok := su.mutation.AddedThemeID(); ok {
-		_spec.AddField(sessions.FieldThemeID, field.TypeInt, value)
+	if value, ok := su.mutation.AddedMatchedUserID(); ok {
+		_spec.AddField(sessions.FieldMatchedUserID, field.TypeInt, value)
 	}
-	if value, ok := su.mutation.CreatedAt(); ok {
-		_spec.SetField(sessions.FieldCreatedAt, field.TypeTime, value)
+	if value, ok := su.mutation.RecordID(); ok {
+		_spec.SetField(sessions.FieldRecordID, field.TypeInt, value)
 	}
-	if su.mutation.HasCleared() {
+	if value, ok := su.mutation.AddedRecordID(); ok {
+		_spec.AddField(sessions.FieldRecordID, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.MatchedAt(); ok {
+		_spec.SetField(sessions.FieldMatchedAt, field.TypeTime, value)
+	}
+	if value, ok := su.mutation.Status(); ok {
+		_spec.SetField(sessions.FieldStatus, field.TypeEnum, value)
+	}
+	if su.mutation.HadCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   sessions.HasTable,
-			Columns: []string{sessions.HasColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sessions.HadTable,
+			Columns: []string{sessions.HadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedHasIDs(); len(nodes) > 0 && !su.mutation.HasCleared() {
+	if nodes := su.mutation.HadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   sessions.HasTable,
-			Columns: []string{sessions.HasColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sessions.HadTable,
+			Columns: []string{sessions.HadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.HasIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   sessions.HasTable,
-			Columns: []string{sessions.HasColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -255,28 +278,28 @@ func (su *SESSIONSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if su.mutation.UsesCleared() {
+	if su.mutation.MakesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   sessions.UsesTable,
-			Columns: []string{sessions.UsesColumn},
+			Table:   sessions.MakesTable,
+			Columns: []string{sessions.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(calls.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.UsesIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.MakesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   sessions.UsesTable,
-			Columns: []string{sessions.UsesColumn},
+			Table:   sessions.MakesTable,
+			Columns: []string{sessions.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(calls.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -304,101 +327,133 @@ type SESSIONSUpdateOne struct {
 	mutation *SESSIONSMutation
 }
 
-// SetSessionStart sets the "session_start" field.
-func (suo *SESSIONSUpdateOne) SetSessionStart(t time.Time) *SESSIONSUpdateOne {
-	suo.mutation.SetSessionStart(t)
+// SetUserID sets the "user_id" field.
+func (suo *SESSIONSUpdateOne) SetUserID(i int) *SESSIONSUpdateOne {
+	suo.mutation.ResetUserID()
+	suo.mutation.SetUserID(i)
 	return suo
 }
 
-// SetNillableSessionStart sets the "session_start" field if the given value is not nil.
-func (suo *SESSIONSUpdateOne) SetNillableSessionStart(t *time.Time) *SESSIONSUpdateOne {
-	if t != nil {
-		suo.SetSessionStart(*t)
-	}
-	return suo
-}
-
-// SetSessionEnd sets the "session_end" field.
-func (suo *SESSIONSUpdateOne) SetSessionEnd(t time.Time) *SESSIONSUpdateOne {
-	suo.mutation.SetSessionEnd(t)
-	return suo
-}
-
-// SetNillableSessionEnd sets the "session_end" field if the given value is not nil.
-func (suo *SESSIONSUpdateOne) SetNillableSessionEnd(t *time.Time) *SESSIONSUpdateOne {
-	if t != nil {
-		suo.SetSessionEnd(*t)
-	}
-	return suo
-}
-
-// SetThemeID sets the "theme_id" field.
-func (suo *SESSIONSUpdateOne) SetThemeID(i int) *SESSIONSUpdateOne {
-	suo.mutation.ResetThemeID()
-	suo.mutation.SetThemeID(i)
-	return suo
-}
-
-// SetNillableThemeID sets the "theme_id" field if the given value is not nil.
-func (suo *SESSIONSUpdateOne) SetNillableThemeID(i *int) *SESSIONSUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableUserID(i *int) *SESSIONSUpdateOne {
 	if i != nil {
-		suo.SetThemeID(*i)
+		suo.SetUserID(*i)
 	}
 	return suo
 }
 
-// AddThemeID adds i to the "theme_id" field.
-func (suo *SESSIONSUpdateOne) AddThemeID(i int) *SESSIONSUpdateOne {
-	suo.mutation.AddThemeID(i)
+// AddUserID adds i to the "user_id" field.
+func (suo *SESSIONSUpdateOne) AddUserID(i int) *SESSIONSUpdateOne {
+	suo.mutation.AddUserID(i)
 	return suo
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (suo *SESSIONSUpdateOne) SetCreatedAt(t time.Time) *SESSIONSUpdateOne {
-	suo.mutation.SetCreatedAt(t)
+// SetMatchedUserID sets the "matched_user_id" field.
+func (suo *SESSIONSUpdateOne) SetMatchedUserID(i int) *SESSIONSUpdateOne {
+	suo.mutation.ResetMatchedUserID()
+	suo.mutation.SetMatchedUserID(i)
 	return suo
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (suo *SESSIONSUpdateOne) SetNillableCreatedAt(t *time.Time) *SESSIONSUpdateOne {
+// SetNillableMatchedUserID sets the "matched_user_id" field if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableMatchedUserID(i *int) *SESSIONSUpdateOne {
+	if i != nil {
+		suo.SetMatchedUserID(*i)
+	}
+	return suo
+}
+
+// AddMatchedUserID adds i to the "matched_user_id" field.
+func (suo *SESSIONSUpdateOne) AddMatchedUserID(i int) *SESSIONSUpdateOne {
+	suo.mutation.AddMatchedUserID(i)
+	return suo
+}
+
+// SetRecordID sets the "record_id" field.
+func (suo *SESSIONSUpdateOne) SetRecordID(i int) *SESSIONSUpdateOne {
+	suo.mutation.ResetRecordID()
+	suo.mutation.SetRecordID(i)
+	return suo
+}
+
+// SetNillableRecordID sets the "record_id" field if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableRecordID(i *int) *SESSIONSUpdateOne {
+	if i != nil {
+		suo.SetRecordID(*i)
+	}
+	return suo
+}
+
+// AddRecordID adds i to the "record_id" field.
+func (suo *SESSIONSUpdateOne) AddRecordID(i int) *SESSIONSUpdateOne {
+	suo.mutation.AddRecordID(i)
+	return suo
+}
+
+// SetMatchedAt sets the "matched_at" field.
+func (suo *SESSIONSUpdateOne) SetMatchedAt(t time.Time) *SESSIONSUpdateOne {
+	suo.mutation.SetMatchedAt(t)
+	return suo
+}
+
+// SetNillableMatchedAt sets the "matched_at" field if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableMatchedAt(t *time.Time) *SESSIONSUpdateOne {
 	if t != nil {
-		suo.SetCreatedAt(*t)
+		suo.SetMatchedAt(*t)
 	}
 	return suo
 }
 
-// AddHaIDs adds the "has" edge to the MATCHINGS entity by IDs.
-func (suo *SESSIONSUpdateOne) AddHaIDs(ids ...int) *SESSIONSUpdateOne {
-	suo.mutation.AddHaIDs(ids...)
+// SetStatus sets the "status" field.
+func (suo *SESSIONSUpdateOne) SetStatus(s sessions.Status) *SESSIONSUpdateOne {
+	suo.mutation.SetStatus(s)
 	return suo
 }
 
-// AddHas adds the "has" edges to the MATCHINGS entity.
-func (suo *SESSIONSUpdateOne) AddHas(m ...*MATCHINGS) *SESSIONSUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableStatus(s *sessions.Status) *SESSIONSUpdateOne {
+	if s != nil {
+		suo.SetStatus(*s)
 	}
-	return suo.AddHaIDs(ids...)
-}
-
-// SetUsesID sets the "uses" edge to the AITHEMES entity by ID.
-func (suo *SESSIONSUpdateOne) SetUsesID(id int) *SESSIONSUpdateOne {
-	suo.mutation.SetUsesID(id)
 	return suo
 }
 
-// SetNillableUsesID sets the "uses" edge to the AITHEMES entity by ID if the given value is not nil.
-func (suo *SESSIONSUpdateOne) SetNillableUsesID(id *int) *SESSIONSUpdateOne {
+// SetHadID sets the "had" edge to the EVENT_RECORDS entity by ID.
+func (suo *SESSIONSUpdateOne) SetHadID(id int) *SESSIONSUpdateOne {
+	suo.mutation.SetHadID(id)
+	return suo
+}
+
+// SetNillableHadID sets the "had" edge to the EVENT_RECORDS entity by ID if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableHadID(id *int) *SESSIONSUpdateOne {
 	if id != nil {
-		suo = suo.SetUsesID(*id)
+		suo = suo.SetHadID(*id)
 	}
 	return suo
 }
 
-// SetUses sets the "uses" edge to the AITHEMES entity.
-func (suo *SESSIONSUpdateOne) SetUses(a *AITHEMES) *SESSIONSUpdateOne {
-	return suo.SetUsesID(a.ID)
+// SetHad sets the "had" edge to the EVENT_RECORDS entity.
+func (suo *SESSIONSUpdateOne) SetHad(e *EVENT_RECORDS) *SESSIONSUpdateOne {
+	return suo.SetHadID(e.ID)
+}
+
+// SetMakesID sets the "makes" edge to the CALLS entity by ID.
+func (suo *SESSIONSUpdateOne) SetMakesID(id int) *SESSIONSUpdateOne {
+	suo.mutation.SetMakesID(id)
+	return suo
+}
+
+// SetNillableMakesID sets the "makes" edge to the CALLS entity by ID if the given value is not nil.
+func (suo *SESSIONSUpdateOne) SetNillableMakesID(id *int) *SESSIONSUpdateOne {
+	if id != nil {
+		suo = suo.SetMakesID(*id)
+	}
+	return suo
+}
+
+// SetMakes sets the "makes" edge to the CALLS entity.
+func (suo *SESSIONSUpdateOne) SetMakes(c *CALLS) *SESSIONSUpdateOne {
+	return suo.SetMakesID(c.ID)
 }
 
 // Mutation returns the SESSIONSMutation object of the builder.
@@ -406,30 +461,15 @@ func (suo *SESSIONSUpdateOne) Mutation() *SESSIONSMutation {
 	return suo.mutation
 }
 
-// ClearHas clears all "has" edges to the MATCHINGS entity.
-func (suo *SESSIONSUpdateOne) ClearHas() *SESSIONSUpdateOne {
-	suo.mutation.ClearHas()
+// ClearHad clears the "had" edge to the EVENT_RECORDS entity.
+func (suo *SESSIONSUpdateOne) ClearHad() *SESSIONSUpdateOne {
+	suo.mutation.ClearHad()
 	return suo
 }
 
-// RemoveHaIDs removes the "has" edge to MATCHINGS entities by IDs.
-func (suo *SESSIONSUpdateOne) RemoveHaIDs(ids ...int) *SESSIONSUpdateOne {
-	suo.mutation.RemoveHaIDs(ids...)
-	return suo
-}
-
-// RemoveHas removes "has" edges to MATCHINGS entities.
-func (suo *SESSIONSUpdateOne) RemoveHas(m ...*MATCHINGS) *SESSIONSUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return suo.RemoveHaIDs(ids...)
-}
-
-// ClearUses clears the "uses" edge to the AITHEMES entity.
-func (suo *SESSIONSUpdateOne) ClearUses() *SESSIONSUpdateOne {
-	suo.mutation.ClearUses()
+// ClearMakes clears the "makes" edge to the CALLS entity.
+func (suo *SESSIONSUpdateOne) ClearMakes() *SESSIONSUpdateOne {
+	suo.mutation.ClearMakes()
 	return suo
 }
 
@@ -473,7 +513,20 @@ func (suo *SESSIONSUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (suo *SESSIONSUpdateOne) check() error {
+	if v, ok := suo.mutation.Status(); ok {
+		if err := sessions.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "SESSIONS.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (suo *SESSIONSUpdateOne) sqlSave(ctx context.Context) (_node *SESSIONS, err error) {
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(sessions.Table, sessions.Columns, sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt))
 	id, ok := suo.mutation.ID()
 	if !ok {
@@ -499,59 +552,52 @@ func (suo *SESSIONSUpdateOne) sqlSave(ctx context.Context) (_node *SESSIONS, err
 			}
 		}
 	}
-	if value, ok := suo.mutation.SessionStart(); ok {
-		_spec.SetField(sessions.FieldSessionStart, field.TypeTime, value)
+	if value, ok := suo.mutation.UserID(); ok {
+		_spec.SetField(sessions.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := suo.mutation.SessionEnd(); ok {
-		_spec.SetField(sessions.FieldSessionEnd, field.TypeTime, value)
+	if value, ok := suo.mutation.AddedUserID(); ok {
+		_spec.AddField(sessions.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := suo.mutation.ThemeID(); ok {
-		_spec.SetField(sessions.FieldThemeID, field.TypeInt, value)
+	if value, ok := suo.mutation.MatchedUserID(); ok {
+		_spec.SetField(sessions.FieldMatchedUserID, field.TypeInt, value)
 	}
-	if value, ok := suo.mutation.AddedThemeID(); ok {
-		_spec.AddField(sessions.FieldThemeID, field.TypeInt, value)
+	if value, ok := suo.mutation.AddedMatchedUserID(); ok {
+		_spec.AddField(sessions.FieldMatchedUserID, field.TypeInt, value)
 	}
-	if value, ok := suo.mutation.CreatedAt(); ok {
-		_spec.SetField(sessions.FieldCreatedAt, field.TypeTime, value)
+	if value, ok := suo.mutation.RecordID(); ok {
+		_spec.SetField(sessions.FieldRecordID, field.TypeInt, value)
 	}
-	if suo.mutation.HasCleared() {
+	if value, ok := suo.mutation.AddedRecordID(); ok {
+		_spec.AddField(sessions.FieldRecordID, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.MatchedAt(); ok {
+		_spec.SetField(sessions.FieldMatchedAt, field.TypeTime, value)
+	}
+	if value, ok := suo.mutation.Status(); ok {
+		_spec.SetField(sessions.FieldStatus, field.TypeEnum, value)
+	}
+	if suo.mutation.HadCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   sessions.HasTable,
-			Columns: []string{sessions.HasColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sessions.HadTable,
+			Columns: []string{sessions.HadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedHasIDs(); len(nodes) > 0 && !suo.mutation.HasCleared() {
+	if nodes := suo.mutation.HadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   sessions.HasTable,
-			Columns: []string{sessions.HasColumn},
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sessions.HadTable,
+			Columns: []string{sessions.HadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.HasIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   sessions.HasTable,
-			Columns: []string{sessions.HasColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -559,28 +605,28 @@ func (suo *SESSIONSUpdateOne) sqlSave(ctx context.Context) (_node *SESSIONS, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if suo.mutation.UsesCleared() {
+	if suo.mutation.MakesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   sessions.UsesTable,
-			Columns: []string{sessions.UsesColumn},
+			Table:   sessions.MakesTable,
+			Columns: []string{sessions.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(calls.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.UsesIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.MakesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   sessions.UsesTable,
-			Columns: []string{sessions.UsesColumn},
+			Table:   sessions.MakesTable,
+			Columns: []string{sessions.MakesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(calls.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

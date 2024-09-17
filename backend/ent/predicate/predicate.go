@@ -9,26 +9,29 @@ import (
 // ACHIEVEMENTS is the predicate function for achievements builders.
 type ACHIEVEMENTS func(*sql.Selector)
 
-// AITHEMES is the predicate function for aithemes builders.
-type AITHEMES func(*sql.Selector)
+// AI_THEMES is the predicate function for ai_themes builders.
+type AI_THEMES func(*sql.Selector)
 
 // CALLS is the predicate function for calls builders.
 type CALLS func(*sql.Selector)
 
+// EVENTS is the predicate function for events builders.
+type EVENTS func(*sql.Selector)
+
+// EVENT_RECORDS is the predicate function for event_records builders.
+type EVENT_RECORDS func(*sql.Selector)
+
 // FRIENDS is the predicate function for friends builders.
 type FRIENDS func(*sql.Selector)
-
-// MATCHINGS is the predicate function for matchings builders.
-type MATCHINGS func(*sql.Selector)
 
 // MEMOS is the predicate function for memos builders.
 type MEMOS func(*sql.Selector)
 
+// PROGRESS is the predicate function for progress builders.
+type PROGRESS func(*sql.Selector)
+
 // SESSIONS is the predicate function for sessions builders.
 type SESSIONS func(*sql.Selector)
-
-// TROPHIES is the predicate function for trophies builders.
-type TROPHIES func(*sql.Selector)
 
 // USERS is the predicate function for users builders.
 type USERS func(*sql.Selector)

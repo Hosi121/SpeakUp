@@ -9,7 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
+	"github.com/Hosi121/SpeakUp/ent/calls"
+	"github.com/Hosi121/SpeakUp/ent/event_records"
 	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
@@ -18,50 +19,54 @@ type SESSIONS struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// SessionStart holds the value of the "session_start" field.
-	SessionStart time.Time `json:"session_start,omitempty"`
-	// SessionEnd holds the value of the "session_end" field.
-	SessionEnd time.Time `json:"session_end,omitempty"`
-	// ThemeID holds the value of the "theme_id" field.
-	ThemeID int `json:"theme_id,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
+	// MatchedUserID holds the value of the "matched_user_id" field.
+	MatchedUserID int `json:"matched_user_id,omitempty"`
+	// RecordID holds the value of the "record_id" field.
+	RecordID int `json:"record_id,omitempty"`
+	// MatchedAt holds the value of the "matched_at" field.
+	MatchedAt time.Time `json:"matched_at,omitempty"`
+	// Status holds the value of the "status" field.
+	Status sessions.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SESSIONSQuery when eager-loading is set.
-	Edges         SESSIONSEdges `json:"edges"`
-	sessions_uses *int
-	selectValues  sql.SelectValues
+	Edges             SESSIONSEdges `json:"edges"`
+	event_records_has *int
+	selectValues      sql.SelectValues
 }
 
 // SESSIONSEdges holds the relations/edges for other nodes in the graph.
 type SESSIONSEdges struct {
-	// Has holds the value of the has edge.
-	Has []*MATCHINGS `json:"has,omitempty"`
-	// Uses holds the value of the uses edge.
-	Uses *AITHEMES `json:"uses,omitempty"`
+	// Had holds the value of the had edge.
+	Had *EVENT_RECORDS `json:"had,omitempty"`
+	// Makes holds the value of the makes edge.
+	Makes *CALLS `json:"makes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// HasOrErr returns the Has value or an error if the edge
-// was not loaded in eager-loading.
-func (e SESSIONSEdges) HasOrErr() ([]*MATCHINGS, error) {
-	if e.loadedTypes[0] {
-		return e.Has, nil
+// HadOrErr returns the Had value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SESSIONSEdges) HadOrErr() (*EVENT_RECORDS, error) {
+	if e.Had != nil {
+		return e.Had, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: event_records.Label}
 	}
-	return nil, &NotLoadedError{edge: "has"}
+	return nil, &NotLoadedError{edge: "had"}
 }
 
-// UsesOrErr returns the Uses value or an error if the edge
+// MakesOrErr returns the Makes value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e SESSIONSEdges) UsesOrErr() (*AITHEMES, error) {
-	if e.Uses != nil {
-		return e.Uses, nil
+func (e SESSIONSEdges) MakesOrErr() (*CALLS, error) {
+	if e.Makes != nil {
+		return e.Makes, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: aithemes.Label}
+		return nil, &NotFoundError{label: calls.Label}
 	}
-	return nil, &NotLoadedError{edge: "uses"}
+	return nil, &NotLoadedError{edge: "makes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -69,11 +74,13 @@ func (*SESSIONS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case sessions.FieldID, sessions.FieldThemeID:
+		case sessions.FieldID, sessions.FieldUserID, sessions.FieldMatchedUserID, sessions.FieldRecordID:
 			values[i] = new(sql.NullInt64)
-		case sessions.FieldSessionStart, sessions.FieldSessionEnd, sessions.FieldCreatedAt:
+		case sessions.FieldStatus:
+			values[i] = new(sql.NullString)
+		case sessions.FieldMatchedAt:
 			values[i] = new(sql.NullTime)
-		case sessions.ForeignKeys[0]: // sessions_uses
+		case sessions.ForeignKeys[0]: // event_records_has
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -96,36 +103,42 @@ func (s *SESSIONS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			s.ID = int(value.Int64)
-		case sessions.FieldSessionStart:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field session_start", values[i])
-			} else if value.Valid {
-				s.SessionStart = value.Time
-			}
-		case sessions.FieldSessionEnd:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field session_end", values[i])
-			} else if value.Valid {
-				s.SessionEnd = value.Time
-			}
-		case sessions.FieldThemeID:
+		case sessions.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field theme_id", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				s.ThemeID = int(value.Int64)
+				s.UserID = int(value.Int64)
 			}
-		case sessions.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+		case sessions.FieldMatchedUserID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field matched_user_id", values[i])
 			} else if value.Valid {
-				s.CreatedAt = value.Time
+				s.MatchedUserID = int(value.Int64)
+			}
+		case sessions.FieldRecordID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field record_id", values[i])
+			} else if value.Valid {
+				s.RecordID = int(value.Int64)
+			}
+		case sessions.FieldMatchedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field matched_at", values[i])
+			} else if value.Valid {
+				s.MatchedAt = value.Time
+			}
+		case sessions.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				s.Status = sessions.Status(value.String)
 			}
 		case sessions.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field sessions_uses", value)
+				return fmt.Errorf("unexpected type %T for edge-field event_records_has", value)
 			} else if value.Valid {
-				s.sessions_uses = new(int)
-				*s.sessions_uses = int(value.Int64)
+				s.event_records_has = new(int)
+				*s.event_records_has = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -140,14 +153,14 @@ func (s *SESSIONS) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
-// QueryHas queries the "has" edge of the SESSIONS entity.
-func (s *SESSIONS) QueryHas() *MATCHINGSQuery {
-	return NewSESSIONSClient(s.config).QueryHas(s)
+// QueryHad queries the "had" edge of the SESSIONS entity.
+func (s *SESSIONS) QueryHad() *EVENTRECORDSQuery {
+	return NewSESSIONSClient(s.config).QueryHad(s)
 }
 
-// QueryUses queries the "uses" edge of the SESSIONS entity.
-func (s *SESSIONS) QueryUses() *AITHEMESQuery {
-	return NewSESSIONSClient(s.config).QueryUses(s)
+// QueryMakes queries the "makes" edge of the SESSIONS entity.
+func (s *SESSIONS) QueryMakes() *CALLSQuery {
+	return NewSESSIONSClient(s.config).QueryMakes(s)
 }
 
 // Update returns a builder for updating this SESSIONS.
@@ -173,17 +186,20 @@ func (s *SESSIONS) String() string {
 	var builder strings.Builder
 	builder.WriteString("SESSIONS(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
-	builder.WriteString("session_start=")
-	builder.WriteString(s.SessionStart.Format(time.ANSIC))
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.UserID))
 	builder.WriteString(", ")
-	builder.WriteString("session_end=")
-	builder.WriteString(s.SessionEnd.Format(time.ANSIC))
+	builder.WriteString("matched_user_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.MatchedUserID))
 	builder.WriteString(", ")
-	builder.WriteString("theme_id=")
-	builder.WriteString(fmt.Sprintf("%v", s.ThemeID))
+	builder.WriteString("record_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.RecordID))
 	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("matched_at=")
+	builder.WriteString(s.MatchedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", s.Status))
 	builder.WriteByte(')')
 	return builder.String()
 }

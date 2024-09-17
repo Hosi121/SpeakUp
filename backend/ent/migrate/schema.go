@@ -12,9 +12,8 @@ var (
 	AchievementSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "user_id", Type: field.TypeInt},
-		{Name: "trophy_id", Type: field.TypeInt},
+		{Name: "title", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "achievements_refers", Type: field.TypeInt, Nullable: true},
 		{Name: "users_acquires", Type: field.TypeInt, Nullable: true},
 	}
 	// AchievementSsTable holds the schema information for the "achievement_ss" table.
@@ -24,30 +23,24 @@ var (
 		PrimaryKey: []*schema.Column{AchievementSsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "achievement_ss_trophie_ss_refers",
-				Columns:    []*schema.Column{AchievementSsColumns[4]},
-				RefColumns: []*schema.Column{TrophieSsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
 				Symbol:     "achievement_ss_user_ss_acquires",
-				Columns:    []*schema.Column{AchievementSsColumns[5]},
+				Columns:    []*schema.Column{AchievementSsColumns[4]},
 				RefColumns: []*schema.Column{UserSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 	}
-	// AithemeSsColumns holds the columns for the "aitheme_ss" table.
-	AithemeSsColumns = []*schema.Column{
+	// AiThemeSsColumns holds the columns for the "ai_theme_ss" table.
+	AiThemeSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "theme_text", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 	}
-	// AithemeSsTable holds the schema information for the "aitheme_ss" table.
-	AithemeSsTable = &schema.Table{
-		Name:       "aitheme_ss",
-		Columns:    AithemeSsColumns,
-		PrimaryKey: []*schema.Column{AithemeSsColumns[0]},
+	// AiThemeSsTable holds the schema information for the "ai_theme_ss" table.
+	AiThemeSsTable = &schema.Table{
+		Name:       "ai_theme_ss",
+		Columns:    AiThemeSsColumns,
+		PrimaryKey: []*schema.Column{AiThemeSsColumns[0]},
 	}
 	// CallSsColumns holds the columns for the "call_ss" table.
 	CallSsColumns = []*schema.Column{
@@ -57,7 +50,7 @@ var (
 		{Name: "call_end", Type: field.TypeTime},
 		{Name: "rating", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "matchings_makes", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "sessions_makes", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// CallSsTable holds the schema information for the "call_ss" table.
 	CallSsTable = &schema.Table{
@@ -66,9 +59,61 @@ var (
 		PrimaryKey: []*schema.Column{CallSsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "call_ss_matching_ss_makes",
+				Symbol:     "call_ss_session_ss_makes",
 				Columns:    []*schema.Column{CallSsColumns[6]},
-				RefColumns: []*schema.Column{MatchingSsColumns[0]},
+				RefColumns: []*schema.Column{SessionSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EventSsColumns holds the columns for the "event_ss" table.
+	EventSsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "event_start", Type: field.TypeTime},
+		{Name: "event_end", Type: field.TypeTime},
+		{Name: "theme_id", Type: field.TypeInt},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "events_uses", Type: field.TypeInt, Nullable: true},
+	}
+	// EventSsTable holds the schema information for the "event_ss" table.
+	EventSsTable = &schema.Table{
+		Name:       "event_ss",
+		Columns:    EventSsColumns,
+		PrimaryKey: []*schema.Column{EventSsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "event_ss_ai_theme_ss_uses",
+				Columns:    []*schema.Column{EventSsColumns[5]},
+				RefColumns: []*schema.Column{AiThemeSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EventRecordSsColumns holds the columns for the "event_record_ss" table.
+	EventRecordSsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "event_id", Type: field.TypeInt},
+		{Name: "records", Type: field.TypeString, Default: ""},
+		{Name: "events_participated", Type: field.TypeInt, Nullable: true},
+		{Name: "users_makes", Type: field.TypeInt, Nullable: true},
+	}
+	// EventRecordSsTable holds the schema information for the "event_record_ss" table.
+	EventRecordSsTable = &schema.Table{
+		Name:       "event_record_ss",
+		Columns:    EventRecordSsColumns,
+		PrimaryKey: []*schema.Column{EventRecordSsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "event_record_ss_event_ss_participated",
+				Columns:    []*schema.Column{EventRecordSsColumns[4]},
+				RefColumns: []*schema.Column{EventSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "event_record_ss_user_ss_makes",
+				Columns:    []*schema.Column{EventRecordSsColumns[5]},
+				RefColumns: []*schema.Column{UserSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -86,30 +131,6 @@ var (
 		Name:       "friend_ss",
 		Columns:    FriendSsColumns,
 		PrimaryKey: []*schema.Column{FriendSsColumns[0]},
-	}
-	// MatchingSsColumns holds the columns for the "matching_ss" table.
-	MatchingSsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "user_id", Type: field.TypeInt},
-		{Name: "matched_user_id", Type: field.TypeInt},
-		{Name: "session_id", Type: field.TypeInt},
-		{Name: "matched_at", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"MATCHED", "PROCCESSING", "FINISHED"}},
-		{Name: "sessions_has", Type: field.TypeInt, Nullable: true},
-	}
-	// MatchingSsTable holds the schema information for the "matching_ss" table.
-	MatchingSsTable = &schema.Table{
-		Name:       "matching_ss",
-		Columns:    MatchingSsColumns,
-		PrimaryKey: []*schema.Column{MatchingSsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "matching_ss_session_ss_has",
-				Columns:    []*schema.Column{MatchingSsColumns[6]},
-				RefColumns: []*schema.Column{SessionSsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// MemoSsColumns holds the columns for the "memo_ss" table.
 	MemoSsColumns = []*schema.Column{
@@ -133,14 +154,38 @@ var (
 			},
 		},
 	}
+	// ProgresSsColumns holds the columns for the "progres_ss" table.
+	ProgresSsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "login_days", Type: field.TypeInt, Default: 0},
+		{Name: "consecutive_participants", Type: field.TypeInt, Default: 0},
+		{Name: "consecutive_login_days", Type: field.TypeInt, Default: 0},
+		{Name: "users_records", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// ProgresSsTable holds the schema information for the "progres_ss" table.
+	ProgresSsTable = &schema.Table{
+		Name:       "progres_ss",
+		Columns:    ProgresSsColumns,
+		PrimaryKey: []*schema.Column{ProgresSsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "progres_ss_user_ss_records",
+				Columns:    []*schema.Column{ProgresSsColumns[5]},
+				RefColumns: []*schema.Column{UserSsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// SessionSsColumns holds the columns for the "session_ss" table.
 	SessionSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "session_start", Type: field.TypeTime},
-		{Name: "session_end", Type: field.TypeTime},
-		{Name: "theme_id", Type: field.TypeInt},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "sessions_uses", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "matched_user_id", Type: field.TypeInt},
+		{Name: "record_id", Type: field.TypeInt},
+		{Name: "matched_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"MATCHED", "PROCCESSING", "FINISHED"}},
+		{Name: "event_records_has", Type: field.TypeInt, Nullable: true},
 	}
 	// SessionSsTable holds the schema information for the "session_ss" table.
 	SessionSsTable = &schema.Table{
@@ -149,37 +194,22 @@ var (
 		PrimaryKey: []*schema.Column{SessionSsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "session_ss_aitheme_ss_uses",
-				Columns:    []*schema.Column{SessionSsColumns[5]},
-				RefColumns: []*schema.Column{AithemeSsColumns[0]},
+				Symbol:     "session_ss_event_record_ss_has",
+				Columns:    []*schema.Column{SessionSsColumns[6]},
+				RefColumns: []*schema.Column{EventRecordSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
-	}
-	// TrophieSsColumns holds the columns for the "trophie_ss" table.
-	TrophieSsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "title", Type: field.TypeString},
-		{Name: "description", Type: field.TypeString},
-		{Name: "requirement", Type: field.TypeString},
-	}
-	// TrophieSsTable holds the schema information for the "trophie_ss" table.
-	TrophieSsTable = &schema.Table{
-		Name:       "trophie_ss",
-		Columns:    TrophieSsColumns,
-		PrimaryKey: []*schema.Column{TrophieSsColumns[0]},
 	}
 	// UserSsColumns holds the columns for the "user_ss" table.
 	UserSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "username", Type: field.TypeString, Size: 255},
-		{Name: "email", Type: field.TypeString, Size: 255},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPERUSER", "ADMIN", "USER"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "is_deleted", Type: field.TypeBool, Default: false},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "access_token", Type: field.TypeString, Size: 2147483647, Default: ""},
 	}
 	// UserSsTable holds the schema information for the "user_ss" table.
 	UserSsTable = &schema.Table{
@@ -212,56 +242,31 @@ var (
 			},
 		},
 	}
-	// UsersParticipatesColumns holds the columns for the "users_participates" table.
-	UsersParticipatesColumns = []*schema.Column{
-		{Name: "users_id", Type: field.TypeInt},
-		{Name: "matchings_id", Type: field.TypeInt},
-	}
-	// UsersParticipatesTable holds the schema information for the "users_participates" table.
-	UsersParticipatesTable = &schema.Table{
-		Name:       "users_participates",
-		Columns:    UsersParticipatesColumns,
-		PrimaryKey: []*schema.Column{UsersParticipatesColumns[0], UsersParticipatesColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "users_participates_users_id",
-				Columns:    []*schema.Column{UsersParticipatesColumns[0]},
-				RefColumns: []*schema.Column{UserSsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "users_participates_matchings_id",
-				Columns:    []*schema.Column{UsersParticipatesColumns[1]},
-				RefColumns: []*schema.Column{MatchingSsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AchievementSsTable,
-		AithemeSsTable,
+		AiThemeSsTable,
 		CallSsTable,
+		EventSsTable,
+		EventRecordSsTable,
 		FriendSsTable,
-		MatchingSsTable,
 		MemoSsTable,
+		ProgresSsTable,
 		SessionSsTable,
-		TrophieSsTable,
 		UserSsTable,
 		UsersConnectsTable,
-		UsersParticipatesTable,
 	}
 )
 
 func init() {
-	AchievementSsTable.ForeignKeys[0].RefTable = TrophieSsTable
-	AchievementSsTable.ForeignKeys[1].RefTable = UserSsTable
-	CallSsTable.ForeignKeys[0].RefTable = MatchingSsTable
-	MatchingSsTable.ForeignKeys[0].RefTable = SessionSsTable
+	AchievementSsTable.ForeignKeys[0].RefTable = UserSsTable
+	CallSsTable.ForeignKeys[0].RefTable = SessionSsTable
+	EventSsTable.ForeignKeys[0].RefTable = AiThemeSsTable
+	EventRecordSsTable.ForeignKeys[0].RefTable = EventSsTable
+	EventRecordSsTable.ForeignKeys[1].RefTable = UserSsTable
 	MemoSsTable.ForeignKeys[0].RefTable = UserSsTable
-	SessionSsTable.ForeignKeys[0].RefTable = AithemeSsTable
+	ProgresSsTable.ForeignKeys[0].RefTable = UserSsTable
+	SessionSsTable.ForeignKeys[0].RefTable = EventRecordSsTable
 	UsersConnectsTable.ForeignKeys[0].RefTable = UserSsTable
 	UsersConnectsTable.ForeignKeys[1].RefTable = FriendSsTable
-	UsersParticipatesTable.ForeignKeys[0].RefTable = UserSsTable
-	UsersParticipatesTable.ForeignKeys[1].RefTable = MatchingSsTable
 }

@@ -9,11 +9,11 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
+	"github.com/Hosi121/SpeakUp/ent/ai_themes"
 )
 
-// AITHEMES is the model entity for the AITHEMES schema.
-type AITHEMES struct {
+// AI_THEMES is the model entity for the AI_THEMES schema.
+type AI_THEMES struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -22,15 +22,15 @@ type AITHEMES struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the AITHEMESQuery when eager-loading is set.
-	Edges        AITHEMESEdges `json:"edges"`
+	// The values are being populated by the AI_THEMESQuery when eager-loading is set.
+	Edges        AI_THEMESEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// AITHEMESEdges holds the relations/edges for other nodes in the graph.
-type AITHEMESEdges struct {
+// AI_THEMESEdges holds the relations/edges for other nodes in the graph.
+type AI_THEMESEdges struct {
 	// Used holds the value of the used edge.
-	Used []*SESSIONS `json:"used,omitempty"`
+	Used []*EVENTS `json:"used,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -38,7 +38,7 @@ type AITHEMESEdges struct {
 
 // UsedOrErr returns the Used value or an error if the edge
 // was not loaded in eager-loading.
-func (e AITHEMESEdges) UsedOrErr() ([]*SESSIONS, error) {
+func (e AI_THEMESEdges) UsedOrErr() ([]*EVENTS, error) {
 	if e.loadedTypes[0] {
 		return e.Used, nil
 	}
@@ -46,15 +46,15 @@ func (e AITHEMESEdges) UsedOrErr() ([]*SESSIONS, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*AITHEMES) scanValues(columns []string) ([]any, error) {
+func (*AI_THEMES) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case aithemes.FieldID:
+		case ai_themes.FieldID:
 			values[i] = new(sql.NullInt64)
-		case aithemes.FieldThemeText:
+		case ai_themes.FieldThemeText:
 			values[i] = new(sql.NullString)
-		case aithemes.FieldCreatedAt:
+		case ai_themes.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -64,80 +64,80 @@ func (*AITHEMES) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the AITHEMES fields.
-func (a *AITHEMES) assignValues(columns []string, values []any) error {
+// to the AI_THEMES fields.
+func (at *AI_THEMES) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case aithemes.FieldID:
+		case ai_themes.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			a.ID = int(value.Int64)
-		case aithemes.FieldThemeText:
+			at.ID = int(value.Int64)
+		case ai_themes.FieldThemeText:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field theme_text", values[i])
 			} else if value.Valid {
-				a.ThemeText = value.String
+				at.ThemeText = value.String
 			}
-		case aithemes.FieldCreatedAt:
+		case ai_themes.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				at.CreatedAt = value.Time
 			}
 		default:
-			a.selectValues.Set(columns[i], values[i])
+			at.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the AITHEMES.
+// Value returns the ent.Value that was dynamically selected and assigned to the AI_THEMES.
 // This includes values selected through modifiers, order, etc.
-func (a *AITHEMES) Value(name string) (ent.Value, error) {
-	return a.selectValues.Get(name)
+func (at *AI_THEMES) Value(name string) (ent.Value, error) {
+	return at.selectValues.Get(name)
 }
 
-// QueryUsed queries the "used" edge of the AITHEMES entity.
-func (a *AITHEMES) QueryUsed() *SESSIONSQuery {
-	return NewAITHEMESClient(a.config).QueryUsed(a)
+// QueryUsed queries the "used" edge of the AI_THEMES entity.
+func (at *AI_THEMES) QueryUsed() *EVENTSQuery {
+	return NewAITHEMESClient(at.config).QueryUsed(at)
 }
 
-// Update returns a builder for updating this AITHEMES.
-// Note that you need to call AITHEMES.Unwrap() before calling this method if this AITHEMES
+// Update returns a builder for updating this AI_THEMES.
+// Note that you need to call AI_THEMES.Unwrap() before calling this method if this AI_THEMES
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (a *AITHEMES) Update() *AITHEMESUpdateOne {
-	return NewAITHEMESClient(a.config).UpdateOne(a)
+func (at *AI_THEMES) Update() *AITHEMESUpdateOne {
+	return NewAITHEMESClient(at.config).UpdateOne(at)
 }
 
-// Unwrap unwraps the AITHEMES entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the AI_THEMES entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (a *AITHEMES) Unwrap() *AITHEMES {
-	_tx, ok := a.config.driver.(*txDriver)
+func (at *AI_THEMES) Unwrap() *AI_THEMES {
+	_tx, ok := at.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: AITHEMES is not a transactional entity")
+		panic("ent: AI_THEMES is not a transactional entity")
 	}
-	a.config.driver = _tx.drv
-	return a
+	at.config.driver = _tx.drv
+	return at
 }
 
 // String implements the fmt.Stringer.
-func (a *AITHEMES) String() string {
+func (at *AI_THEMES) String() string {
 	var builder strings.Builder
-	builder.WriteString("AITHEMES(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString("AI_THEMES(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", at.ID))
 	builder.WriteString("theme_text=")
-	builder.WriteString(a.ThemeText)
+	builder.WriteString(at.ThemeText)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(at.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// AITHEMESs is a parsable slice of AITHEMES.
-type AITHEMESs []*AITHEMES
+// AI_THEMESs is a parsable slice of AI_THEMES.
+type AI_THEMESs []*AI_THEMES

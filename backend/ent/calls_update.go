@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/calls"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
+	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
 // CALLSUpdate is the builder for updating CALLS entities.
@@ -113,13 +113,13 @@ func (cu *CALLSUpdate) SetNillableCreatedAt(t *time.Time) *CALLSUpdate {
 	return cu
 }
 
-// SetMadeID sets the "made" edge to the MATCHINGS entity by ID.
+// SetMadeID sets the "made" edge to the SESSIONS entity by ID.
 func (cu *CALLSUpdate) SetMadeID(id int) *CALLSUpdate {
 	cu.mutation.SetMadeID(id)
 	return cu
 }
 
-// SetNillableMadeID sets the "made" edge to the MATCHINGS entity by ID if the given value is not nil.
+// SetNillableMadeID sets the "made" edge to the SESSIONS entity by ID if the given value is not nil.
 func (cu *CALLSUpdate) SetNillableMadeID(id *int) *CALLSUpdate {
 	if id != nil {
 		cu = cu.SetMadeID(*id)
@@ -127,9 +127,9 @@ func (cu *CALLSUpdate) SetNillableMadeID(id *int) *CALLSUpdate {
 	return cu
 }
 
-// SetMade sets the "made" edge to the MATCHINGS entity.
-func (cu *CALLSUpdate) SetMade(m *MATCHINGS) *CALLSUpdate {
-	return cu.SetMadeID(m.ID)
+// SetMade sets the "made" edge to the SESSIONS entity.
+func (cu *CALLSUpdate) SetMade(s *SESSIONS) *CALLSUpdate {
+	return cu.SetMadeID(s.ID)
 }
 
 // Mutation returns the CALLSMutation object of the builder.
@@ -137,7 +137,7 @@ func (cu *CALLSUpdate) Mutation() *CALLSMutation {
 	return cu.mutation
 }
 
-// ClearMade clears the "made" edge to the MATCHINGS entity.
+// ClearMade clears the "made" edge to the SESSIONS entity.
 func (cu *CALLSUpdate) ClearMade() *CALLSUpdate {
 	cu.mutation.ClearMade()
 	return cu
@@ -208,7 +208,7 @@ func (cu *CALLSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{calls.MadeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -221,7 +221,7 @@ func (cu *CALLSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{calls.MadeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -333,13 +333,13 @@ func (cuo *CALLSUpdateOne) SetNillableCreatedAt(t *time.Time) *CALLSUpdateOne {
 	return cuo
 }
 
-// SetMadeID sets the "made" edge to the MATCHINGS entity by ID.
+// SetMadeID sets the "made" edge to the SESSIONS entity by ID.
 func (cuo *CALLSUpdateOne) SetMadeID(id int) *CALLSUpdateOne {
 	cuo.mutation.SetMadeID(id)
 	return cuo
 }
 
-// SetNillableMadeID sets the "made" edge to the MATCHINGS entity by ID if the given value is not nil.
+// SetNillableMadeID sets the "made" edge to the SESSIONS entity by ID if the given value is not nil.
 func (cuo *CALLSUpdateOne) SetNillableMadeID(id *int) *CALLSUpdateOne {
 	if id != nil {
 		cuo = cuo.SetMadeID(*id)
@@ -347,9 +347,9 @@ func (cuo *CALLSUpdateOne) SetNillableMadeID(id *int) *CALLSUpdateOne {
 	return cuo
 }
 
-// SetMade sets the "made" edge to the MATCHINGS entity.
-func (cuo *CALLSUpdateOne) SetMade(m *MATCHINGS) *CALLSUpdateOne {
-	return cuo.SetMadeID(m.ID)
+// SetMade sets the "made" edge to the SESSIONS entity.
+func (cuo *CALLSUpdateOne) SetMade(s *SESSIONS) *CALLSUpdateOne {
+	return cuo.SetMadeID(s.ID)
 }
 
 // Mutation returns the CALLSMutation object of the builder.
@@ -357,7 +357,7 @@ func (cuo *CALLSUpdateOne) Mutation() *CALLSMutation {
 	return cuo.mutation
 }
 
-// ClearMade clears the "made" edge to the MATCHINGS entity.
+// ClearMade clears the "made" edge to the SESSIONS entity.
 func (cuo *CALLSUpdateOne) ClearMade() *CALLSUpdateOne {
 	cuo.mutation.ClearMade()
 	return cuo
@@ -458,7 +458,7 @@ func (cuo *CALLSUpdateOne) sqlSave(ctx context.Context) (_node *CALLS, err error
 			Columns: []string{calls.MadeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -471,7 +471,7 @@ func (cuo *CALLSUpdateOne) sqlSave(ctx context.Context) (_node *CALLS, err error
 			Columns: []string{calls.MadeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(matchings.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(sessions.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

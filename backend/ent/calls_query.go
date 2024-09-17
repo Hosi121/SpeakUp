@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Hosi121/SpeakUp/ent/calls"
-	"github.com/Hosi121/SpeakUp/ent/matchings"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
+	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
 // CALLSQuery is the builder for querying CALLS entities.
@@ -23,7 +23,7 @@ type CALLSQuery struct {
 	order      []calls.OrderOption
 	inters     []Interceptor
 	predicates []predicate.CALLS
-	withMade   *MATCHINGSQuery
+	withMade   *SESSIONSQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -62,8 +62,8 @@ func (cq *CALLSQuery) Order(o ...calls.OrderOption) *CALLSQuery {
 }
 
 // QueryMade chains the current query on the "made" edge.
-func (cq *CALLSQuery) QueryMade() *MATCHINGSQuery {
-	query := (&MATCHINGSClient{config: cq.config}).Query()
+func (cq *CALLSQuery) QueryMade() *SESSIONSQuery {
+	query := (&SESSIONSClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -74,7 +74,7 @@ func (cq *CALLSQuery) QueryMade() *MATCHINGSQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(calls.Table, calls.FieldID, selector),
-			sqlgraph.To(matchings.Table, matchings.FieldID),
+			sqlgraph.To(sessions.Table, sessions.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, calls.MadeTable, calls.MadeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
@@ -284,8 +284,8 @@ func (cq *CALLSQuery) Clone() *CALLSQuery {
 
 // WithMade tells the query-builder to eager-load the nodes that are connected to
 // the "made" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CALLSQuery) WithMade(opts ...func(*MATCHINGSQuery)) *CALLSQuery {
-	query := (&MATCHINGSClient{config: cq.config}).Query()
+func (cq *CALLSQuery) WithMade(opts ...func(*SESSIONSQuery)) *CALLSQuery {
+	query := (&SESSIONSClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -402,21 +402,21 @@ func (cq *CALLSQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CALLS,
 	}
 	if query := cq.withMade; query != nil {
 		if err := cq.loadMade(ctx, query, nodes, nil,
-			func(n *CALLS, e *MATCHINGS) { n.Edges.Made = e }); err != nil {
+			func(n *CALLS, e *SESSIONS) { n.Edges.Made = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cq *CALLSQuery) loadMade(ctx context.Context, query *MATCHINGSQuery, nodes []*CALLS, init func(*CALLS), assign func(*CALLS, *MATCHINGS)) error {
+func (cq *CALLSQuery) loadMade(ctx context.Context, query *SESSIONSQuery, nodes []*CALLS, init func(*CALLS), assign func(*CALLS, *SESSIONS)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CALLS)
 	for i := range nodes {
-		if nodes[i].matchings_makes == nil {
+		if nodes[i].sessions_makes == nil {
 			continue
 		}
-		fk := *nodes[i].matchings_makes
+		fk := *nodes[i].sessions_makes
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -425,7 +425,7 @@ func (cq *CALLSQuery) loadMade(ctx context.Context, query *MATCHINGSQuery, nodes
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(matchings.IDIn(ids...))
+	query.Where(sessions.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -433,7 +433,7 @@ func (cq *CALLSQuery) loadMade(ctx context.Context, query *MATCHINGSQuery, nodes
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "matchings_makes" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "sessions_makes" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

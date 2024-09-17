@@ -12,26 +12,26 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/Hosi121/SpeakUp/ent/aithemes"
+	"github.com/Hosi121/SpeakUp/ent/ai_themes"
+	"github.com/Hosi121/SpeakUp/ent/events"
 	"github.com/Hosi121/SpeakUp/ent/predicate"
-	"github.com/Hosi121/SpeakUp/ent/sessions"
 )
 
-// AITHEMESQuery is the builder for querying AITHEMES entities.
+// AITHEMESQuery is the builder for querying AI_THEMES entities.
 type AITHEMESQuery struct {
 	config
 	ctx        *QueryContext
-	order      []aithemes.OrderOption
+	order      []ai_themes.OrderOption
 	inters     []Interceptor
-	predicates []predicate.AITHEMES
-	withUsed   *SESSIONSQuery
+	predicates []predicate.AI_THEMES
+	withUsed   *EVENTSQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
 // Where adds a new predicate for the AITHEMESQuery builder.
-func (aq *AITHEMESQuery) Where(ps ...predicate.AITHEMES) *AITHEMESQuery {
+func (aq *AITHEMESQuery) Where(ps ...predicate.AI_THEMES) *AITHEMESQuery {
 	aq.predicates = append(aq.predicates, ps...)
 	return aq
 }
@@ -56,14 +56,14 @@ func (aq *AITHEMESQuery) Unique(unique bool) *AITHEMESQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (aq *AITHEMESQuery) Order(o ...aithemes.OrderOption) *AITHEMESQuery {
+func (aq *AITHEMESQuery) Order(o ...ai_themes.OrderOption) *AITHEMESQuery {
 	aq.order = append(aq.order, o...)
 	return aq
 }
 
 // QueryUsed chains the current query on the "used" edge.
-func (aq *AITHEMESQuery) QueryUsed() *SESSIONSQuery {
-	query := (&SESSIONSClient{config: aq.config}).Query()
+func (aq *AITHEMESQuery) QueryUsed() *EVENTSQuery {
+	query := (&EVENTSClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,9 +73,9 @@ func (aq *AITHEMESQuery) QueryUsed() *SESSIONSQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(aithemes.Table, aithemes.FieldID, selector),
-			sqlgraph.To(sessions.Table, sessions.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, aithemes.UsedTable, aithemes.UsedColumn),
+			sqlgraph.From(ai_themes.Table, ai_themes.FieldID, selector),
+			sqlgraph.To(events.Table, events.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, ai_themes.UsedTable, ai_themes.UsedColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -83,21 +83,21 @@ func (aq *AITHEMESQuery) QueryUsed() *SESSIONSQuery {
 	return query
 }
 
-// First returns the first AITHEMES entity from the query.
-// Returns a *NotFoundError when no AITHEMES was found.
-func (aq *AITHEMESQuery) First(ctx context.Context) (*AITHEMES, error) {
+// First returns the first AI_THEMES entity from the query.
+// Returns a *NotFoundError when no AI_THEMES was found.
+func (aq *AITHEMESQuery) First(ctx context.Context) (*AI_THEMES, error) {
 	nodes, err := aq.Limit(1).All(setContextOp(ctx, aq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{aithemes.Label}
+		return nil, &NotFoundError{ai_themes.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (aq *AITHEMESQuery) FirstX(ctx context.Context) *AITHEMES {
+func (aq *AITHEMESQuery) FirstX(ctx context.Context) *AI_THEMES {
 	node, err := aq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -105,15 +105,15 @@ func (aq *AITHEMESQuery) FirstX(ctx context.Context) *AITHEMES {
 	return node
 }
 
-// FirstID returns the first AITHEMES ID from the query.
-// Returns a *NotFoundError when no AITHEMES ID was found.
+// FirstID returns the first AI_THEMES ID from the query.
+// Returns a *NotFoundError when no AI_THEMES ID was found.
 func (aq *AITHEMESQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{aithemes.Label}
+		err = &NotFoundError{ai_themes.Label}
 		return
 	}
 	return ids[0], nil
@@ -128,10 +128,10 @@ func (aq *AITHEMESQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single AITHEMES entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one AITHEMES entity is found.
-// Returns a *NotFoundError when no AITHEMES entities are found.
-func (aq *AITHEMESQuery) Only(ctx context.Context) (*AITHEMES, error) {
+// Only returns a single AI_THEMES entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one AI_THEMES entity is found.
+// Returns a *NotFoundError when no AI_THEMES entities are found.
+func (aq *AITHEMESQuery) Only(ctx context.Context) (*AI_THEMES, error) {
 	nodes, err := aq.Limit(2).All(setContextOp(ctx, aq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -140,14 +140,14 @@ func (aq *AITHEMESQuery) Only(ctx context.Context) (*AITHEMES, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{aithemes.Label}
+		return nil, &NotFoundError{ai_themes.Label}
 	default:
-		return nil, &NotSingularError{aithemes.Label}
+		return nil, &NotSingularError{ai_themes.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (aq *AITHEMESQuery) OnlyX(ctx context.Context) *AITHEMES {
+func (aq *AITHEMESQuery) OnlyX(ctx context.Context) *AI_THEMES {
 	node, err := aq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -155,8 +155,8 @@ func (aq *AITHEMESQuery) OnlyX(ctx context.Context) *AITHEMES {
 	return node
 }
 
-// OnlyID is like Only, but returns the only AITHEMES ID in the query.
-// Returns a *NotSingularError when more than one AITHEMES ID is found.
+// OnlyID is like Only, but returns the only AI_THEMES ID in the query.
+// Returns a *NotSingularError when more than one AI_THEMES ID is found.
 // Returns a *NotFoundError when no entities are found.
 func (aq *AITHEMESQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
@@ -167,9 +167,9 @@ func (aq *AITHEMESQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{aithemes.Label}
+		err = &NotFoundError{ai_themes.Label}
 	default:
-		err = &NotSingularError{aithemes.Label}
+		err = &NotSingularError{ai_themes.Label}
 	}
 	return
 }
@@ -183,18 +183,18 @@ func (aq *AITHEMESQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of AITHEMESs.
-func (aq *AITHEMESQuery) All(ctx context.Context) ([]*AITHEMES, error) {
+// All executes the query and returns a list of AI_THEMESs.
+func (aq *AITHEMESQuery) All(ctx context.Context) ([]*AI_THEMES, error) {
 	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryAll)
 	if err := aq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*AITHEMES, *AITHEMESQuery]()
-	return withInterceptors[[]*AITHEMES](ctx, aq, qr, aq.inters)
+	qr := querierAll[[]*AI_THEMES, *AITHEMESQuery]()
+	return withInterceptors[[]*AI_THEMES](ctx, aq, qr, aq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (aq *AITHEMESQuery) AllX(ctx context.Context) []*AITHEMES {
+func (aq *AITHEMESQuery) AllX(ctx context.Context) []*AI_THEMES {
 	nodes, err := aq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -202,13 +202,13 @@ func (aq *AITHEMESQuery) AllX(ctx context.Context) []*AITHEMES {
 	return nodes
 }
 
-// IDs executes the query and returns a list of AITHEMES IDs.
+// IDs executes the query and returns a list of AI_THEMES IDs.
 func (aq *AITHEMESQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if aq.ctx.Unique == nil && aq.path != nil {
 		aq.Unique(true)
 	}
 	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryIDs)
-	if err = aq.Select(aithemes.FieldID).Scan(ctx, &ids); err != nil {
+	if err = aq.Select(ai_themes.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -272,9 +272,9 @@ func (aq *AITHEMESQuery) Clone() *AITHEMESQuery {
 	return &AITHEMESQuery{
 		config:     aq.config,
 		ctx:        aq.ctx.Clone(),
-		order:      append([]aithemes.OrderOption{}, aq.order...),
+		order:      append([]ai_themes.OrderOption{}, aq.order...),
 		inters:     append([]Interceptor{}, aq.inters...),
-		predicates: append([]predicate.AITHEMES{}, aq.predicates...),
+		predicates: append([]predicate.AI_THEMES{}, aq.predicates...),
 		withUsed:   aq.withUsed.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
@@ -284,8 +284,8 @@ func (aq *AITHEMESQuery) Clone() *AITHEMESQuery {
 
 // WithUsed tells the query-builder to eager-load the nodes that are connected to
 // the "used" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AITHEMESQuery) WithUsed(opts ...func(*SESSIONSQuery)) *AITHEMESQuery {
-	query := (&SESSIONSClient{config: aq.config}).Query()
+func (aq *AITHEMESQuery) WithUsed(opts ...func(*EVENTSQuery)) *AITHEMESQuery {
+	query := (&EVENTSClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -304,14 +304,14 @@ func (aq *AITHEMESQuery) WithUsed(opts ...func(*SESSIONSQuery)) *AITHEMESQuery {
 //	}
 //
 //	client.AITHEMES.Query().
-//		GroupBy(aithemes.FieldThemeText).
+//		GroupBy(ai_themes.FieldThemeText).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (aq *AITHEMESQuery) GroupBy(field string, fields ...string) *AITHEMESGroupBy {
 	aq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &AITHEMESGroupBy{build: aq}
 	grbuild.flds = &aq.ctx.Fields
-	grbuild.label = aithemes.Label
+	grbuild.label = ai_themes.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -326,12 +326,12 @@ func (aq *AITHEMESQuery) GroupBy(field string, fields ...string) *AITHEMESGroupB
 //	}
 //
 //	client.AITHEMES.Query().
-//		Select(aithemes.FieldThemeText).
+//		Select(ai_themes.FieldThemeText).
 //		Scan(ctx, &v)
 func (aq *AITHEMESQuery) Select(fields ...string) *AITHEMESSelect {
 	aq.ctx.Fields = append(aq.ctx.Fields, fields...)
 	sbuild := &AITHEMESSelect{AITHEMESQuery: aq}
-	sbuild.label = aithemes.Label
+	sbuild.label = ai_themes.Label
 	sbuild.flds, sbuild.scan = &aq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
@@ -353,7 +353,7 @@ func (aq *AITHEMESQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range aq.ctx.Fields {
-		if !aithemes.ValidColumn(f) {
+		if !ai_themes.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -367,19 +367,19 @@ func (aq *AITHEMESQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (aq *AITHEMESQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AITHEMES, error) {
+func (aq *AITHEMESQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AI_THEMES, error) {
 	var (
-		nodes       = []*AITHEMES{}
+		nodes       = []*AI_THEMES{}
 		_spec       = aq.querySpec()
 		loadedTypes = [1]bool{
 			aq.withUsed != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*AITHEMES).scanValues(nil, columns)
+		return (*AI_THEMES).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &AITHEMES{config: aq.config}
+		node := &AI_THEMES{config: aq.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -395,17 +395,17 @@ func (aq *AITHEMESQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AIT
 	}
 	if query := aq.withUsed; query != nil {
 		if err := aq.loadUsed(ctx, query, nodes,
-			func(n *AITHEMES) { n.Edges.Used = []*SESSIONS{} },
-			func(n *AITHEMES, e *SESSIONS) { n.Edges.Used = append(n.Edges.Used, e) }); err != nil {
+			func(n *AI_THEMES) { n.Edges.Used = []*EVENTS{} },
+			func(n *AI_THEMES, e *EVENTS) { n.Edges.Used = append(n.Edges.Used, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (aq *AITHEMESQuery) loadUsed(ctx context.Context, query *SESSIONSQuery, nodes []*AITHEMES, init func(*AITHEMES), assign func(*AITHEMES, *SESSIONS)) error {
+func (aq *AITHEMESQuery) loadUsed(ctx context.Context, query *EVENTSQuery, nodes []*AI_THEMES, init func(*AI_THEMES), assign func(*AI_THEMES, *EVENTS)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*AITHEMES)
+	nodeids := make(map[int]*AI_THEMES)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -414,21 +414,21 @@ func (aq *AITHEMESQuery) loadUsed(ctx context.Context, query *SESSIONSQuery, nod
 		}
 	}
 	query.withFKs = true
-	query.Where(predicate.SESSIONS(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(aithemes.UsedColumn), fks...))
+	query.Where(predicate.EVENTS(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(ai_themes.UsedColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.sessions_uses
+		fk := n.events_uses
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "sessions_uses" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "events_uses" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "sessions_uses" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "events_uses" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -445,7 +445,7 @@ func (aq *AITHEMESQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (aq *AITHEMESQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(aithemes.Table, aithemes.Columns, sqlgraph.NewFieldSpec(aithemes.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(ai_themes.Table, ai_themes.Columns, sqlgraph.NewFieldSpec(ai_themes.FieldID, field.TypeInt))
 	_spec.From = aq.sql
 	if unique := aq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -454,9 +454,9 @@ func (aq *AITHEMESQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := aq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, aithemes.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, ai_themes.FieldID)
 		for i := range fields {
-			if fields[i] != aithemes.FieldID {
+			if fields[i] != ai_themes.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -486,10 +486,10 @@ func (aq *AITHEMESQuery) querySpec() *sqlgraph.QuerySpec {
 
 func (aq *AITHEMESQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(aq.driver.Dialect())
-	t1 := builder.Table(aithemes.Table)
+	t1 := builder.Table(ai_themes.Table)
 	columns := aq.ctx.Fields
 	if len(columns) == 0 {
-		columns = aithemes.Columns
+		columns = ai_themes.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if aq.sql != nil {
@@ -516,7 +516,7 @@ func (aq *AITHEMESQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// AITHEMESGroupBy is the group-by builder for AITHEMES entities.
+// AITHEMESGroupBy is the group-by builder for AI_THEMES entities.
 type AITHEMESGroupBy struct {
 	selector
 	build *AITHEMESQuery
