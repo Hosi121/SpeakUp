@@ -1,4 +1,4 @@
-package jwt_auth
+package utils
 
 import (
 	"crypto/x509"
