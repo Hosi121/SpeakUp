@@ -30,5 +30,6 @@ func (FRIENDS) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("connects", USERS.Type).
 			Ref("connects"),
+		edge.To("has", CHATS.Type),
 	}
 }
