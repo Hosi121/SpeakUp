@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/Hosi121/SpeakUp/ent"
-	"github.com/Hosi121/SpeakUp/ent/users"
+	"github.com/Hosi121/SpeakUp/ent/memos"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,9 +40,9 @@ func GetMemo(client *ent.Client) gin.HandlerFunc {
 		ctx := context.Background()
 
 		// Query the memo from the database
-		m, err := client.Memo.
+		m, err := client.Memos.
 			Query().
-			Where(memo.UserIDEQ(userID)).
+			Where(memos.UserIDEQ(userID)).
 			Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -87,20 +87,21 @@ func UpdateMemo(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
-		ctx := c.Request.Context()
+		ctx := context.Background()
 
 		// Check if memo exists
 		m, err := client.Memos.
 			Query().
-			Where(memos.HasUserWith(users.IDEQ(userID))).
+			Where(memos.UserIDEQ(userID)).
 			Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				// Create a new memo
 				_, err = client.Memos.
 					Create().
-					SsetUserID(userID).
-					SetContent(req.Content).
+					SetUserID(userID).
+					SetMemo1(req.Memo1).
+					SetMemo2(req.Memo2).
 					Save(ctx)
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create memo", "details": err.Error()})
@@ -113,7 +114,8 @@ func UpdateMemo(client *ent.Client) gin.HandlerFunc {
 		} else {
 			// Update existing memo
 			_, err = m.Update().
-				SetContent(req.Content).
+				SetMemo1(req.Memo1).
+				SetMemo2(req.Memo2).
 				Save(ctx)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update memo", "details": err.Error()})
