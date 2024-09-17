@@ -12,4 +12,8 @@ func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
 
 	// Add this line
 	router.PUT("/user/update", controllers.UpdateUserInfo(client))
+
+	// メモのルート
+	router.GET("/memo", controllers.GetMemo(client))
+	router.PUT("/memo", controllers.UpdateMemo(client))
 }
