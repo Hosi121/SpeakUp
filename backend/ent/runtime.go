@@ -120,16 +120,20 @@ func init() {
 			return nil
 		}
 	}()
+	// usersDescEmail is the schema descriptor for email field.
+	usersDescEmail := usersFields[1].Descriptor()
+	// users.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	users.EmailValidator = usersDescEmail.Validators[0].(func(string) error)
 	// usersDescCreatedAt is the schema descriptor for created_at field.
-	usersDescCreatedAt := usersFields[3].Descriptor()
+	usersDescCreatedAt := usersFields[4].Descriptor()
 	// users.DefaultCreatedAt holds the default value on creation for the created_at field.
 	users.DefaultCreatedAt = usersDescCreatedAt.Default.(func() time.Time)
 	// usersDescIsDeleted is the schema descriptor for is_deleted field.
-	usersDescIsDeleted := usersFields[4].Descriptor()
+	usersDescIsDeleted := usersFields[5].Descriptor()
 	// users.DefaultIsDeleted holds the default value on creation for the is_deleted field.
 	users.DefaultIsDeleted = usersDescIsDeleted.Default.(bool)
 	// usersDescUpdatedAt is the schema descriptor for updated_at field.
-	usersDescUpdatedAt := usersFields[5].Descriptor()
+	usersDescUpdatedAt := usersFields[6].Descriptor()
 	// users.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	users.DefaultUpdatedAt = usersDescUpdatedAt.Default.(func() time.Time)
 }

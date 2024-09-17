@@ -19,6 +19,8 @@ func (USERS) Fields() []ent.Field {
 		field.String("username").
 			NotEmpty().
 			MaxLen(255),
+		field.String("email").
+			NotEmpty(),
 		field.Text("avatar_url").
 			Optional(),
 		field.Enum("role").

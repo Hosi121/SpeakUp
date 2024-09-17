@@ -5777,6 +5777,7 @@ type USERSMutation struct {
 	typ             string
 	id              *int
 	username        *string
+	email           *string
 	avatar_url      *string
 	role            *users.Role
 	created_at      *time.Time
@@ -5933,6 +5934,42 @@ func (m *USERSMutation) OldUsername(ctx context.Context) (v string, err error) {
 // ResetUsername resets all changes to the "username" field.
 func (m *USERSMutation) ResetUsername() {
 	m.username = nil
+}
+
+// SetEmail sets the "email" field.
+func (m *USERSMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *USERSMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the USERS entity.
+// If the USERS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *USERSMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *USERSMutation) ResetEmail() {
+	m.email = nil
 }
 
 // SetAvatarURL sets the "avatar_url" field.
@@ -6402,9 +6439,12 @@ func (m *USERSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *USERSMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.username != nil {
 		fields = append(fields, users.FieldUsername)
+	}
+	if m.email != nil {
+		fields = append(fields, users.FieldEmail)
 	}
 	if m.avatar_url != nil {
 		fields = append(fields, users.FieldAvatarURL)
@@ -6431,6 +6471,8 @@ func (m *USERSMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case users.FieldUsername:
 		return m.Username()
+	case users.FieldEmail:
+		return m.Email()
 	case users.FieldAvatarURL:
 		return m.AvatarURL()
 	case users.FieldRole:
@@ -6452,6 +6494,8 @@ func (m *USERSMutation) OldField(ctx context.Context, name string) (ent.Value, e
 	switch name {
 	case users.FieldUsername:
 		return m.OldUsername(ctx)
+	case users.FieldEmail:
+		return m.OldEmail(ctx)
 	case users.FieldAvatarURL:
 		return m.OldAvatarURL(ctx)
 	case users.FieldRole:
@@ -6477,6 +6521,13 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUsername(v)
+		return nil
+	case users.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
 		return nil
 	case users.FieldAvatarURL:
 		v, ok := value.(string)
@@ -6573,6 +6624,9 @@ func (m *USERSMutation) ResetField(name string) error {
 	switch name {
 	case users.FieldUsername:
 		m.ResetUsername()
+		return nil
+	case users.FieldEmail:
+		m.ResetEmail()
 		return nil
 	case users.FieldAvatarURL:
 		m.ResetAvatarURL()
