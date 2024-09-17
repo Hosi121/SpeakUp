@@ -7,6 +7,9 @@ import (
 )
 
 func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
-	// User info endpoint
+	// Existing routes
 	router.GET("/user/info", controllers.GetUserInfo(client))
+
+	// Add this line
+	router.PUT("/user/update", controllers.UpdateUserInfo(client))
 }

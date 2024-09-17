@@ -20,6 +20,11 @@ type UserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type UpdateUserRequest struct {
+	Username string `json:"username,omitempty"`
+	Email    string `json:"email,omitempty"`
+}
+
 // GetUserInfo handles the GET /user/info endpoint
 func GetUserInfo(client *ent.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -58,5 +63,47 @@ func GetUserInfo(client *ent.Client) gin.HandlerFunc {
 
 		// Return the user information as JSON
 		c.JSON(http.StatusOK, response)
+	}
+}
+
+// UpdateUserInfo handles the PUT /user/update endpoint
+func UpdateUserInfo(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Retrieve user_id from context
+		userIDInterface, exists := c.Get("user_id")
+		if !exists {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found in context"})
+			return
+		}
+
+		userID, ok := userIDInterface.(int)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID is invalid"})
+			return
+		}
+
+		var req UpdateUserRequest
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+
+		// Build the update query
+		updateQuery := client.USERS.UpdateOneID(userID)
+		if req.Username != "" {
+			updateQuery.SetUsername(req.Username)
+		}
+		if req.Email != "" {
+			updateQuery.SetEmail(req.Email)
+		}
+
+		// Execute the update
+		_, err := updateQuery.Save(context.Background())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user", "details": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
 	}
 }
