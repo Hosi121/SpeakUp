@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Hosi121/SpeakUp/config"
@@ -151,7 +152,7 @@ func SignIn(c *gin.Context) {
 	}
 
 	// JWTトークンを生成
-	jwt_token, err := utils.GenerateJWT(user.ID)
+	jwt_token, err := utils.GenerateJWT(strconv.Itoa(user.ID))
 	if err != nil {
 		slog.Error("Failed to generate JWT: %v", err)
 	}
