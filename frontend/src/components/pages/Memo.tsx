@@ -11,12 +11,12 @@ const MemoContainer = () => {
   const [memo2, setMemo2] = useState("");
 
   useEffect(() => {
-    // Fetch memos on page load
+    // ページ読み込み時にメモを取得
     api
       .get("/memo")
       .then((response) => {
-        setMemo1(response.data.memo1);
-        setMemo2(response.data.memo2);
+        setMemo1(response.data.memo1 || "");
+        setMemo2(response.data.memo2 || "");
       })
       .catch((error) => {
         console.error("Failed to fetch memos", error);
@@ -24,11 +24,12 @@ const MemoContainer = () => {
   }, []);
 
   const handleSave = () => {
-    // Save memos on button click
+    // 保存ボタンがクリックされたときにメモを更新
     api
       .put("/memo", { memo1, memo2 })
       .then((response) => {
         console.log("Memos saved successfully");
+        // 成功メッセージを表示するなどの処理
       })
       .catch((error) => {
         console.error("Failed to save memos", error);
@@ -57,10 +58,14 @@ const MemoContainer = () => {
             持ち込みメモ
           </Typography>
           <MemoInputField
-            memo1={memo1}
-            memo2={memo2}
-            onChangeMemo1={(e) => setMemo1(e.target.value)}
-            onChangeMemo2={(e) => setMemo2(e.target.value)}
+            label="メモ1"
+            value={memo1}
+            onChange={setMemo1}
+          />
+          <MemoInputField
+            label="メモ2"
+            value={memo2}
+            onChange={setMemo2}
           />
           <Button
             variant="contained"

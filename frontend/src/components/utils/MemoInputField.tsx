@@ -1,30 +1,39 @@
-import React, { useState } from "react";
-import { TextField } from "@mui/material";
+import { TextField } from '@mui/material';
 
-export const MemoInputField = () => {
-  const [text, setText] = useState("");
-  const maxLength = 500;
+interface MemoInputFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  maxLength?: number;
+}
 
+export const MemoInputField: React.FC<MemoInputFieldProps> = ({
+  value,
+  onChange,
+  label,
+  maxLength = 500,
+}) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setText(event.target.value.slice(0, maxLength));
+    const text = event.target.value.slice(0, maxLength);
+    onChange(text);
   };
 
   return (
     <TextField
-      label="持ち込みメモ"
+      label={label}
       multiline
       fullWidth
       variant="outlined"
-      value={text}
+      value={value}
       onChange={handleChange}
-      helperText={`${text.length}/${maxLength}`}
+      helperText={`${value.length}/${maxLength}`}
       InputProps={{
         style: {
-          height: "300px", // テキストエリアの高さを調整
+          height: '300px',
         },
       }}
       rows={10}
-      sx={{ bgcolor: "secondary.main", borderRadius: 2 }}
+      sx={{ bgcolor: 'secondary.main', borderRadius: 2 }}
     />
   );
 };
