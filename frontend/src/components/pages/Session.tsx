@@ -7,12 +7,7 @@ import { HalfModal } from "../utils/HalfModal";
 import { useState } from "react";
 import HomeLogo from "../../assets/homeLogo";
 
-const SessionContainer = () => {
-  const users = [
-    { name: "User1", icon: <Person />, description: "英語" },
-    { name: "User2", icon: <Favorite />, description: "苗字" },
-  ];
-
+const SessionContainer = ({ theme, users }: { theme: string; users: { name: string; icon: JSX.Element; description: string }[] }) => {
   return (
     <Container
       sx={{
@@ -42,7 +37,7 @@ const SessionContainer = () => {
             <SessionCountDownModal />
           </Box>
           <Typography variant="h5" align="center" gutterBottom color="primary.main" fontWeight="bolder">
-            テーマ: 好きな言葉
+            テーマ: {theme}
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", mb: 2 }}>
             {users.map((user, index) => (
@@ -66,6 +61,13 @@ const SessionContainer = () => {
   );
 };
 
+const users = [
+  { name: "User1", icon: <Person />, description: "英語" },
+  { name: "User2", icon: <Favorite />, description: "苗字" },
+];
+
+const theme = "好きな言葉";
+
 export const Session = () => {
   const [memoOpen, setMemoOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
@@ -83,7 +85,7 @@ export const Session = () => {
 
   return (
     <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen}>
-      <SessionContainer />
+      <SessionContainer theme={theme} users={users} />
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="持ち込みメモ">
         <Typography variant="body1">{memo}</Typography>
       </HalfModal>
