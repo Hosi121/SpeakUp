@@ -19,6 +19,7 @@ import { Stats } from "./components/pages/Stats.tsx";
 import { ConversationHistory } from "./components/pages/ConversationHistory.tsx";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import AdminPage from "./components/pages/AdminPage.tsx";
+import FriendList from "./components/pages/FriendList.tsx";
 import Theme from "./styles/Theme.tsx";
 
 const router = createBrowserRouter([
@@ -75,7 +76,7 @@ const router = createBrowserRouter([
     element: <Memo />,
   },
   {
-    path: "message",
+    path: "message/:friendname",
     element: <Message />,
   },
   {
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
   {
     path: "admin",
     element: <AdminPage />,
+  },
+  {
+    path: "friendlist",
+    element: <FriendList />,
   },
 ]);
 

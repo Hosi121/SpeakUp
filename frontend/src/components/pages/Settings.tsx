@@ -6,7 +6,6 @@ import {
   Avatar,
   TextField,
   Button,
-  Switch,
   Paper,
   Grid,
   Divider,
