@@ -8,8 +8,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent"
 	"github.com/Hosi121/SpeakUp/routes"
 
-	middleware "github.com/Hosi121/SpeakUp/middlewares"
-	supabaseAPI "github.com/Hosi121/SpeakUp/supaseAPI"
+	"github.com/Hosi121/SpeakUp/middlewares"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -24,11 +23,17 @@ func main() {
 
 	// ginの初期化
 	r := gin.Default()
-	r.Use(middleware.CORSMiddleware())
+	r.Use(middlewares.CORSMiddleware())
+
+	// 認証が不要なルート
 	routes.SupabaseAuthRoutes(r)
 
-	// supabase APIの準備
-	supabaseAPI.InitSupabase()
+	// 認証が必要なルートのグループを作成
+	protected := r.Group("/")
+	protected.Use(middlewares.JWTAuthMiddleware())
+
+	// 認証が必要なルートを定義
+	routes.ProtectedRoutes(protected)
 
 	// Entクライアントを作成
 	client, err := ent.Open("mysql", dsn)

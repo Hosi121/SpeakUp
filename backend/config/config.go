@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -30,4 +31,10 @@ func GetSupabaseAPI() (string, string) {
 	supabaseKey := os.Getenv("SUPABASE_API_KEY")
 
 	return supabaseRef, supabaseKey
+}
+
+func GetKey() ([]byte, []byte) {
+	publicKey := []byte(strings.ReplaceAll(os.Getenv("PUBLIC_KEY"), "\\n", "\n"))
+	secretKey := []byte(strings.ReplaceAll(os.Getenv("SECRET_KEY"), "\\n", "\n"))
+	return publicKey, secretKey
 }
