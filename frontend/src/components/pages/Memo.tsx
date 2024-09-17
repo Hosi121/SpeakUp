@@ -4,7 +4,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import TopSection from "../utils/TopSection";
 import { MemoInputField } from "../utils/MemoInputField";
-import api from "../../services/api";
+import { fetchMemo, saveMemo } from "../../services/memoService";
 
 const MemoContainer = () => {
   const [memo1, setMemo1] = useState("");
@@ -12,28 +12,26 @@ const MemoContainer = () => {
 
   useEffect(() => {
     // ページ読み込み時にメモを取得
-    api
-      .get("/memo")
-      .then((response) => {
-        setMemo1(response.data.memo1 || "");
-        setMemo2(response.data.memo2 || "");
-      })
-      .catch((error) => {
+    const getMemo = async () => {
+      try {
+        const data = await fetchMemo();
+        setMemo1(data.memo1 || "");
+        setMemo2(data.memo2 || "");
+      } catch (error) {
         console.error("Failed to fetch memos", error);
-      });
+      }
+    };
+    getMemo();
   }, []);
 
-  const handleSave = () => {
-    // 保存ボタンがクリックされたときにメモを更新
-    api
-      .put("/memo", { memo1, memo2 })
-      .then((response) => {
-        console.log("Memos saved successfully");
-        // 成功メッセージを表示するなどの処理
-      })
-      .catch((error) => {
-        console.error("Failed to save memos", error);
-      });
+  const handleSave = async () => {
+    try {
+      await saveMemo(memo1, memo2);
+      console.log("Memos saved successfully");
+      // 成功メッセージを表示するなどの処理
+    } catch (error) {
+      console.error("Failed to save memos", error);
+    }
   };
 
   return (
