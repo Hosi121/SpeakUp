@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Accordion, AccordionSummary, AccordionDetails, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
+import conversation_history from "../../mock/conversation_history.json"; // Import the JSON file directly
 
 type SessionData = {
   date: string;
@@ -16,13 +17,7 @@ const ConversationHistoryContainer = () => {
   const [data, setData] = useState<SessionData[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("../../conversation_history.json"); // JSONファイルの場所を指定
-      const newData = await response.json();
-      setData(newData);
-    };
-
-    fetchData();
+    setData(conversation_history);
   }, []);
 
   return (
