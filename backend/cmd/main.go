@@ -20,6 +20,8 @@ func main() {
 	// Get DSN and set up database connection
 	dsn := config.GetDSN()
 
+	apiKey := config.GetOpenAIKey()
+
 	// Initialize gin
 	r := gin.Default()
 	r.Use(middlewares.CORSMiddleware())
@@ -42,6 +44,8 @@ func main() {
 	// Create a group for protected routes
 	protected := r.Group("/")
 	protected.Use(middlewares.JWTAuthMiddleware())
+
+	routes.ChatRoute(r, apiKey)
 
 	// Protected routes with Ent client
 	routes.ProtectedRoutes(protected, client)

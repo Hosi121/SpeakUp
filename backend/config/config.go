@@ -33,6 +33,11 @@ func GetSupabaseAPI() (string, string) {
 	return supabaseRef, supabaseKey
 }
 
+func GetOpenAIKey() string {
+	openAIKey := os.Getenv("OPENAI_API_KEY")
+	return openAIKey
+}
+
 func GetKey() ([]byte, []byte) {
 	publicKey := []byte(strings.ReplaceAll(os.Getenv("PUBLIC_KEY"), "\\n", "\n"))
 	secretKey := []byte(strings.ReplaceAll(os.Getenv("SECRET_KEY"), "\\n", "\n"))
