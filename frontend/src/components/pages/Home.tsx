@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Container, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import TopSection from "../utils/TopSection";
 import TopWaves from "../utils/TopWaves";
@@ -14,7 +14,7 @@ type SessionData = {
 };
 
 const HomeContainer = () => {
-  const [sessionData, setSessionData] = useState<SessionData>();
+  const [sessionData, setSessionData] = useState<SessionData[]>([]);
 
   useEffect(() => {
     setSessionData(session);
@@ -31,19 +31,25 @@ const HomeContainer = () => {
           </Box>
           <TopWaves isFlipped={true} />
         </Container>
-        <Box sx={{ width: "100%", backgroundColor: "secondary.main", display: "flex", flexDirection: "column", alignItems: "center", mt: 3, mb: 3, p: 3, boxSizing: "border-box", borderRadius: 3 }}>
-          <h2>直近の参加予定</h2>
-          <List>
-            <ListItem>
-              <ListItemText primary={sessionData?.dateTime} primaryTypographyProps={{ color: "primary.main", fontSize: "1.3rem", fontWeight: "bolder", textAlign: "center" }} />
-            </ListItem>
-            {sessionData?.sessions.map((session) => (
-              <ListItem sx={{ p: 0 }}>
-                <ListItemText primary={"セッション" + session} primaryTypographyProps={{ color: "primary.main", textAlign: "center" }} />
-              </ListItem>
-            ))}
-          </List>
+        <Box
+          sx={{
+            width: "100%",
+            backgroundColor: "secondary.main",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mt: 3,
+            mb: 3,
+            p: 3,
+            boxSizing: "border-box",
+            borderRadius: 3,
+          }}
+        >
+          <h3>直近の参加予定</h3>
+          <Typography sx={{ mt: 1, mb: 1, color: "primary.main", fontSize: "1.3rem", fontWeight: "bolder", textAlign: "center" }}>{sessionData[0]?.dateTime}</Typography>
+          {sessionData[0]?.sessions.map((session) => <Typography sx={{ color: "primary.main", textAlign: "center", fontSize: "0.9rem" }}>セッション{session}</Typography>)}
         </Box>
+
         <Box
           sx={{
             display: "flex",
