@@ -1,11 +1,20 @@
 [
-    {
-      "date": "5月15日",
-      "previousDate": "4月30日",
-      "sessions": 2,
-      "completionRate": "30%",
-      "comment": "想像の言う通りと少し違っていて、思わず笑ってしまった。皆さんに共有して感謝しました。",
-      "examples": ["stuffed animal(動物のぬいぐるみ)", "parents(両親)"]
-    }
-  ]
-  
+  {
+    "date": "5月15日",
+    "previousDate": "4月30日",
+    "sessions": 2,
+    "completionRate": "30%",
+    "comment": "想像の言う通りと少し違っていて、思わず笑ってしまった。皆さんに共有して感謝しました。",
+    "examples": [
+      {
+        "english": "stuffed animal",
+        "japanese": "動物のぬいぐるみ"
+      },
+      {
+        "english": "parents",
+        "japanese": "両親"
+
+      }
+    ]
+  }
+]
