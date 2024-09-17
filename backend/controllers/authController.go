@@ -9,8 +9,8 @@ import (
 	"github.com/Hosi121/SpeakUp/config"
 	"github.com/Hosi121/SpeakUp/ent"
 	"github.com/Hosi121/SpeakUp/ent/users"
-	jwt_auth "github.com/Hosi121/SpeakUp/jwt_auth"
 	supabaseAPI "github.com/Hosi121/SpeakUp/supaseAPI"
+	"github.com/Hosi121/SpeakUp/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/supabase-community/auth-go/types"
 )
@@ -151,7 +151,7 @@ func SignIn(c *gin.Context) {
 	}
 
 	// JWTトークンを生成
-	jwt_token, err := jwt_auth.GenerateJWT(user.ID)
+	jwt_token, err := utils.GenerateJWT(user.ID)
 	if err != nil {
 		slog.Error("Failed to generate JWT: %v", err)
 	}
