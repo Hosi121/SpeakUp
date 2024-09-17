@@ -2,7 +2,7 @@ import { Message, Mic, MicOff, PriorityHigh, Search } from "@mui/icons-material"
 import { BottomNavigation, BottomNavigationAction, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-type sessionBottomNavigation = "wordList" | "assistance" | "topic";
+export type sessionBottomNavigation = "wordList" | "assistance" | "topic" | "other";
 type sessionBottomNavigationProps = {
   value: sessionBottomNavigation;
   isMute: boolean;

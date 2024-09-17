@@ -1,8 +1,9 @@
 import { Card, CardContent, Typography, Avatar, Grid, Box, Container, Stack } from "@mui/material";
 import { Favorite, Person } from "@mui/icons-material";
 import TopSection from "../utils/TopSection";
+import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 
-function Session() {
+const SessionContainer = () => {
   const users = [
     { name: "User1", icon: <Person />, description: "英語" },
     { name: "User2", icon: <Favorite />, description: "苗字" },
@@ -43,6 +44,12 @@ function Session() {
       </Container>
     </Container>
   );
-}
+};
 
-export default Session;
+export const Session = () => {
+  return (
+    <SessionBottomNavigationTemplate value="other" isMute={false}>
+      <SessionContainer />
+    </SessionBottomNavigationTemplate>
+  );
+};
