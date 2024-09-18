@@ -1,12 +1,13 @@
 import { HalfModal } from "../utils/HalfModal";
 import { useState, useEffect } from "react";
-import { Typography, Box, List, ListItem, Paper, ListItemText, TextField, Button } from "@mui/material";
+import { Typography, Box, List, ListItem, Paper, ListItemText, TextField, Button, Tab } from "@mui/material";
 import HomeLogo from "../../assets/homeLogo";
 import { Favorite, Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionContainer from "../utils/SessionContainer";
 import api from "../../services/api";
 import { fetchMemo } from "../../services/memoService"; // Import the fetchMemo function
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 
 const users = [
   { name: "User1", icon: <Person />, description: "英語" },
@@ -23,6 +24,7 @@ export const Session = () => {
   const [isLoading, setIsLoading] = useState(false); // ローディング状態を管理
   const [memo1, setMemo1] = useState(""); // メモ1を管理
   const [memo2, setMemo2] = useState(""); // メモ2を管理
+  const [value, setValue] = useState("1");
 
   useEffect(() => {
     // コンポーネント読み込み時にメモを取得
@@ -41,6 +43,9 @@ export const Session = () => {
   const handleMemoClose = () => setMemoOpen(false);
   const handleAssistantClose = () => setAssistantOpen(false);
 
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
 
@@ -72,12 +77,21 @@ export const Session = () => {
   return (
     <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen}>
       <SessionContainer theme={theme} users={users} />
-      <HalfModal open={memoOpen} handleClose={handleMemoClose} title="持ち込みメモ">
-        <Typography variant="body1">{memo1}</Typography> {/* memo1 を表示 */}
-        <Typography variant="h6" fontWeight="bolder" color="primary.main" sx={{ mt: 4, mb: 1 }}>
-          ワードリスト
-        </Typography>
-        <Typography variant="body1">{memo2}</Typography>
+      <HalfModal open={memoOpen} handleClose={handleMemoClose} title="">
+        <TabContext value={value}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <TabList onChange={handleChange} sx={{ display: "grid", placeContent: "center" }}>
+              <Tab label=" 持ち込みメモ" value="1" />
+              <Tab label="ワードリスト" value="2" />
+            </TabList>
+          </Box>
+          <TabPanel value="1">
+            <Typography variant="body1">{memo1}</Typography>
+          </TabPanel>
+          <TabPanel value="2">
+            <Typography variant="body1">{memo2}</Typography>
+          </TabPanel>
+        </TabContext>
       </HalfModal>
 
       <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
