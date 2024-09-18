@@ -1,18 +1,14 @@
-import { TextField } from '@mui/material';
+import { TextField } from "@mui/material";
 
 interface MemoInputFieldProps {
   value: string;
   onChange: (value: string) => void;
   label: string;
   maxLength?: number;
+  height?: string;
 }
 
-export const MemoInputField: React.FC<MemoInputFieldProps> = ({
-  value,
-  onChange,
-  label,
-  maxLength = 500,
-}) => {
+export const MemoInputField: React.FC<MemoInputFieldProps> = ({ value, onChange, label, maxLength = 500, height = "300px" }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const text = event.target.value.slice(0, maxLength);
     onChange(text);
@@ -29,11 +25,11 @@ export const MemoInputField: React.FC<MemoInputFieldProps> = ({
       helperText={`${value.length}/${maxLength}`}
       InputProps={{
         style: {
-          height: '300px',
+          height: height,
         },
       }}
       rows={10}
-      sx={{ bgcolor: 'secondary.main', borderRadius: 2 }}
+      sx={{ bgcolor: "secondary.main", borderRadius: 2 }}
     />
   );
 };
