@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import { Person, Star } from '@mui/icons-material';
 import { styled } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
 
 interface Friend {
   id: number;
@@ -21,6 +22,14 @@ const YellowButton = styled(Button)({
   },
 });
 
+const PinkButton = styled(Button)({
+  backgroundColor: '#FF69B4',
+  color: 'white',
+  '&:hover': {
+    backgroundColor: '#FF1493',
+  },
+});
+
 const GrayButton = styled(Button)({
   backgroundColor: '#E0E0E0',
   color: 'black',
@@ -29,7 +38,9 @@ const GrayButton = styled(Button)({
   },
 });
 
-const FriendRequest : React.FC = () => {
+const FriendRequest: React.FC = () => {
+  const navigate = useNavigate();
+
   const friends: Friend[] = [
     {
       id: 1,
@@ -50,6 +61,10 @@ const FriendRequest : React.FC = () => {
       isFriend: false,
     },
   ];
+
+  const handleEndSession = () => {
+    navigate('/home');
+  };
 
   return (
     <Box sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
@@ -102,7 +117,7 @@ const FriendRequest : React.FC = () => {
               <GrayButton variant="contained" disabled={friend.isFriend}>
                 {friend.isFriend ? 'フレンド申請済' : 'フレンド申請'}
               </GrayButton>
-              <YellowButton variant="contained">メッセージ</YellowButton>
+              <PinkButton variant="contained">メッセージ</PinkButton>
             </Box>
           </Paper>
         ))}
@@ -113,7 +128,7 @@ const FriendRequest : React.FC = () => {
         記録＞セッション履歴からでもできるよ！
       </Typography>
 
-      <Button variant="outlined" fullWidth sx={{ marginTop: 2 }}>
+      <Button variant="outlined" fullWidth sx={{ marginTop: 2 }} onClick={handleEndSession}>
         セッションを終わる→
       </Button>
     </Box>
