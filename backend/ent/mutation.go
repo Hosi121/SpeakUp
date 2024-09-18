@@ -6455,6 +6455,8 @@ type USERSMutation struct {
 	username        *string
 	email           *string
 	avatar_url      *string
+	rank            *int
+	addrank         *int
 	role            *users.Role
 	created_at      *time.Time
 	is_deleted      *bool
@@ -6695,6 +6697,62 @@ func (m *USERSMutation) AvatarURLCleared() bool {
 func (m *USERSMutation) ResetAvatarURL() {
 	m.avatar_url = nil
 	delete(m.clearedFields, users.FieldAvatarURL)
+}
+
+// SetRank sets the "rank" field.
+func (m *USERSMutation) SetRank(i int) {
+	m.rank = &i
+	m.addrank = nil
+}
+
+// Rank returns the value of the "rank" field in the mutation.
+func (m *USERSMutation) Rank() (r int, exists bool) {
+	v := m.rank
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRank returns the old "rank" field's value of the USERS entity.
+// If the USERS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *USERSMutation) OldRank(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRank is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRank requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRank: %w", err)
+	}
+	return oldValue.Rank, nil
+}
+
+// AddRank adds i to the "rank" field.
+func (m *USERSMutation) AddRank(i int) {
+	if m.addrank != nil {
+		*m.addrank += i
+	} else {
+		m.addrank = &i
+	}
+}
+
+// AddedRank returns the value that was added to the "rank" field in this mutation.
+func (m *USERSMutation) AddedRank() (r int, exists bool) {
+	v := m.addrank
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRank resets all changes to the "rank" field.
+func (m *USERSMutation) ResetRank() {
+	m.rank = nil
+	m.addrank = nil
 }
 
 // SetRole sets the "role" field.
@@ -7115,7 +7173,7 @@ func (m *USERSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *USERSMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.username != nil {
 		fields = append(fields, users.FieldUsername)
 	}
@@ -7124,6 +7182,9 @@ func (m *USERSMutation) Fields() []string {
 	}
 	if m.avatar_url != nil {
 		fields = append(fields, users.FieldAvatarURL)
+	}
+	if m.rank != nil {
+		fields = append(fields, users.FieldRank)
 	}
 	if m.role != nil {
 		fields = append(fields, users.FieldRole)
@@ -7151,6 +7212,8 @@ func (m *USERSMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case users.FieldAvatarURL:
 		return m.AvatarURL()
+	case users.FieldRank:
+		return m.Rank()
 	case users.FieldRole:
 		return m.Role()
 	case users.FieldCreatedAt:
@@ -7174,6 +7237,8 @@ func (m *USERSMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldEmail(ctx)
 	case users.FieldAvatarURL:
 		return m.OldAvatarURL(ctx)
+	case users.FieldRank:
+		return m.OldRank(ctx)
 	case users.FieldRole:
 		return m.OldRole(ctx)
 	case users.FieldCreatedAt:
@@ -7212,6 +7277,13 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAvatarURL(v)
 		return nil
+	case users.FieldRank:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRank(v)
+		return nil
 	case users.FieldRole:
 		v, ok := value.(users.Role)
 		if !ok {
@@ -7247,13 +7319,21 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *USERSMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addrank != nil {
+		fields = append(fields, users.FieldRank)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *USERSMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case users.FieldRank:
+		return m.AddedRank()
+	}
 	return nil, false
 }
 
@@ -7262,6 +7342,13 @@ func (m *USERSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *USERSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case users.FieldRank:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRank(v)
+		return nil
 	}
 	return fmt.Errorf("unknown USERS numeric field %s", name)
 }
@@ -7306,6 +7393,9 @@ func (m *USERSMutation) ResetField(name string) error {
 		return nil
 	case users.FieldAvatarURL:
 		m.ResetAvatarURL()
+		return nil
+	case users.FieldRank:
+		m.ResetRank()
 		return nil
 	case users.FieldRole:
 		m.ResetRole()

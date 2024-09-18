@@ -81,6 +81,27 @@ func (uu *USERSUpdate) ClearAvatarURL() *USERSUpdate {
 	return uu
 }
 
+// SetRank sets the "rank" field.
+func (uu *USERSUpdate) SetRank(i int) *USERSUpdate {
+	uu.mutation.ResetRank()
+	uu.mutation.SetRank(i)
+	return uu
+}
+
+// SetNillableRank sets the "rank" field if the given value is not nil.
+func (uu *USERSUpdate) SetNillableRank(i *int) *USERSUpdate {
+	if i != nil {
+		uu.SetRank(*i)
+	}
+	return uu
+}
+
+// AddRank adds i to the "rank" field.
+func (uu *USERSUpdate) AddRank(i int) *USERSUpdate {
+	uu.mutation.AddRank(i)
+	return uu
+}
+
 // SetRole sets the "role" field.
 func (uu *USERSUpdate) SetRole(u users.Role) *USERSUpdate {
 	uu.mutation.SetRole(u)
@@ -339,6 +360,11 @@ func (uu *USERSUpdate) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
 		}
 	}
+	if v, ok := uu.mutation.Rank(); ok {
+		if err := users.RankValidator(v); err != nil {
+			return &ValidationError{Name: "rank", err: fmt.Errorf(`ent: validator failed for field "USERS.rank": %w`, err)}
+		}
+	}
 	if v, ok := uu.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -370,6 +396,12 @@ func (uu *USERSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.AvatarURLCleared() {
 		_spec.ClearField(users.FieldAvatarURL, field.TypeString)
+	}
+	if value, ok := uu.mutation.Rank(); ok {
+		_spec.SetField(users.FieldRank, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.AddedRank(); ok {
+		_spec.AddField(users.FieldRank, field.TypeInt, value)
 	}
 	if value, ok := uu.mutation.Role(); ok {
 		_spec.SetField(users.FieldRole, field.TypeEnum, value)
@@ -644,6 +676,27 @@ func (uuo *USERSUpdateOne) ClearAvatarURL() *USERSUpdateOne {
 	return uuo
 }
 
+// SetRank sets the "rank" field.
+func (uuo *USERSUpdateOne) SetRank(i int) *USERSUpdateOne {
+	uuo.mutation.ResetRank()
+	uuo.mutation.SetRank(i)
+	return uuo
+}
+
+// SetNillableRank sets the "rank" field if the given value is not nil.
+func (uuo *USERSUpdateOne) SetNillableRank(i *int) *USERSUpdateOne {
+	if i != nil {
+		uuo.SetRank(*i)
+	}
+	return uuo
+}
+
+// AddRank adds i to the "rank" field.
+func (uuo *USERSUpdateOne) AddRank(i int) *USERSUpdateOne {
+	uuo.mutation.AddRank(i)
+	return uuo
+}
+
 // SetRole sets the "role" field.
 func (uuo *USERSUpdateOne) SetRole(u users.Role) *USERSUpdateOne {
 	uuo.mutation.SetRole(u)
@@ -915,6 +968,11 @@ func (uuo *USERSUpdateOne) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
 		}
 	}
+	if v, ok := uuo.mutation.Rank(); ok {
+		if err := users.RankValidator(v); err != nil {
+			return &ValidationError{Name: "rank", err: fmt.Errorf(`ent: validator failed for field "USERS.rank": %w`, err)}
+		}
+	}
 	if v, ok := uuo.mutation.Role(); ok {
 		if err := users.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "USERS.role": %w`, err)}
@@ -963,6 +1021,12 @@ func (uuo *USERSUpdateOne) sqlSave(ctx context.Context) (_node *USERS, err error
 	}
 	if uuo.mutation.AvatarURLCleared() {
 		_spec.ClearField(users.FieldAvatarURL, field.TypeString)
+	}
+	if value, ok := uuo.mutation.Rank(); ok {
+		_spec.SetField(users.FieldRank, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.AddedRank(); ok {
+		_spec.AddField(users.FieldRank, field.TypeInt, value)
 	}
 	if value, ok := uuo.mutation.Role(); ok {
 		_spec.SetField(users.FieldRole, field.TypeEnum, value)

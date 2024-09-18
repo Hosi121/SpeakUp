@@ -230,6 +230,7 @@ var (
 		{Name: "username", Type: field.TypeString, Size: 255},
 		{Name: "email", Type: field.TypeString},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "rank", Type: field.TypeInt, Default: 3},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPERUSER", "ADMIN", "USER"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "is_deleted", Type: field.TypeBool, Default: false},
