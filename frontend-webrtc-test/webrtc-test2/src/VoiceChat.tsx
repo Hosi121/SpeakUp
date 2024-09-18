@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const WEBSOCKET_URL = "ws://10.70.174.101:8080/ws";
+const STUN_SERVERS = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    { urls: "stun:stun4.l.google.com:19302" },
+  ],
+};
 
 const VoiceChat: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -67,8 +76,8 @@ const VoiceChat: React.FC = () => {
     websocketRef.current = ws;
   };
 
-  const startCall = async (): Promise<void> => {
-    const pc = new RTCPeerConnection();
+  const createPeerConnection = (): RTCPeerConnection => {
+    const pc = new RTCPeerConnection(STUN_SERVERS);
 
     pc.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
       if (event.candidate && websocketRef.current) {
@@ -86,6 +95,16 @@ const VoiceChat: React.FC = () => {
         remoteAudioRef.current.srcObject = event.streams[0];
       }
     };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log("ICE Connection State:", pc.iceConnectionState);
+    };
+
+    return pc;
+  };
+
+  const startCall = async (): Promise<void> => {
+    const pc = createPeerConnection();
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -114,24 +133,7 @@ const VoiceChat: React.FC = () => {
   const handleOffer = async (
     offer: RTCSessionDescriptionInit
   ): Promise<void> => {
-    const pc = new RTCPeerConnection();
-
-    pc.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-      if (event.candidate && websocketRef.current) {
-        websocketRef.current.send(
-          JSON.stringify({
-            type: "ice-candidate",
-            candidate: event.candidate,
-          })
-        );
-      }
-    };
-
-    pc.ontrack = (event: RTCTrackEvent) => {
-      if (remoteAudioRef.current && event.streams[0]) {
-        remoteAudioRef.current.srcObject = event.streams[0];
-      }
-    };
+    const pc = createPeerConnection();
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
