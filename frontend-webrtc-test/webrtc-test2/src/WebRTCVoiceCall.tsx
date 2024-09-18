@@ -16,6 +16,7 @@ const WebRTCVoiceCall: React.FC = () => {
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const websocket = useRef<WebSocket | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const iceCandidatesQueue = useRef<RTCIceCandidate[]>([]);
 
   useEffect(() => {
     // WebSocketの接続
@@ -131,6 +132,13 @@ const WebRTCVoiceCall: React.FC = () => {
           sendAnswer(answer, data.offerId);
         }
         setIsCalling(true);
+        // キューに入れられたICE candidateを処理
+        iceCandidatesQueue.current.forEach((candidate) => {
+          peerConnection.current
+            ?.addIceCandidate(candidate)
+            .catch((e) => console.error("Error adding queued candidate:", e));
+        });
+        iceCandidatesQueue.current = [];
       }
     } catch (error) {
       console.error("Error handling received offer:", error);
@@ -157,10 +165,21 @@ const WebRTCVoiceCall: React.FC = () => {
     data: WebSocketMessage
   ): Promise<void> => {
     try {
-      if (data.answer && peerConnection.current) {
+      if (
+        data.answer &&
+        peerConnection.current &&
+        peerConnection.current.signalingState !== "stable"
+      ) {
         await peerConnection.current.setRemoteDescription(
           new RTCSessionDescription(data.answer)
         );
+        // キューに入れられたICE candidateを処理
+        iceCandidatesQueue.current.forEach((candidate) => {
+          peerConnection.current
+            ?.addIceCandidate(candidate)
+            .catch((e) => console.error("Error adding queued candidate:", e));
+        });
+        iceCandidatesQueue.current = [];
       }
     } catch (error) {
       console.error("Error handling received answer:", error);
@@ -170,9 +189,17 @@ const WebRTCVoiceCall: React.FC = () => {
   const handleIceCandidate = async (data: WebSocketMessage): Promise<void> => {
     try {
       if (data.candidate && peerConnection.current) {
-        await peerConnection.current.addIceCandidate(
-          new RTCIceCandidate(data.candidate)
-        );
+        if (
+          peerConnection.current.remoteDescription &&
+          peerConnection.current.remoteDescription.type
+        ) {
+          await peerConnection.current.addIceCandidate(
+            new RTCIceCandidate(data.candidate)
+          );
+        } else {
+          // リモート記述がまだ設定されていない場合は、candidateをキューに入れる
+          iceCandidatesQueue.current.push(new RTCIceCandidate(data.candidate));
+        }
       }
     } catch (error) {
       console.error("Error handling ICE candidate:", error);
@@ -215,6 +242,7 @@ const WebRTCVoiceCall: React.FC = () => {
     if (remoteAudioRef.current) {
       remoteAudioRef.current.srcObject = null;
     }
+    iceCandidatesQueue.current = [];
   };
 
   return (
