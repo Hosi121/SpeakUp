@@ -70,7 +70,6 @@ const SettingsContainer = () => {
   const [newEmail, setNewEmail] = useState("");
 
   useEffect(() => {
-    // Fetch user data when the component mounts
     const fetchUserData = async () => {
       try {
         const response = await api.get<UserData>("/user/info");
@@ -79,16 +78,29 @@ const SettingsContainer = () => {
         setNewEmail(response.data.email);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
-        // Handle error (e.g., show notification or redirect to login)
       }
     };
-
+  
     fetchUserData();
   }, []);
 
-  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Handle avatar upload logic here
-    // You may need to implement an API endpoint to handle avatar uploads
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const formData = new FormData();
+      formData.append("avatar", event.target.files[0]);
+  
+      try {
+        const response = await api.put("/user/avatar", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setUser((prevUser) => prevUser ? { ...prevUser, avatar_url: response.data.avatar_url } : null);
+      } catch (error) {
+        console.error("Failed to upload avatar:", error);
+        // Handle error (e.g., show notification)
+      }
+    }
   };
 
   const handleSaveName = () => {
@@ -124,6 +136,7 @@ const SettingsContainer = () => {
       updateUser();
     }
   };
+  
 
   const handleLogout = () => {
     // Implement logout logic

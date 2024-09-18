@@ -24,6 +24,7 @@ func main() {
 
 	// Initialize gin
 	r := gin.Default()
+	r.Static("/upload", "./backend/upload")
 	r.Use(middlewares.CORSMiddleware())
 
 	// Ent client creation
