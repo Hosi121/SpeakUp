@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"goserver2/config"
+	"github.com/Hosi121/SpeakUp/config"
 
 	"github.com/golang-jwt/jwt/v5"
 )
