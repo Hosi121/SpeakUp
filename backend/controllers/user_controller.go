@@ -58,7 +58,7 @@ func GetUserInfo(client *ent.Client) gin.HandlerFunc {
 		response := UserResponse{
 			ID:        user.ID,
 			Username:  user.Username,
-			AvatarURL: "https://example.com/avatar.jpg",
+			AvatarURL: user.AvatarURL,
 			Role:      "user",
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
@@ -178,6 +178,9 @@ func UpdateAvatar(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Avatar uploaded successfully", "avatar_url": avatarURL})
+		c.JSON(http.StatusOK, gin.H{
+			"message":    "Avatar uploaded successfully",
+			"avatar_url": "http://localhost:8081/upload/" + filename, // 画像のURLを返す
+		})
 	}
 }
