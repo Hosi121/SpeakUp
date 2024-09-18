@@ -1,4 +1,4 @@
-package main
+package signaling
 
 import (
 	"encoding/json"
@@ -6,8 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"goserver2/middlewares"
-
+	"github.com/Hosi121/SpeakUp/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -15,7 +14,7 @@ import (
 // WebSocketのアップグレード用
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		return true // 本番環境では適切なオリジン確認を行ってください
+		return true
 	},
 }
 
@@ -42,7 +41,7 @@ var idToWs = map[int]*websocket.Conn{}
 
 var clients = make(map[*websocket.Conn]bool)
 
-func main() {
+func Signaling() {
 	router := gin.Default()
 
 	router.Use(middlewares.JWTAuthMiddleware())
