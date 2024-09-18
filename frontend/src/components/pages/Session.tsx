@@ -4,10 +4,18 @@ import TopSection from "../utils/TopSection";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionCountDownModal from "../utils/SessionCountDownModal";
 import { HalfModal } from "../utils/HalfModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import HomeLogo from "../../assets/homeLogo";
+import { TopicPopup } from "../utils/TopicPopup";
 
 const SessionContainer = ({ theme, users }: { theme: string; users: { name: string; icon: JSX.Element; description: string }[] }) => {
+  const [showTopicPopup, setShowTopicPopup] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTopicPopup(true);
+    }, 123000);
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <Container
       sx={{
@@ -56,6 +64,7 @@ const SessionContainer = ({ theme, users }: { theme: string; users: { name: stri
             ))}
           </Box>
         </Stack>
+        {showTopicPopup && <TopicPopup />}
       </Container>
     </Container>
   );
