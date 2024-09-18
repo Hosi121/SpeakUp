@@ -39,7 +39,7 @@ const WebRTCVoiceCall: React.FC = () => {
 
     websocket.current.onmessage = (event: MessageEvent) => {
       const data: WebSocketMessage = JSON.parse(event.data);
-      console.log("Received message:", data.type);
+      console.log("Received message:", data.type, data);
       switch (data.type) {
         case "offer":
           handleReceivedOffer(data);
@@ -139,6 +139,7 @@ const WebRTCVoiceCall: React.FC = () => {
     try {
       createPeerConnection();
       if (data.offer && peerConnection.current) {
+        console.log("Setting remote description (offer)");
         await peerConnection.current.setRemoteDescription(
           new RTCSessionDescription(data.offer)
         );
@@ -149,7 +150,9 @@ const WebRTCVoiceCall: React.FC = () => {
         stream
           .getTracks()
           .forEach((track) => peerConnection.current?.addTrack(track, stream));
+        console.log("Creating answer");
         const answer = await peerConnection.current.createAnswer();
+        console.log("Setting local description (answer)");
         await peerConnection.current.setLocalDescription(answer);
         if (data.offerId !== undefined) {
           sendAnswer(answer, data.offerId);
@@ -179,10 +182,19 @@ const WebRTCVoiceCall: React.FC = () => {
   ): Promise<void> => {
     try {
       if (data.answer && peerConnection.current) {
-        await peerConnection.current.setRemoteDescription(
-          new RTCSessionDescription(data.answer)
+        console.log(
+          "Current signaling state:",
+          peerConnection.current.signalingState
         );
-        processIceCandidateQueue();
+        if (peerConnection.current.signalingState !== "stable") {
+          console.log("Setting remote description (answer)");
+          await peerConnection.current.setRemoteDescription(
+            new RTCSessionDescription(data.answer)
+          );
+          processIceCandidateQueue();
+        } else {
+          console.warn("Received answer while in stable state, ignoring");
+        }
       }
     } catch (error) {
       console.error("Error handling received answer:", error);
@@ -191,18 +203,22 @@ const WebRTCVoiceCall: React.FC = () => {
 
   const handleIceCandidate = (data: WebSocketMessage): void => {
     if (data.candidate) {
+      console.log("Handling ICE candidate", data.candidate);
       const iceCandidate = new RTCIceCandidate(data.candidate);
       if (
         peerConnection.current &&
         peerConnection.current.remoteDescription &&
         peerConnection.current.remoteDescription.type
       ) {
+        console.log("Adding ICE candidate");
         peerConnection.current
           .addIceCandidate(iceCandidate)
+          .then(() => console.log("ICE candidate added successfully"))
           .catch((e) =>
             console.error("Error adding received ice candidate:", e)
           );
       } else {
+        console.log("Queueing ICE candidate");
         iceCandidatesQueue.current.push(data.candidate);
       }
     }
@@ -210,9 +226,14 @@ const WebRTCVoiceCall: React.FC = () => {
 
   const processIceCandidateQueue = (): void => {
     if (peerConnection.current && peerConnection.current.remoteDescription) {
+      console.log(
+        "Processing ICE candidate queue",
+        iceCandidatesQueue.current.length
+      );
       iceCandidatesQueue.current.forEach((candidate) => {
         peerConnection.current
           ?.addIceCandidate(new RTCIceCandidate(candidate))
+          .then(() => console.log("Queued ICE candidate added successfully"))
           .catch((e) => console.error("Error adding queued ice candidate:", e));
       });
       iceCandidatesQueue.current = [];
