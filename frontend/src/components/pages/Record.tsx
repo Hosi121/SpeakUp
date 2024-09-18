@@ -35,7 +35,7 @@ const RecordContainer = () => {
             }}
           >
             <IconButton icon={<DescriptionIcon sx={{ fontSize: "60px" }} />} text="会話の記録" url="conversation_history" />
-            <IconButton icon={<FolderOutlinedIcon sx={{ fontSize: "60px" }} />} text="履歴" url="history" />
+            <IconButton icon={<FolderOutlinedIcon sx={{ fontSize: "60px" }} />} text="履歴" url="session_history_friendlist" />
             <IconButton icon={<EmojiEventsIcon sx={{ fontSize: "60px" }} />} text="データ" url="stats" />
             <IconButton icon={<EditNoteIcon sx={{ fontSize: "60px" }} />} text="持ち込みメモ" url="memo" />
           </Box>

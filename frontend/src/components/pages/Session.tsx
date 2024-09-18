@@ -5,8 +5,7 @@ import HomeLogo from "../../assets/homeLogo";
 import { Favorite, Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionContainer from "../utils/SessionContainer";
-import api from "../../services/api"; // ここでaxiosインスタンスをインポート
-
+import api from "../../services/api";
 const users = [
   { name: "User1", icon: <Person />, description: "英語" },
   { name: "User2", icon: <Favorite />, description: "苗字" },
