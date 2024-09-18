@@ -1,7 +1,7 @@
-import WebRTCVoiceCall from "./WebRTCVoiceCall";
+import VoiceChat from "./VoiceChat";
 
 const App: React.FC = () => {
-  return <WebRTCVoiceCall />;
+  return <VoiceChat />;
 };
 
 export default App;
