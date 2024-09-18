@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 const WEBSOCKET_URL = "ws://10.70.174.101:8080/ws";
 const STUN_SERVERS = {
@@ -11,22 +11,34 @@ const STUN_SERVERS = {
 const VoiceChat: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
-  const [peerConnection, setPeerConnection] =
-    useState<RTCPeerConnection | null>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+
+  const cleanupResources = useCallback(() => {
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+      localStreamRef.current = null;
+    }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
+    }
+    setIsInCall(false);
+  }, []);
 
   useEffect(() => {
     return () => {
       if (websocketRef.current) {
         websocketRef.current.close();
       }
-      if (localStreamRef.current) {
-        localStreamRef.current.getTracks().forEach((track) => track.stop());
-      }
+      cleanupResources();
     };
-  }, []);
+  }, [cleanupResources]);
 
   const connectToSignalingServer = (): void => {
     const ws = new WebSocket(WEBSOCKET_URL);
@@ -44,30 +56,32 @@ const VoiceChat: React.FC = () => {
         candidate?: RTCIceCandidateInit;
       } = JSON.parse(event.data);
 
-      if (message.type === "offer" && message.offer) {
-        await handleOffer(message.offer);
-      } else if (
-        message.type === "answer" &&
-        message.answer &&
-        peerConnection
-      ) {
-        await peerConnection.setRemoteDescription(
-          new RTCSessionDescription(message.answer)
-        );
-      } else if (
-        message.type === "ice-candidate" &&
-        message.candidate &&
-        peerConnection
-      ) {
-        await peerConnection.addIceCandidate(
-          new RTCIceCandidate(message.candidate)
-        );
+      if (!peerConnectionRef.current) {
+        console.warn("Received message but peer connection is not established");
+        return;
+      }
+
+      try {
+        if (message.type === "offer" && message.offer) {
+          await handleOffer(message.offer);
+        } else if (message.type === "answer" && message.answer) {
+          await peerConnectionRef.current.setRemoteDescription(
+            new RTCSessionDescription(message.answer)
+          );
+        } else if (message.type === "ice-candidate" && message.candidate) {
+          await peerConnectionRef.current.addIceCandidate(
+            new RTCIceCandidate(message.candidate)
+          );
+        }
+      } catch (error) {
+        console.error("Error handling WebSocket message:", error);
       }
     };
 
     ws.onclose = () => {
       console.log("Disconnected from signaling server");
       setIsConnected(false);
+      cleanupResources();
     };
 
     websocketRef.current = ws;
@@ -95,6 +109,13 @@ const VoiceChat: React.FC = () => {
 
     pc.oniceconnectionstatechange = () => {
       console.log("ICE Connection State:", pc.iceConnectionState);
+      if (
+        pc.iceConnectionState === "disconnected" ||
+        pc.iceConnectionState === "failed" ||
+        pc.iceConnectionState === "closed"
+      ) {
+        cleanupResources();
+      }
     };
 
     return pc;
@@ -102,6 +123,7 @@ const VoiceChat: React.FC = () => {
 
   const startCall = async (): Promise<void> => {
     const pc = createPeerConnection();
+    peerConnectionRef.current = pc;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -120,10 +142,10 @@ const VoiceChat: React.FC = () => {
         );
       }
 
-      setPeerConnection(pc);
       setIsInCall(true);
     } catch (error) {
       console.error("Error starting call:", error);
+      cleanupResources();
     }
   };
 
@@ -131,6 +153,7 @@ const VoiceChat: React.FC = () => {
     offer: RTCSessionDescriptionInit
   ): Promise<void> => {
     const pc = createPeerConnection();
+    peerConnectionRef.current = pc;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -150,25 +173,15 @@ const VoiceChat: React.FC = () => {
         );
       }
 
-      setPeerConnection(pc);
       setIsInCall(true);
     } catch (error) {
       console.error("Error handling offer:", error);
+      cleanupResources();
     }
   };
 
   const endCall = (): void => {
-    if (peerConnection) {
-      peerConnection.close();
-      setPeerConnection(null);
-    }
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach((track) => track.stop());
-    }
-    if (remoteAudioRef.current) {
-      remoteAudioRef.current.srcObject = null;
-    }
-    setIsInCall(false);
+    cleanupResources();
   };
 
   return (
