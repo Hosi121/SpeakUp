@@ -27,16 +27,22 @@ export const HalfModal = ({ open, handleClose, children, title }: HalfModalProps
           overflow: "auto",
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-          <Typography variant="h6" component="h2" color="primary.main" fontWeight="bolder">
-            {title}
-          </Typography>
-          <Box>
-            <IconButton onClick={handleClose} aria-label="close">
-              <CloseIcon />
-            </IconButton>
+        {title === "" ? (
+          <IconButton onClick={handleClose} aria-label="close" sx={{ position: "absolute", right: "5%" }}>
+            <CloseIcon />
+          </IconButton>
+        ) : (
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+            <Typography variant="h6" component="h2" color="primary.main" fontWeight="bolder">
+              {title}
+            </Typography>
+            <Box>
+              <IconButton onClick={handleClose} aria-label="close">
+                <CloseIcon />
+              </IconButton>
+            </Box>
           </Box>
-        </Box>
+        )}
         {children}
       </Box>
     </Modal>
