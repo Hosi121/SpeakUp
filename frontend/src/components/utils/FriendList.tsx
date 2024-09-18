@@ -39,7 +39,7 @@ const FriendList: React.FC = () => {
             <Avatar src={friend.avatar} alt={friend.username} sx={{ width: "50px", height: "50px" }} />
           </ListItemAvatar>
           <ListItemText primary={friend.username} primaryTypographyProps={{ fontSize: "1.5rem" }} />
-          <Button variant="contained" onClick={() => handleMessage(friend.username)}>
+          <Button variant="contained" onClick={() => handleMessage(friend.username)} sx={{ borderRadius: 3 }}>
             メッセージ
           </Button>
         </ListItem>
