@@ -6,24 +6,40 @@ interface WebSocketMessage {
   offer?: RTCSessionDescriptionInit;
   answer?: RTCSessionDescriptionInit;
   sdp?: string;
-  candidate?: RTCIceCandidate;
+  candidate?: RTCIceCandidateInit;
 }
 
 const WebRTCVoiceCall: React.FC = () => {
   const [isOffer, setIsOffer] = useState<boolean>(false);
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const websocket = useRef<WebSocket | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
-  const iceCandidatesQueue = useRef<RTCIceCandidate[]>([]);
+  const iceCandidatesQueue = useRef<RTCIceCandidateInit[]>([]);
 
   useEffect(() => {
-    // WebSocketの接続
     websocket.current = new WebSocket("ws://10.70.174.101:8080/ws");
+
+    websocket.current.onopen = () => {
+      console.log("WebSocket connection established");
+      setIsConnected(true);
+    };
+
+    websocket.current.onclose = () => {
+      console.log("WebSocket connection closed");
+      setIsConnected(false);
+    };
+
+    websocket.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setIsConnected(false);
+    };
 
     websocket.current.onmessage = (event: MessageEvent) => {
       const data: WebSocketMessage = JSON.parse(event.data);
+      console.log("Received message:", data.type);
       switch (data.type) {
         case "offer":
           handleReceivedOffer(data);
@@ -40,7 +56,6 @@ const WebRTCVoiceCall: React.FC = () => {
       }
     };
 
-    // コンポーネントのアンマウント時にクリーンアップ
     return () => {
       cleanupCall();
     };
@@ -76,6 +91,10 @@ const WebRTCVoiceCall: React.FC = () => {
         peerConnection.current?.iceConnectionState
       );
     };
+
+    peerConnection.current.onsignalingstatechange = () => {
+      console.log("Signaling state:", peerConnection.current?.signalingState);
+    };
   };
 
   const startCall = async (): Promise<void> => {
@@ -98,18 +117,22 @@ const WebRTCVoiceCall: React.FC = () => {
     }
   };
 
+  const sendMessage = (message: any): void => {
+    if (websocket.current && websocket.current.readyState === WebSocket.OPEN) {
+      websocket.current.send(JSON.stringify(message));
+    } else {
+      console.error("WebSocket is not open. Unable to send message.");
+    }
+  };
+
   const sendOffer = (offer: RTCSessionDescriptionInit): void => {
     const offerId = Math.floor(Math.random() * 1000000);
-    if (websocket.current) {
-      websocket.current.send(
-        JSON.stringify({
-          type: "offer",
-          offerId: offerId,
-          offer: offer,
-          sdp: offer.sdp,
-        })
-      );
-    }
+    sendMessage({
+      type: "offer",
+      offerId: offerId,
+      offer: offer,
+      sdp: offer.sdp,
+    });
   };
 
   const handleReceivedOffer = async (data: WebSocketMessage): Promise<void> => {
@@ -132,13 +155,7 @@ const WebRTCVoiceCall: React.FC = () => {
           sendAnswer(answer, data.offerId);
         }
         setIsCalling(true);
-        // キューに入れられたICE candidateを処理
-        iceCandidatesQueue.current.forEach((candidate) => {
-          peerConnection.current
-            ?.addIceCandidate(candidate)
-            .catch((e) => console.error("Error adding queued candidate:", e));
-        });
-        iceCandidatesQueue.current = [];
+        processIceCandidateQueue();
       }
     } catch (error) {
       console.error("Error handling received offer:", error);
@@ -149,78 +166,68 @@ const WebRTCVoiceCall: React.FC = () => {
     answer: RTCSessionDescriptionInit,
     offerId: number
   ): void => {
-    if (websocket.current) {
-      websocket.current.send(
-        JSON.stringify({
-          type: "answer",
-          offerId: offerId,
-          answer: answer,
-          sdp: answer.sdp,
-        })
-      );
-    }
+    sendMessage({
+      type: "answer",
+      offerId: offerId,
+      answer: answer,
+      sdp: answer.sdp,
+    });
   };
 
   const handleReceivedAnswer = async (
     data: WebSocketMessage
   ): Promise<void> => {
     try {
-      if (
-        data.answer &&
-        peerConnection.current &&
-        peerConnection.current.signalingState !== "stable"
-      ) {
+      if (data.answer && peerConnection.current) {
         await peerConnection.current.setRemoteDescription(
           new RTCSessionDescription(data.answer)
         );
-        // キューに入れられたICE candidateを処理
-        iceCandidatesQueue.current.forEach((candidate) => {
-          peerConnection.current
-            ?.addIceCandidate(candidate)
-            .catch((e) => console.error("Error adding queued candidate:", e));
-        });
-        iceCandidatesQueue.current = [];
+        processIceCandidateQueue();
       }
     } catch (error) {
       console.error("Error handling received answer:", error);
     }
   };
 
-  const handleIceCandidate = async (data: WebSocketMessage): Promise<void> => {
-    try {
-      if (data.candidate && peerConnection.current) {
-        if (
-          peerConnection.current.remoteDescription &&
-          peerConnection.current.remoteDescription.type
-        ) {
-          await peerConnection.current.addIceCandidate(
-            new RTCIceCandidate(data.candidate)
+  const handleIceCandidate = (data: WebSocketMessage): void => {
+    if (data.candidate) {
+      const iceCandidate = new RTCIceCandidate(data.candidate);
+      if (
+        peerConnection.current &&
+        peerConnection.current.remoteDescription &&
+        peerConnection.current.remoteDescription.type
+      ) {
+        peerConnection.current
+          .addIceCandidate(iceCandidate)
+          .catch((e) =>
+            console.error("Error adding received ice candidate:", e)
           );
-        } else {
-          // リモート記述がまだ設定されていない場合は、candidateをキューに入れる
-          iceCandidatesQueue.current.push(new RTCIceCandidate(data.candidate));
-        }
+      } else {
+        iceCandidatesQueue.current.push(data.candidate);
       }
-    } catch (error) {
-      console.error("Error handling ICE candidate:", error);
+    }
+  };
+
+  const processIceCandidateQueue = (): void => {
+    if (peerConnection.current && peerConnection.current.remoteDescription) {
+      iceCandidatesQueue.current.forEach((candidate) => {
+        peerConnection.current
+          ?.addIceCandidate(new RTCIceCandidate(candidate))
+          .catch((e) => console.error("Error adding queued ice candidate:", e));
+      });
+      iceCandidatesQueue.current = [];
     }
   };
 
   const sendIceCandidate = (candidate: RTCIceCandidate): void => {
-    if (websocket.current) {
-      websocket.current.send(
-        JSON.stringify({
-          type: "ice_candidate",
-          candidate: candidate,
-        })
-      );
-    }
+    sendMessage({
+      type: "ice_candidate",
+      candidate: candidate,
+    });
   };
 
   const endCall = (): void => {
-    if (websocket.current) {
-      websocket.current.send(JSON.stringify({ type: "end_call" }));
-    }
+    sendMessage({ type: "end_call" });
     cleanupCall();
   };
 
@@ -247,7 +254,9 @@ const WebRTCVoiceCall: React.FC = () => {
 
   return (
     <div>
-      {!isCalling ? (
+      {!isConnected ? (
+        <p>Connecting to server...</p>
+      ) : !isCalling ? (
         <button onClick={startCall}>Start Call</button>
       ) : (
         <div>
