@@ -11,7 +11,7 @@ import (
 
 func ChatRoute(router *gin.Engine, apiKey string) {
 	// JSONファイルからプロンプトをロード
-	prompt, err := utils.LoadPromptConfig("prompt.json")
+	prompt, err := utils.LoadPromptConfig("theme_prompt.json")
 	if err != nil {
 		log.Fatal("Error loading prompt config:", err)
 	}
