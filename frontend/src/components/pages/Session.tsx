@@ -1,11 +1,13 @@
 import { HalfModal } from "../utils/HalfModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Typography, Box, List, ListItem, Paper, ListItemText, TextField, Button } from "@mui/material";
 import HomeLogo from "../../assets/homeLogo";
 import { Favorite, Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionContainer from "../utils/SessionContainer";
 import api from "../../services/api";
+import { fetchMemo } from "../../services/memoService"; // Import the fetchMemo function
+
 const users = [
   { name: "User1", icon: <Person />, description: "英語" },
   { name: "User2", icon: <Favorite />, description: "苗字" },
@@ -19,27 +21,38 @@ export const Session = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false); // ローディング状態を管理
+  const [memo1, setMemo1] = useState(""); // メモ1を管理
+
+  useEffect(() => {
+    // コンポーネント読み込み時にメモを取得
+    const getMemo = async () => {
+      try {
+        const data = await fetchMemo();
+        setMemo1(data.memo1 || ""); // memo1だけ取得
+      } catch (error) {
+        console.error("Failed to fetch memo1", error);
+      }
+    };
+    getMemo();
+  }, []);
 
   const handleMemoClose = () => setMemoOpen(false);
   const handleAssistantClose = () => setAssistantOpen(false);
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
-  
+
     setIsLoading(true); // ローディング状態を開始
     setMessages([...messages, `You: ${inputMessage}`]); // ユーザーのメッセージを表示
     const userMessage = inputMessage;
     setInputMessage(""); // 送信後に入力フィールドをクリア
-  
+
     try {
       // サーバーにリクエストを送信
       const response = await api.post("/chat/ask", {
         content: userMessage,
       });
-  
-      // レスポンスデータを確認
-      console.log("Response data:", response.data); // ここでレスポンスデータを確認
-  
+
       // 応答メッセージを表示
       if (response.data && response.data.choices && response.data.choices[0].message.content) {
         const assistantMessage = response.data.choices[0].message.content;
@@ -52,15 +65,13 @@ export const Session = () => {
     } finally {
       setIsLoading(false); // ローディング状態を終了
     }
-  };  
-
-  const memo = "I'm Hanako. Please call me Hanako.";
+  };
 
   return (
     <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen}>
       <SessionContainer theme={theme} users={users} />
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="持ち込みメモ">
-        <Typography variant="body1">{memo}</Typography>
+        <Typography variant="body1">{memo1}</Typography> {/* memo1 を表示 */}
       </HalfModal>
 
       <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
