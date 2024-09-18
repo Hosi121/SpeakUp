@@ -26,26 +26,34 @@ export const Session = () => {
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
-
+  
     setIsLoading(true); // ローディング状態を開始
     setMessages([...messages, `You: ${inputMessage}`]); // ユーザーのメッセージを表示
     const userMessage = inputMessage;
     setInputMessage(""); // 送信後に入力フィールドをクリア
-
+  
     try {
       // サーバーにリクエストを送信
       const response = await api.post("/chat/ask", {
         content: userMessage,
       });
-
+  
+      // レスポンスデータを確認
+      console.log("Response data:", response.data); // ここでレスポンスデータを確認
+  
       // 応答メッセージを表示
-      setMessages((prevMessages) => [...prevMessages, `Assistant: ${response.data.message}`]);
+      if (response.data && response.data.choices && response.data.choices[0].message.content) {
+        const assistantMessage = response.data.choices[0].message.content;
+        setMessages((prevMessages) => [...prevMessages, `Assistant: ${assistantMessage}`]);
+      } else {
+        setMessages((prevMessages) => [...prevMessages, "Error: Invalid response format"]);
+      }
     } catch (error) {
       setMessages((prevMessages) => [...prevMessages, "Error: Failed to get response"]);
     } finally {
       setIsLoading(false); // ローディング状態を終了
     }
-  };
+  };  
 
   const memo = "I'm Hanako. Please call me Hanako.";
 

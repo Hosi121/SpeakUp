@@ -34,7 +34,7 @@ func ChatRoute(router *gin.Engine, apiKey string) {
 	supportChatController := controllers.NewChatController(
 		"gpt-3.5-turbo", // 使用するモデル
 		apiKey,          // 環境変数から取得したAPIキー
-		100,             // max tokens
+		1000,            // max tokens
 		20*time.Second,  // timeout
 		supportPrompt,   // JSONから読み込んだプロンプトを渡す (support)
 	)
