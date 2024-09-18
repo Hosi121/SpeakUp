@@ -44,7 +44,7 @@ const AdminPage: React.FC = () => {
   const handleGenerateTheme = async () => {
     try {
       const prompt = 'イベントのテーマを提案してください。';
-      const response = await api.post<ChatResponse>('/chat/ask', { content: prompt });
+      const response = await api.post<ChatResponse>('/chat/theme', { content: prompt });
       const generatedTheme = response.data.choices[0].message.content;
       setTheme(generatedTheme);
     } catch (error) {
