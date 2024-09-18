@@ -100,7 +100,7 @@ const VoiceChat: React.FC = () => {
     return pc;
   };
 
-  const startCall = async (isReceiver: boolean = false): Promise<void> => {
+  const startCall = async (): Promise<void> => {
     const pc = createPeerConnection();
 
     try {
@@ -108,23 +108,20 @@ const VoiceChat: React.FC = () => {
       localStreamRef.current = stream;
       stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-      if (!isReceiver) {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
 
-        if (websocketRef.current) {
-          websocketRef.current.send(
-            JSON.stringify({
-              type: "offer",
-              offer: pc.localDescription,
-            })
-          );
-        }
+      if (websocketRef.current) {
+        websocketRef.current.send(
+          JSON.stringify({
+            type: "offer",
+            offer: pc.localDescription,
+          })
+        );
       }
 
       setPeerConnection(pc);
       setIsInCall(true);
-      setIsIncomingCall(false);
     } catch (error) {
       console.error("Error starting call:", error);
     }
@@ -136,6 +133,10 @@ const VoiceChat: React.FC = () => {
     const pc = createPeerConnection();
 
     try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      localStreamRef.current = stream;
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
@@ -153,19 +154,6 @@ const VoiceChat: React.FC = () => {
       setIsInCall(true);
     } catch (error) {
       console.error("Error handling offer:", error);
-    }
-  };
-
-  const requestCall = (): void => {
-    if (websocketRef.current) {
-      websocketRef.current.send(JSON.stringify({ type: "call_request" }));
-    }
-  };
-
-  const acceptCall = async (): Promise<void> => {
-    if (websocketRef.current) {
-      websocketRef.current.send(JSON.stringify({ type: "call_accepted" }));
-      await startCall(true);
     }
   };
 
@@ -207,53 +195,25 @@ const VoiceChat: React.FC = () => {
       >
         {isConnected ? "Connected to Server" : "Connect to Server"}
       </button>
-      {isIncomingCall ? (
-        <button
-          onClick={acceptCall}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: "#28a745",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Accept Call
-        </button>
-      ) : isInCall ? (
-        <button
-          onClick={endCall}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: "#dc3545",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          End Call
-        </button>
-      ) : (
-        <button
-          onClick={requestCall}
-          disabled={!isConnected}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: !isConnected ? "#ccc" : "#28a745",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: !isConnected ? "default" : "pointer",
-          }}
-        >
-          Start Call
-        </button>
-      )}
+      <button
+        onClick={isInCall ? endCall : startCall}
+        disabled={!isConnected}
+        style={{
+          padding: "10px 20px",
+          fontSize: "16px",
+          backgroundColor: !isConnected
+            ? "#ccc"
+            : isInCall
+            ? "#dc3545"
+            : "#28a745",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: !isConnected ? "default" : "pointer",
+        }}
+      >
+        {isInCall ? "End Call" : "Start Call"}
+      </button>
       <audio ref={remoteAudioRef} autoPlay />
     </div>
   );
