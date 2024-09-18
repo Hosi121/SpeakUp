@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const WEBSOCKET_URL = "ws://localhost:8080/ws";
+const WEBSOCKET_URL = "ws://10.70.174.101:8080/ws";
 
 const VoiceChat: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
