@@ -1,79 +1,12 @@
 import { RefObject } from "react";
-import { textForSendSdpRef, textToReceiveSdpRef } from "./App";
+import { textForSendSdpRef, ws } from "./App";
 
 let localStream: MediaStream | null = null;
 let peerConnection: RTCPeerConnection | null;
 let negotiationneededCounter = 0;
 const iceCandidateQueue: RTCIceCandidate[] = [];
 
-// シグナリングサーバへ接続する
-const wsUrl = "ws://10.70.174.103:3001/";
-const ws = new WebSocket(wsUrl);
-ws.onopen = () => {
-  console.log("ws open()");
-};
-ws.onerror = (err) => {
-  console.error("ws onerror() ERR:", err);
-};
-ws.onmessage = async (evt) => {
-  console.log("ws onmessage() data:", evt.data);
-  let messageText: string;
-
-  if (evt.data instanceof Blob) {
-    try {
-      messageText = await evt.data.text();
-    } catch (error) {
-      console.error("Error reading Blob data:", error);
-      return;
-    }
-  } else if (typeof evt.data === "string") {
-    messageText = evt.data;
-  } else {
-    console.error("Unsupported message data type:", typeof evt.data);
-    return;
-  }
-  const message = JSON.parse(messageText);
-  switch (message.type) {
-    case "offer": {
-      console.log("Received offer ...");
-      const textToReceiveSdp = textToReceiveSdpRef.current;
-      if (textToReceiveSdp !== null) {
-        textToReceiveSdp.value = message.sdp;
-      }
-      await setOffer(new RTCSessionDescription(message));
-      break;
-    }
-    case "answer": {
-      console.log("Received answer ...");
-      const textToReceiveSdp = textToReceiveSdpRef.current;
-      if (textToReceiveSdp) {
-        textToReceiveSdp.value = message.sdp;
-      }
-      setAnswer(new RTCSessionDescription(message));
-      break;
-    }
-    case "candidate": {
-      console.log("Received ICE candidate ...");
-      const candidate = new RTCIceCandidate(message.ice);
-      console.log(candidate);
-      addIceCandidate(candidate);
-      break;
-    }
-    case "close": {
-      console.log("peer is closed ...");
-      const textForSendSdp = textForSendSdpRef.current;
-      const textToReceiveSdp = textToReceiveSdpRef.current;
-      hangUp(textForSendSdp, textToReceiveSdp);
-      break;
-    }
-    default: {
-      console.log("Invalid message");
-      break;
-    }
-  }
-};
-
-const addIceCandidate = (candidate: RTCIceCandidate) => {
+export const addIceCandidate = (candidate: RTCIceCandidate) => {
   if (
     peerConnection &&
     peerConnection.remoteDescription &&
@@ -327,7 +260,7 @@ const setRemoteDescription = async (
   }
 };
 
-const setOffer = async (sessionDescription: RTCSessionDescription) => {
+export const setOffer = async (sessionDescription: RTCSessionDescription) => {
   if (peerConnection) {
     console.warn("PeerConnection already exists, closing existing connection");
     peerConnection.close();
@@ -347,7 +280,7 @@ const setOffer = async (sessionDescription: RTCSessionDescription) => {
   await setRemoteDescription(sessionDescription);
 };
 
-const setAnswer = async (sessionDescription: RTCSessionDescription) => {
+export const setAnswer = async (sessionDescription: RTCSessionDescription) => {
   if (!peerConnection) {
     console.error("peerConnection NOT exist!");
     return;
