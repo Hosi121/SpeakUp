@@ -8,6 +8,8 @@ const STUN_SERVERS = {
   ],
 };
 
+type HashedId = { hashedId: number };
+
 const VoiceChat: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
@@ -15,6 +17,12 @@ const VoiceChat: React.FC = () => {
   const websocketRef = useRef<WebSocket | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+
+  const [hashedId, setHashedId] = useState(0);
+  const handleSetHashId = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = Number(e.target.value);
+    setHashedId(id);
+  }
 
   const cleanupResources = useCallback(() => {
     if (peerConnectionRef.current) {
@@ -46,6 +54,9 @@ const VoiceChat: React.FC = () => {
     ws.onopen = () => {
       console.log("Connected to signaling server");
       setIsConnected(true);
+
+      const idData: HashedId = { hashedId: hashedId };
+      ws.send(JSON.stringify(idData));
     };
 
     ws.onmessage = async (event: MessageEvent) => {
@@ -193,6 +204,10 @@ const VoiceChat: React.FC = () => {
         gap: "1rem",
       }}
     >
+      <p>
+        Hashed ID:
+        <input onChange={e => handleSetHashId(e)} />
+      </p>
       <button
         onClick={connectToSignalingServer}
         disabled={isConnected}
@@ -217,8 +232,8 @@ const VoiceChat: React.FC = () => {
           backgroundColor: !isConnected
             ? "#ccc"
             : isInCall
-            ? "#dc3545"
-            : "#28a745",
+              ? "#dc3545"
+              : "#28a745",
           color: "white",
           border: "none",
           borderRadius: "5px",
