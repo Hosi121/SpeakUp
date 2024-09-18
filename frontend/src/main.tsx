@@ -14,6 +14,7 @@ import SignUp from "./components/pages/SignUp.tsx";
 import { Record } from "./components/pages/Record.tsx";
 import { Memo } from "./components/pages/Memo.tsx";
 import { Message } from "./components/pages/Message.tsx";
+import FriendRequest from "./components/pages/FriendRequest.tsx";
 import Login from "./components/pages/Login.tsx";
 import { Stats } from "./components/pages/Stats.tsx";
 import { ConversationHistory } from "./components/pages/ConversationHistory.tsx";
@@ -100,6 +101,10 @@ const router = createBrowserRouter([
     path: "session_history_friendlist",
     element: <SessionHistoryFriendlist />,
   },
+  {
+    path: "friendrequest",
+    element: <FriendRequest />,
+  }
 ]);
 
 const rootElement = document.getElementById("root");
