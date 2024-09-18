@@ -34,6 +34,20 @@ func (ec *EVENTRECORDSCreate) SetEventID(i int) *EVENTRECORDSCreate {
 	return ec
 }
 
+// SetParticipatesBit sets the "participates_bit" field.
+func (ec *EVENTRECORDSCreate) SetParticipatesBit(i int) *EVENTRECORDSCreate {
+	ec.mutation.SetParticipatesBit(i)
+	return ec
+}
+
+// SetNillableParticipatesBit sets the "participates_bit" field if the given value is not nil.
+func (ec *EVENTRECORDSCreate) SetNillableParticipatesBit(i *int) *EVENTRECORDSCreate {
+	if i != nil {
+		ec.SetParticipatesBit(*i)
+	}
+	return ec
+}
+
 // SetRecords sets the "records" field.
 func (ec *EVENTRECORDSCreate) SetRecords(s string) *EVENTRECORDSCreate {
 	ec.mutation.SetRecords(s)
@@ -136,6 +150,10 @@ func (ec *EVENTRECORDSCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ec *EVENTRECORDSCreate) defaults() {
+	if _, ok := ec.mutation.ParticipatesBit(); !ok {
+		v := event_records.DefaultParticipatesBit
+		ec.mutation.SetParticipatesBit(v)
+	}
 	if _, ok := ec.mutation.Records(); !ok {
 		v := event_records.DefaultRecords
 		ec.mutation.SetRecords(v)
@@ -149,6 +167,14 @@ func (ec *EVENTRECORDSCreate) check() error {
 	}
 	if _, ok := ec.mutation.EventID(); !ok {
 		return &ValidationError{Name: "event_id", err: errors.New(`ent: missing required field "EVENT_RECORDS.event_id"`)}
+	}
+	if _, ok := ec.mutation.ParticipatesBit(); !ok {
+		return &ValidationError{Name: "participates_bit", err: errors.New(`ent: missing required field "EVENT_RECORDS.participates_bit"`)}
+	}
+	if v, ok := ec.mutation.ParticipatesBit(); ok {
+		if err := event_records.ParticipatesBitValidator(v); err != nil {
+			return &ValidationError{Name: "participates_bit", err: fmt.Errorf(`ent: validator failed for field "EVENT_RECORDS.participates_bit": %w`, err)}
+		}
 	}
 	if _, ok := ec.mutation.Records(); !ok {
 		return &ValidationError{Name: "records", err: errors.New(`ent: missing required field "EVENT_RECORDS.records"`)}
@@ -186,6 +212,10 @@ func (ec *EVENTRECORDSCreate) createSpec() (*EVENT_RECORDS, *sqlgraph.CreateSpec
 	if value, ok := ec.mutation.EventID(); ok {
 		_spec.SetField(event_records.FieldEventID, field.TypeInt, value)
 		_node.EventID = value
+	}
+	if value, ok := ec.mutation.ParticipatesBit(); ok {
+		_spec.SetField(event_records.FieldParticipatesBit, field.TypeInt, value)
+		_node.ParticipatesBit = value
 	}
 	if value, ok := ec.mutation.Records(); ok {
 		_spec.SetField(event_records.FieldRecords, field.TypeString, value)

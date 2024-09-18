@@ -3012,6 +3012,8 @@ type EVENTRECORDSMutation struct {
 	adduser_id          *int
 	event_id            *int
 	addevent_id         *int
+	participates_bit    *int
+	addparticipates_bit *int
 	records             *string
 	clearedFields       map[string]struct{}
 	made                *int
@@ -3236,6 +3238,62 @@ func (m *EVENTRECORDSMutation) ResetEventID() {
 	m.addevent_id = nil
 }
 
+// SetParticipatesBit sets the "participates_bit" field.
+func (m *EVENTRECORDSMutation) SetParticipatesBit(i int) {
+	m.participates_bit = &i
+	m.addparticipates_bit = nil
+}
+
+// ParticipatesBit returns the value of the "participates_bit" field in the mutation.
+func (m *EVENTRECORDSMutation) ParticipatesBit() (r int, exists bool) {
+	v := m.participates_bit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParticipatesBit returns the old "participates_bit" field's value of the EVENT_RECORDS entity.
+// If the EVENT_RECORDS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EVENTRECORDSMutation) OldParticipatesBit(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParticipatesBit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParticipatesBit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParticipatesBit: %w", err)
+	}
+	return oldValue.ParticipatesBit, nil
+}
+
+// AddParticipatesBit adds i to the "participates_bit" field.
+func (m *EVENTRECORDSMutation) AddParticipatesBit(i int) {
+	if m.addparticipates_bit != nil {
+		*m.addparticipates_bit += i
+	} else {
+		m.addparticipates_bit = &i
+	}
+}
+
+// AddedParticipatesBit returns the value that was added to the "participates_bit" field in this mutation.
+func (m *EVENTRECORDSMutation) AddedParticipatesBit() (r int, exists bool) {
+	v := m.addparticipates_bit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetParticipatesBit resets all changes to the "participates_bit" field.
+func (m *EVENTRECORDSMutation) ResetParticipatesBit() {
+	m.participates_bit = nil
+	m.addparticipates_bit = nil
+}
+
 // SetRecords sets the "records" field.
 func (m *EVENTRECORDSMutation) SetRecords(s string) {
 	m.records = &s
@@ -3438,12 +3496,15 @@ func (m *EVENTRECORDSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EVENTRECORDSMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.user_id != nil {
 		fields = append(fields, event_records.FieldUserID)
 	}
 	if m.event_id != nil {
 		fields = append(fields, event_records.FieldEventID)
+	}
+	if m.participates_bit != nil {
+		fields = append(fields, event_records.FieldParticipatesBit)
 	}
 	if m.records != nil {
 		fields = append(fields, event_records.FieldRecords)
@@ -3460,6 +3521,8 @@ func (m *EVENTRECORDSMutation) Field(name string) (ent.Value, bool) {
 		return m.UserID()
 	case event_records.FieldEventID:
 		return m.EventID()
+	case event_records.FieldParticipatesBit:
+		return m.ParticipatesBit()
 	case event_records.FieldRecords:
 		return m.Records()
 	}
@@ -3475,6 +3538,8 @@ func (m *EVENTRECORDSMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldUserID(ctx)
 	case event_records.FieldEventID:
 		return m.OldEventID(ctx)
+	case event_records.FieldParticipatesBit:
+		return m.OldParticipatesBit(ctx)
 	case event_records.FieldRecords:
 		return m.OldRecords(ctx)
 	}
@@ -3500,6 +3565,13 @@ func (m *EVENTRECORDSMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEventID(v)
 		return nil
+	case event_records.FieldParticipatesBit:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParticipatesBit(v)
+		return nil
 	case event_records.FieldRecords:
 		v, ok := value.(string)
 		if !ok {
@@ -3521,6 +3593,9 @@ func (m *EVENTRECORDSMutation) AddedFields() []string {
 	if m.addevent_id != nil {
 		fields = append(fields, event_records.FieldEventID)
 	}
+	if m.addparticipates_bit != nil {
+		fields = append(fields, event_records.FieldParticipatesBit)
+	}
 	return fields
 }
 
@@ -3533,6 +3608,8 @@ func (m *EVENTRECORDSMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUserID()
 	case event_records.FieldEventID:
 		return m.AddedEventID()
+	case event_records.FieldParticipatesBit:
+		return m.AddedParticipatesBit()
 	}
 	return nil, false
 }
@@ -3555,6 +3632,13 @@ func (m *EVENTRECORDSMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddEventID(v)
+		return nil
+	case event_records.FieldParticipatesBit:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddParticipatesBit(v)
 		return nil
 	}
 	return fmt.Errorf("unknown EVENT_RECORDS numeric field %s", name)
@@ -3588,6 +3672,9 @@ func (m *EVENTRECORDSMutation) ResetField(name string) error {
 		return nil
 	case event_records.FieldEventID:
 		m.ResetEventID()
+		return nil
+	case event_records.FieldParticipatesBit:
+		m.ResetParticipatesBit()
 		return nil
 	case event_records.FieldRecords:
 		m.ResetRecords()
@@ -6455,6 +6542,8 @@ type USERSMutation struct {
 	username        *string
 	email           *string
 	avatar_url      *string
+	rank            *int
+	addrank         *int
 	role            *users.Role
 	created_at      *time.Time
 	is_deleted      *bool
@@ -6695,6 +6784,62 @@ func (m *USERSMutation) AvatarURLCleared() bool {
 func (m *USERSMutation) ResetAvatarURL() {
 	m.avatar_url = nil
 	delete(m.clearedFields, users.FieldAvatarURL)
+}
+
+// SetRank sets the "rank" field.
+func (m *USERSMutation) SetRank(i int) {
+	m.rank = &i
+	m.addrank = nil
+}
+
+// Rank returns the value of the "rank" field in the mutation.
+func (m *USERSMutation) Rank() (r int, exists bool) {
+	v := m.rank
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRank returns the old "rank" field's value of the USERS entity.
+// If the USERS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *USERSMutation) OldRank(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRank is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRank requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRank: %w", err)
+	}
+	return oldValue.Rank, nil
+}
+
+// AddRank adds i to the "rank" field.
+func (m *USERSMutation) AddRank(i int) {
+	if m.addrank != nil {
+		*m.addrank += i
+	} else {
+		m.addrank = &i
+	}
+}
+
+// AddedRank returns the value that was added to the "rank" field in this mutation.
+func (m *USERSMutation) AddedRank() (r int, exists bool) {
+	v := m.addrank
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRank resets all changes to the "rank" field.
+func (m *USERSMutation) ResetRank() {
+	m.rank = nil
+	m.addrank = nil
 }
 
 // SetRole sets the "role" field.
@@ -7115,7 +7260,7 @@ func (m *USERSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *USERSMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.username != nil {
 		fields = append(fields, users.FieldUsername)
 	}
@@ -7124,6 +7269,9 @@ func (m *USERSMutation) Fields() []string {
 	}
 	if m.avatar_url != nil {
 		fields = append(fields, users.FieldAvatarURL)
+	}
+	if m.rank != nil {
+		fields = append(fields, users.FieldRank)
 	}
 	if m.role != nil {
 		fields = append(fields, users.FieldRole)
@@ -7151,6 +7299,8 @@ func (m *USERSMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case users.FieldAvatarURL:
 		return m.AvatarURL()
+	case users.FieldRank:
+		return m.Rank()
 	case users.FieldRole:
 		return m.Role()
 	case users.FieldCreatedAt:
@@ -7174,6 +7324,8 @@ func (m *USERSMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldEmail(ctx)
 	case users.FieldAvatarURL:
 		return m.OldAvatarURL(ctx)
+	case users.FieldRank:
+		return m.OldRank(ctx)
 	case users.FieldRole:
 		return m.OldRole(ctx)
 	case users.FieldCreatedAt:
@@ -7212,6 +7364,13 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAvatarURL(v)
 		return nil
+	case users.FieldRank:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRank(v)
+		return nil
 	case users.FieldRole:
 		v, ok := value.(users.Role)
 		if !ok {
@@ -7247,13 +7406,21 @@ func (m *USERSMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *USERSMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addrank != nil {
+		fields = append(fields, users.FieldRank)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *USERSMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case users.FieldRank:
+		return m.AddedRank()
+	}
 	return nil, false
 }
 
@@ -7262,6 +7429,13 @@ func (m *USERSMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *USERSMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case users.FieldRank:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRank(v)
+		return nil
 	}
 	return fmt.Errorf("unknown USERS numeric field %s", name)
 }
@@ -7306,6 +7480,9 @@ func (m *USERSMutation) ResetField(name string) error {
 		return nil
 	case users.FieldAvatarURL:
 		m.ResetAvatarURL()
+		return nil
+	case users.FieldRank:
+		m.ResetRank()
 		return nil
 	case users.FieldRole:
 		m.ResetRole()

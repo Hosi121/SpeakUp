@@ -23,6 +23,10 @@ func (USERS) Fields() []ent.Field {
 			NotEmpty(),
 		field.Text("avatar_url").
 			Optional(),
+		field.Int("rank").
+			Max(5).
+			Min(1).
+			Default(3),
 		field.Enum("role").
 			Values("SUPERUSER", "ADMIN", "USER"),
 		field.Time("created_at").

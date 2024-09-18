@@ -72,6 +72,27 @@ func (eu *EVENTRECORDSUpdate) AddEventID(i int) *EVENTRECORDSUpdate {
 	return eu
 }
 
+// SetParticipatesBit sets the "participates_bit" field.
+func (eu *EVENTRECORDSUpdate) SetParticipatesBit(i int) *EVENTRECORDSUpdate {
+	eu.mutation.ResetParticipatesBit()
+	eu.mutation.SetParticipatesBit(i)
+	return eu
+}
+
+// SetNillableParticipatesBit sets the "participates_bit" field if the given value is not nil.
+func (eu *EVENTRECORDSUpdate) SetNillableParticipatesBit(i *int) *EVENTRECORDSUpdate {
+	if i != nil {
+		eu.SetParticipatesBit(*i)
+	}
+	return eu
+}
+
+// AddParticipatesBit adds i to the "participates_bit" field.
+func (eu *EVENTRECORDSUpdate) AddParticipatesBit(i int) *EVENTRECORDSUpdate {
+	eu.mutation.AddParticipatesBit(i)
+	return eu
+}
+
 // SetRecords sets the "records" field.
 func (eu *EVENTRECORDSUpdate) SetRecords(s string) *EVENTRECORDSUpdate {
 	eu.mutation.SetRecords(s)
@@ -204,7 +225,20 @@ func (eu *EVENTRECORDSUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (eu *EVENTRECORDSUpdate) check() error {
+	if v, ok := eu.mutation.ParticipatesBit(); ok {
+		if err := event_records.ParticipatesBitValidator(v); err != nil {
+			return &ValidationError{Name: "participates_bit", err: fmt.Errorf(`ent: validator failed for field "EVENT_RECORDS.participates_bit": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (eu *EVENTRECORDSUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := eu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(event_records.Table, event_records.Columns, sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt))
 	if ps := eu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -224,6 +258,12 @@ func (eu *EVENTRECORDSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.AddedEventID(); ok {
 		_spec.AddField(event_records.FieldEventID, field.TypeInt, value)
+	}
+	if value, ok := eu.mutation.ParticipatesBit(); ok {
+		_spec.SetField(event_records.FieldParticipatesBit, field.TypeInt, value)
+	}
+	if value, ok := eu.mutation.AddedParticipatesBit(); ok {
+		_spec.AddField(event_records.FieldParticipatesBit, field.TypeInt, value)
 	}
 	if value, ok := eu.mutation.Records(); ok {
 		_spec.SetField(event_records.FieldRecords, field.TypeString, value)
@@ -393,6 +433,27 @@ func (euo *EVENTRECORDSUpdateOne) AddEventID(i int) *EVENTRECORDSUpdateOne {
 	return euo
 }
 
+// SetParticipatesBit sets the "participates_bit" field.
+func (euo *EVENTRECORDSUpdateOne) SetParticipatesBit(i int) *EVENTRECORDSUpdateOne {
+	euo.mutation.ResetParticipatesBit()
+	euo.mutation.SetParticipatesBit(i)
+	return euo
+}
+
+// SetNillableParticipatesBit sets the "participates_bit" field if the given value is not nil.
+func (euo *EVENTRECORDSUpdateOne) SetNillableParticipatesBit(i *int) *EVENTRECORDSUpdateOne {
+	if i != nil {
+		euo.SetParticipatesBit(*i)
+	}
+	return euo
+}
+
+// AddParticipatesBit adds i to the "participates_bit" field.
+func (euo *EVENTRECORDSUpdateOne) AddParticipatesBit(i int) *EVENTRECORDSUpdateOne {
+	euo.mutation.AddParticipatesBit(i)
+	return euo
+}
+
 // SetRecords sets the "records" field.
 func (euo *EVENTRECORDSUpdateOne) SetRecords(s string) *EVENTRECORDSUpdateOne {
 	euo.mutation.SetRecords(s)
@@ -538,7 +599,20 @@ func (euo *EVENTRECORDSUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (euo *EVENTRECORDSUpdateOne) check() error {
+	if v, ok := euo.mutation.ParticipatesBit(); ok {
+		if err := event_records.ParticipatesBitValidator(v); err != nil {
+			return &ValidationError{Name: "participates_bit", err: fmt.Errorf(`ent: validator failed for field "EVENT_RECORDS.participates_bit": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (euo *EVENTRECORDSUpdateOne) sqlSave(ctx context.Context) (_node *EVENT_RECORDS, err error) {
+	if err := euo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(event_records.Table, event_records.Columns, sqlgraph.NewFieldSpec(event_records.FieldID, field.TypeInt))
 	id, ok := euo.mutation.ID()
 	if !ok {
@@ -575,6 +649,12 @@ func (euo *EVENTRECORDSUpdateOne) sqlSave(ctx context.Context) (_node *EVENT_REC
 	}
 	if value, ok := euo.mutation.AddedEventID(); ok {
 		_spec.AddField(event_records.FieldEventID, field.TypeInt, value)
+	}
+	if value, ok := euo.mutation.ParticipatesBit(); ok {
+		_spec.SetField(event_records.FieldParticipatesBit, field.TypeInt, value)
+	}
+	if value, ok := euo.mutation.AddedParticipatesBit(); ok {
+		_spec.AddField(event_records.FieldParticipatesBit, field.TypeInt, value)
 	}
 	if value, ok := euo.mutation.Records(); ok {
 		_spec.SetField(event_records.FieldRecords, field.TypeString, value)

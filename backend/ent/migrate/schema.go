@@ -117,6 +117,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "event_id", Type: field.TypeInt},
+		{Name: "participates_bit", Type: field.TypeInt, Default: 0},
 		{Name: "records", Type: field.TypeString, Default: ""},
 		{Name: "events_participated", Type: field.TypeInt, Nullable: true},
 		{Name: "users_makes", Type: field.TypeInt, Nullable: true},
@@ -129,13 +130,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "event_record_ss_event_ss_participated",
-				Columns:    []*schema.Column{EventRecordSsColumns[4]},
+				Columns:    []*schema.Column{EventRecordSsColumns[5]},
 				RefColumns: []*schema.Column{EventSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "event_record_ss_user_ss_makes",
-				Columns:    []*schema.Column{EventRecordSsColumns[5]},
+				Columns:    []*schema.Column{EventRecordSsColumns[6]},
 				RefColumns: []*schema.Column{UserSsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -230,6 +231,7 @@ var (
 		{Name: "username", Type: field.TypeString, Size: 255},
 		{Name: "email", Type: field.TypeString},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "rank", Type: field.TypeInt, Default: 3},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPERUSER", "ADMIN", "USER"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "is_deleted", Type: field.TypeBool, Default: false},

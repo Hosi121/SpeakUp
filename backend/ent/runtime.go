@@ -71,8 +71,28 @@ func init() {
 	events.DefaultCreatedAt = eventsDescCreatedAt.Default.(time.Time)
 	event_recordsFields := schema.EVENT_RECORDS{}.Fields()
 	_ = event_recordsFields
+	// event_recordsDescParticipatesBit is the schema descriptor for participates_bit field.
+	event_recordsDescParticipatesBit := event_recordsFields[2].Descriptor()
+	// event_records.DefaultParticipatesBit holds the default value on creation for the participates_bit field.
+	event_records.DefaultParticipatesBit = event_recordsDescParticipatesBit.Default.(int)
+	// event_records.ParticipatesBitValidator is a validator for the "participates_bit" field. It is called by the builders before save.
+	event_records.ParticipatesBitValidator = func() func(int) error {
+		validators := event_recordsDescParticipatesBit.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(participates_bit int) error {
+			for _, fn := range fns {
+				if err := fn(participates_bit); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// event_recordsDescRecords is the schema descriptor for records field.
-	event_recordsDescRecords := event_recordsFields[2].Descriptor()
+	event_recordsDescRecords := event_recordsFields[3].Descriptor()
 	// event_records.DefaultRecords holds the default value on creation for the records field.
 	event_records.DefaultRecords = event_recordsDescRecords.Default.(string)
 	friendsFields := schema.FRIENDS{}.Fields()
@@ -139,16 +159,36 @@ func init() {
 	usersDescEmail := usersFields[1].Descriptor()
 	// users.EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	users.EmailValidator = usersDescEmail.Validators[0].(func(string) error)
+	// usersDescRank is the schema descriptor for rank field.
+	usersDescRank := usersFields[3].Descriptor()
+	// users.DefaultRank holds the default value on creation for the rank field.
+	users.DefaultRank = usersDescRank.Default.(int)
+	// users.RankValidator is a validator for the "rank" field. It is called by the builders before save.
+	users.RankValidator = func() func(int) error {
+		validators := usersDescRank.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(rank int) error {
+			for _, fn := range fns {
+				if err := fn(rank); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// usersDescCreatedAt is the schema descriptor for created_at field.
-	usersDescCreatedAt := usersFields[4].Descriptor()
+	usersDescCreatedAt := usersFields[5].Descriptor()
 	// users.DefaultCreatedAt holds the default value on creation for the created_at field.
 	users.DefaultCreatedAt = usersDescCreatedAt.Default.(func() time.Time)
 	// usersDescIsDeleted is the schema descriptor for is_deleted field.
-	usersDescIsDeleted := usersFields[5].Descriptor()
+	usersDescIsDeleted := usersFields[6].Descriptor()
 	// users.DefaultIsDeleted holds the default value on creation for the is_deleted field.
 	users.DefaultIsDeleted = usersDescIsDeleted.Default.(bool)
 	// usersDescUpdatedAt is the schema descriptor for updated_at field.
-	usersDescUpdatedAt := usersFields[6].Descriptor()
+	usersDescUpdatedAt := usersFields[7].Descriptor()
 	// users.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	users.DefaultUpdatedAt = usersDescUpdatedAt.Default.(func() time.Time)
 }
