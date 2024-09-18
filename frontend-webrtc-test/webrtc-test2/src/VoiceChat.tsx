@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-// WebSocket URLを環境変数から読み込む
-const WEBSOCKET_URL = "ws://10.70.174.101:8080/ws";
+const WEBSOCKET_URL = "ws://localhost:8080/ws";
 
 const VoiceChat: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -9,11 +8,16 @@ const VoiceChat: React.FC = () => {
   const [peerConnection, setPeerConnection] =
     useState<RTCPeerConnection | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     return () => {
       if (websocketRef.current) {
         websocketRef.current.close();
+      }
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
@@ -78,15 +82,14 @@ const VoiceChat: React.FC = () => {
     };
 
     pc.ontrack = (event: RTCTrackEvent) => {
-      const remoteAudio = new Audio();
-      if (event.streams[0]) {
-        remoteAudio.srcObject = event.streams[0];
-        remoteAudio.play();
+      if (remoteAudioRef.current && event.streams[0]) {
+        remoteAudioRef.current.srcObject = event.streams[0];
       }
     };
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      localStreamRef.current = stream;
       stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
       const offer = await pc.createOffer();
@@ -125,15 +128,14 @@ const VoiceChat: React.FC = () => {
     };
 
     pc.ontrack = (event: RTCTrackEvent) => {
-      const remoteAudio = new Audio();
-      if (event.streams[0]) {
-        remoteAudio.srcObject = event.streams[0];
-        remoteAudio.play();
+      if (remoteAudioRef.current && event.streams[0]) {
+        remoteAudioRef.current.srcObject = event.streams[0];
       }
     };
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      localStreamRef.current = stream;
       stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
@@ -160,6 +162,12 @@ const VoiceChat: React.FC = () => {
     if (peerConnection) {
       peerConnection.close();
       setPeerConnection(null);
+    }
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+    }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
     }
     setIsInCall(false);
   };
@@ -207,6 +215,7 @@ const VoiceChat: React.FC = () => {
       >
         {isInCall ? "End Call" : "Start Call"}
       </button>
+      <audio ref={remoteAudioRef} autoPlay />
     </div>
   );
 };
