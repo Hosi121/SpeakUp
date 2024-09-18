@@ -19,7 +19,7 @@ const WebRTCVoiceCall: React.FC = () => {
 
   useEffect(() => {
     // WebSocketの接続
-    websocket.current = new WebSocket("ws://localhost:8080/ws");
+    websocket.current = new WebSocket("ws://10.70.174.101:8080/ws");
 
     websocket.current.onmessage = (event: MessageEvent) => {
       const data: WebSocketMessage = JSON.parse(event.data);
