@@ -71,8 +71,28 @@ func init() {
 	events.DefaultCreatedAt = eventsDescCreatedAt.Default.(time.Time)
 	event_recordsFields := schema.EVENT_RECORDS{}.Fields()
 	_ = event_recordsFields
+	// event_recordsDescParticipatesBit is the schema descriptor for participates_bit field.
+	event_recordsDescParticipatesBit := event_recordsFields[2].Descriptor()
+	// event_records.DefaultParticipatesBit holds the default value on creation for the participates_bit field.
+	event_records.DefaultParticipatesBit = event_recordsDescParticipatesBit.Default.(int)
+	// event_records.ParticipatesBitValidator is a validator for the "participates_bit" field. It is called by the builders before save.
+	event_records.ParticipatesBitValidator = func() func(int) error {
+		validators := event_recordsDescParticipatesBit.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(participates_bit int) error {
+			for _, fn := range fns {
+				if err := fn(participates_bit); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// event_recordsDescRecords is the schema descriptor for records field.
-	event_recordsDescRecords := event_recordsFields[2].Descriptor()
+	event_recordsDescRecords := event_recordsFields[3].Descriptor()
 	// event_records.DefaultRecords holds the default value on creation for the records field.
 	event_records.DefaultRecords = event_recordsDescRecords.Default.(string)
 	friendsFields := schema.FRIENDS{}.Fields()

@@ -63,6 +63,11 @@ func EventID(v int) predicate.EVENT_RECORDS {
 	return predicate.EVENT_RECORDS(sql.FieldEQ(FieldEventID, v))
 }
 
+// ParticipatesBit applies equality check predicate on the "participates_bit" field. It's identical to ParticipatesBitEQ.
+func ParticipatesBit(v int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldEQ(FieldParticipatesBit, v))
+}
+
 // Records applies equality check predicate on the "records" field. It's identical to RecordsEQ.
 func Records(v string) predicate.EVENT_RECORDS {
 	return predicate.EVENT_RECORDS(sql.FieldEQ(FieldRecords, v))
@@ -146,6 +151,46 @@ func EventIDLT(v int) predicate.EVENT_RECORDS {
 // EventIDLTE applies the LTE predicate on the "event_id" field.
 func EventIDLTE(v int) predicate.EVENT_RECORDS {
 	return predicate.EVENT_RECORDS(sql.FieldLTE(FieldEventID, v))
+}
+
+// ParticipatesBitEQ applies the EQ predicate on the "participates_bit" field.
+func ParticipatesBitEQ(v int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldEQ(FieldParticipatesBit, v))
+}
+
+// ParticipatesBitNEQ applies the NEQ predicate on the "participates_bit" field.
+func ParticipatesBitNEQ(v int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldNEQ(FieldParticipatesBit, v))
+}
+
+// ParticipatesBitIn applies the In predicate on the "participates_bit" field.
+func ParticipatesBitIn(vs ...int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldIn(FieldParticipatesBit, vs...))
+}
+
+// ParticipatesBitNotIn applies the NotIn predicate on the "participates_bit" field.
+func ParticipatesBitNotIn(vs ...int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldNotIn(FieldParticipatesBit, vs...))
+}
+
+// ParticipatesBitGT applies the GT predicate on the "participates_bit" field.
+func ParticipatesBitGT(v int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldGT(FieldParticipatesBit, v))
+}
+
+// ParticipatesBitGTE applies the GTE predicate on the "participates_bit" field.
+func ParticipatesBitGTE(v int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldGTE(FieldParticipatesBit, v))
+}
+
+// ParticipatesBitLT applies the LT predicate on the "participates_bit" field.
+func ParticipatesBitLT(v int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldLT(FieldParticipatesBit, v))
+}
+
+// ParticipatesBitLTE applies the LTE predicate on the "participates_bit" field.
+func ParticipatesBitLTE(v int) predicate.EVENT_RECORDS {
+	return predicate.EVENT_RECORDS(sql.FieldLTE(FieldParticipatesBit, v))
 }
 
 // RecordsEQ applies the EQ predicate on the "records" field.

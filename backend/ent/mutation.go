@@ -3012,6 +3012,8 @@ type EVENTRECORDSMutation struct {
 	adduser_id          *int
 	event_id            *int
 	addevent_id         *int
+	participates_bit    *int
+	addparticipates_bit *int
 	records             *string
 	clearedFields       map[string]struct{}
 	made                *int
@@ -3236,6 +3238,62 @@ func (m *EVENTRECORDSMutation) ResetEventID() {
 	m.addevent_id = nil
 }
 
+// SetParticipatesBit sets the "participates_bit" field.
+func (m *EVENTRECORDSMutation) SetParticipatesBit(i int) {
+	m.participates_bit = &i
+	m.addparticipates_bit = nil
+}
+
+// ParticipatesBit returns the value of the "participates_bit" field in the mutation.
+func (m *EVENTRECORDSMutation) ParticipatesBit() (r int, exists bool) {
+	v := m.participates_bit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParticipatesBit returns the old "participates_bit" field's value of the EVENT_RECORDS entity.
+// If the EVENT_RECORDS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EVENTRECORDSMutation) OldParticipatesBit(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParticipatesBit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParticipatesBit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParticipatesBit: %w", err)
+	}
+	return oldValue.ParticipatesBit, nil
+}
+
+// AddParticipatesBit adds i to the "participates_bit" field.
+func (m *EVENTRECORDSMutation) AddParticipatesBit(i int) {
+	if m.addparticipates_bit != nil {
+		*m.addparticipates_bit += i
+	} else {
+		m.addparticipates_bit = &i
+	}
+}
+
+// AddedParticipatesBit returns the value that was added to the "participates_bit" field in this mutation.
+func (m *EVENTRECORDSMutation) AddedParticipatesBit() (r int, exists bool) {
+	v := m.addparticipates_bit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetParticipatesBit resets all changes to the "participates_bit" field.
+func (m *EVENTRECORDSMutation) ResetParticipatesBit() {
+	m.participates_bit = nil
+	m.addparticipates_bit = nil
+}
+
 // SetRecords sets the "records" field.
 func (m *EVENTRECORDSMutation) SetRecords(s string) {
 	m.records = &s
@@ -3438,12 +3496,15 @@ func (m *EVENTRECORDSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EVENTRECORDSMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.user_id != nil {
 		fields = append(fields, event_records.FieldUserID)
 	}
 	if m.event_id != nil {
 		fields = append(fields, event_records.FieldEventID)
+	}
+	if m.participates_bit != nil {
+		fields = append(fields, event_records.FieldParticipatesBit)
 	}
 	if m.records != nil {
 		fields = append(fields, event_records.FieldRecords)
@@ -3460,6 +3521,8 @@ func (m *EVENTRECORDSMutation) Field(name string) (ent.Value, bool) {
 		return m.UserID()
 	case event_records.FieldEventID:
 		return m.EventID()
+	case event_records.FieldParticipatesBit:
+		return m.ParticipatesBit()
 	case event_records.FieldRecords:
 		return m.Records()
 	}
@@ -3475,6 +3538,8 @@ func (m *EVENTRECORDSMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldUserID(ctx)
 	case event_records.FieldEventID:
 		return m.OldEventID(ctx)
+	case event_records.FieldParticipatesBit:
+		return m.OldParticipatesBit(ctx)
 	case event_records.FieldRecords:
 		return m.OldRecords(ctx)
 	}
@@ -3500,6 +3565,13 @@ func (m *EVENTRECORDSMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEventID(v)
 		return nil
+	case event_records.FieldParticipatesBit:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParticipatesBit(v)
+		return nil
 	case event_records.FieldRecords:
 		v, ok := value.(string)
 		if !ok {
@@ -3521,6 +3593,9 @@ func (m *EVENTRECORDSMutation) AddedFields() []string {
 	if m.addevent_id != nil {
 		fields = append(fields, event_records.FieldEventID)
 	}
+	if m.addparticipates_bit != nil {
+		fields = append(fields, event_records.FieldParticipatesBit)
+	}
 	return fields
 }
 
@@ -3533,6 +3608,8 @@ func (m *EVENTRECORDSMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUserID()
 	case event_records.FieldEventID:
 		return m.AddedEventID()
+	case event_records.FieldParticipatesBit:
+		return m.AddedParticipatesBit()
 	}
 	return nil, false
 }
@@ -3555,6 +3632,13 @@ func (m *EVENTRECORDSMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddEventID(v)
+		return nil
+	case event_records.FieldParticipatesBit:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddParticipatesBit(v)
 		return nil
 	}
 	return fmt.Errorf("unknown EVENT_RECORDS numeric field %s", name)
@@ -3588,6 +3672,9 @@ func (m *EVENTRECORDSMutation) ResetField(name string) error {
 		return nil
 	case event_records.FieldEventID:
 		m.ResetEventID()
+		return nil
+	case event_records.FieldParticipatesBit:
+		m.ResetParticipatesBit()
 		return nil
 	case event_records.FieldRecords:
 		m.ResetRecords()

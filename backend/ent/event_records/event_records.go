@@ -16,6 +16,8 @@ const (
 	FieldUserID = "user_id"
 	// FieldEventID holds the string denoting the event_id field in the database.
 	FieldEventID = "event_id"
+	// FieldParticipatesBit holds the string denoting the participates_bit field in the database.
+	FieldParticipatesBit = "participates_bit"
 	// FieldRecords holds the string denoting the records field in the database.
 	FieldRecords = "records"
 	// EdgeMade holds the string denoting the made edge name in mutations.
@@ -54,6 +56,7 @@ var Columns = []string{
 	FieldID,
 	FieldUserID,
 	FieldEventID,
+	FieldParticipatesBit,
 	FieldRecords,
 }
 
@@ -80,6 +83,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultParticipatesBit holds the default value on creation for the "participates_bit" field.
+	DefaultParticipatesBit int
+	// ParticipatesBitValidator is a validator for the "participates_bit" field. It is called by the builders before save.
+	ParticipatesBitValidator func(int) error
 	// DefaultRecords holds the default value on creation for the "records" field.
 	DefaultRecords string
 )
@@ -100,6 +107,11 @@ func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 // ByEventID orders the results by the event_id field.
 func ByEventID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEventID, opts...).ToFunc()
+}
+
+// ByParticipatesBit orders the results by the participates_bit field.
+func ByParticipatesBit(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParticipatesBit, opts...).ToFunc()
 }
 
 // ByRecords orders the results by the records field.
