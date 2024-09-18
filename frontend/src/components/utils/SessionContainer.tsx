@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, CardContent, Typography, Avatar, Grid, Box, Container, Stack } from "@mui/material";
 import SessionCountDownModal from "./SessionCountDownModal";
 
