@@ -11,6 +11,7 @@ const STUN_SERVERS = {
 const VoiceChat: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
+  const [isIncomingCall, setIsIncomingCall] = useState<boolean>(false);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
@@ -29,6 +30,7 @@ const VoiceChat: React.FC = () => {
       remoteAudioRef.current.srcObject = null;
     }
     setIsInCall(false);
+    setIsIncomingCall(false);
   }, []);
 
   useEffect(() => {
@@ -56,22 +58,33 @@ const VoiceChat: React.FC = () => {
         candidate?: RTCIceCandidateInit;
       } = JSON.parse(event.data);
 
-      if (!peerConnectionRef.current) {
-        console.warn("Received message but peer connection is not established");
-        return;
-      }
-
       try {
-        if (message.type === "offer" && message.offer) {
-          await handleOffer(message.offer);
-        } else if (message.type === "answer" && message.answer) {
-          await peerConnectionRef.current.setRemoteDescription(
-            new RTCSessionDescription(message.answer)
-          );
-        } else if (message.type === "ice-candidate" && message.candidate) {
-          await peerConnectionRef.current.addIceCandidate(
-            new RTCIceCandidate(message.candidate)
-          );
+        switch (message.type) {
+          case "call_request":
+            setIsIncomingCall(true);
+            break;
+          case "call_accepted":
+            await startCall(true);
+            break;
+          case "offer":
+            if (message.offer) await handleOffer(message.offer);
+            break;
+          case "answer":
+            if (message.answer && peerConnectionRef.current) {
+              await peerConnectionRef.current.setRemoteDescription(
+                new RTCSessionDescription(message.answer)
+              );
+            }
+            break;
+          case "ice-candidate":
+            if (message.candidate && peerConnectionRef.current) {
+              await peerConnectionRef.current.addIceCandidate(
+                new RTCIceCandidate(message.candidate)
+              );
+            }
+            break;
+          default:
+            console.warn("Unknown message type:", message.type);
         }
       } catch (error) {
         console.error("Error handling WebSocket message:", error);
@@ -121,7 +134,7 @@ const VoiceChat: React.FC = () => {
     return pc;
   };
 
-  const startCall = async (): Promise<void> => {
+  const startCall = async (isReceiver: boolean = false): Promise<void> => {
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
@@ -130,19 +143,22 @@ const VoiceChat: React.FC = () => {
       localStreamRef.current = stream;
       stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
+      if (!isReceiver) {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
 
-      if (websocketRef.current) {
-        websocketRef.current.send(
-          JSON.stringify({
-            type: "offer",
-            offer: pc.localDescription,
-          })
-        );
+        if (websocketRef.current) {
+          websocketRef.current.send(
+            JSON.stringify({
+              type: "offer",
+              offer: pc.localDescription,
+            })
+          );
+        }
       }
 
       setIsInCall(true);
+      setIsIncomingCall(false);
     } catch (error) {
       console.error("Error starting call:", error);
       cleanupResources();
@@ -156,10 +172,6 @@ const VoiceChat: React.FC = () => {
     peerConnectionRef.current = pc;
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      localStreamRef.current = stream;
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
@@ -172,16 +184,30 @@ const VoiceChat: React.FC = () => {
           })
         );
       }
-
-      setIsInCall(true);
     } catch (error) {
       console.error("Error handling offer:", error);
       cleanupResources();
     }
   };
 
+  const requestCall = (): void => {
+    if (websocketRef.current) {
+      websocketRef.current.send(JSON.stringify({ type: "call_request" }));
+    }
+  };
+
+  const acceptCall = async (): Promise<void> => {
+    if (websocketRef.current) {
+      websocketRef.current.send(JSON.stringify({ type: "call_accepted" }));
+      await startCall(true);
+    }
+  };
+
   const endCall = (): void => {
     cleanupResources();
+    if (websocketRef.current) {
+      websocketRef.current.send(JSON.stringify({ type: "call_ended" }));
+    }
   };
 
   return (
@@ -208,25 +234,53 @@ const VoiceChat: React.FC = () => {
       >
         {isConnected ? "Connected to Server" : "Connect to Server"}
       </button>
-      <button
-        onClick={isInCall ? endCall : startCall}
-        disabled={!isConnected}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor: !isConnected
-            ? "#ccc"
-            : isInCall
-            ? "#dc3545"
-            : "#28a745",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          cursor: !isConnected ? "default" : "pointer",
-        }}
-      >
-        {isInCall ? "End Call" : "Start Call"}
-      </button>
+      {isIncomingCall ? (
+        <button
+          onClick={acceptCall}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Accept Call
+        </button>
+      ) : isInCall ? (
+        <button
+          onClick={endCall}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#dc3545",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          End Call
+        </button>
+      ) : (
+        <button
+          onClick={requestCall}
+          disabled={!isConnected}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: !isConnected ? "#ccc" : "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: !isConnected ? "default" : "pointer",
+          }}
+        >
+          Start Call
+        </button>
+      )}
       <audio ref={remoteAudioRef} autoPlay />
     </div>
   );
