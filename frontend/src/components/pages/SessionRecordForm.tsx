@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Paper } from '@mui/material';
 import { styled } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
 
 const YellowBox = styled(Box)({
   backgroundColor: '#FFD700',
@@ -20,10 +21,23 @@ const NextSessionBox = styled(Box)({
   marginBottom: '20px',
 });
 
+const PinkButton = styled(Button)({
+  backgroundColor: '#FF69B4',
+  color: 'white',
+  '&:hover': {
+    backgroundColor: '#FF1493',
+  },
+});
+
 const SessionRecordForm: React.FC = () => {
   const [satisfaction, setSatisfaction] = useState<string>('');
   const [thoughts, setThoughts] = useState<string>('');
   const [learnedExpressions, setLearnedExpressions] = useState<string>('');
+  const navigate = useNavigate();
+
+  const handleNext = () => {
+    navigate('/friendrequest');
+  };
 
   return (
     <Box sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
@@ -77,9 +91,9 @@ const SessionRecordForm: React.FC = () => {
         </Typography>
       </NextSessionBox>
       
-      <Button variant="contained" fullWidth>
+      <PinkButton variant="contained" fullWidth onClick={handleNext}>
         次へ
-      </Button>
+      </PinkButton>
     </Box>
   );
 };
