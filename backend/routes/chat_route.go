@@ -10,23 +10,41 @@ import (
 )
 
 func ChatRoute(router *gin.Engine, apiKey string) {
-	// JSONファイルからプロンプトをロード
-	prompt, err := utils.LoadPromptConfig("prompt.json")
+	// theme_prompt.json をロード
+	themePrompt, err := utils.LoadPromptConfig("theme_prompt.json")
 	if err != nil {
-		log.Fatal("Error loading prompt config:", err)
+		log.Fatal("Error loading theme prompt config:", err)
+	}
+
+	// support_prompt.json をロード
+	supportPrompt, err := utils.LoadPromptConfig("support_prompt.json")
+	if err != nil {
+		log.Fatal("Error loading support prompt config:", err)
 	}
 
 	// ChatControllerの初期化時にプロンプトを設定
-	chatController := controllers.NewChatController(
+	themeChatController := controllers.NewChatController(
 		"gpt-3.5-turbo", // 使用するモデル
 		apiKey,          // 環境変数から取得したAPIキー
 		100,             // max tokens
 		20*time.Second,  // timeout
-		prompt,          // JSONから読み込んだプロンプトを渡す
+		themePrompt,     // JSONから読み込んだプロンプトを渡す (theme)
+	)
+
+	supportChatController := controllers.NewChatController(
+		"gpt-3.5-turbo", // 使用するモデル
+		apiKey,          // 環境変数から取得したAPIキー
+		1000,            // max tokens
+		20*time.Second,  // timeout
+		supportPrompt,   // JSONから読み込んだプロンプトを渡す (support)
 	)
 
 	chatGroup := router.Group("/chat")
 	{
-		chatGroup.POST("/ask", chatController.AskQuestion)
+		// /theme エンドポイントには theme_prompt.json を使用
+		chatGroup.POST("/theme", themeChatController.AskQuestion)
+
+		// /ask エンドポイントには support_prompt.json を使用
+		chatGroup.POST("/ask", supportChatController.AskQuestion)
 	}
 }
