@@ -22,6 +22,7 @@ export const Session = () => {
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false); // ローディング状態を管理
   const [memo1, setMemo1] = useState(""); // メモ1を管理
+  const [memo2, setMemo2] = useState(""); // メモ2を管理
 
   useEffect(() => {
     // コンポーネント読み込み時にメモを取得
@@ -29,8 +30,9 @@ export const Session = () => {
       try {
         const data = await fetchMemo();
         setMemo1(data.memo1 || ""); // memo1だけ取得
+        setMemo2(data.memo2 || "");
       } catch (error) {
-        console.error("Failed to fetch memo1", error);
+        console.error("Failed to fetch memo", error);
       }
     };
     getMemo();
@@ -72,6 +74,10 @@ export const Session = () => {
       <SessionContainer theme={theme} users={users} />
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="持ち込みメモ">
         <Typography variant="body1">{memo1}</Typography> {/* memo1 を表示 */}
+        <Typography variant="h6" fontWeight="bolder" color="primary.main" sx={{ mt: 4, mb: 1 }}>
+          ワードリスト
+        </Typography>
+        <Typography variant="body1">{memo2}</Typography>
       </HalfModal>
 
       <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
