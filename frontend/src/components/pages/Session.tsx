@@ -133,6 +133,7 @@ export const Session = () => {
         return;
       }
 
+      console.log("Received message type:", message.type);
       try {
         if (message.type === "offer" && message.offer) {
           await handleOffer(message.offer);
@@ -197,6 +198,7 @@ export const Session = () => {
   };
 
   const startCall = async (): Promise<void> => {
+    console.log("start call")
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
