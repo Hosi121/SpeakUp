@@ -40,7 +40,7 @@ export const MainBottomNavigation = ({ value }: bottomNavigationProps) => {
     >
       <BottomNavigationAction onClick={() => navigate("/record")} icon={<LibraryBooks fontSize="large" />} />
       <BottomNavigationAction onClick={() => navigate("/home")} icon={<Home fontSize="large" />} />
-      <BottomNavigationAction onClick={() => navigate("/session")} icon={<Mic fontSize="large" />} />
+      <BottomNavigationAction onClick={() => navigate("/sessionlist")} icon={<Mic fontSize="large" />} />
     </BottomNavigation>
   );
 };
