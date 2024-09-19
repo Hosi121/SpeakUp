@@ -17,7 +17,7 @@ const SessionFeedback: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNext = () => {
-    navigate('/home');
+    navigate('/friendrequest');
   };
 
   return (

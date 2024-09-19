@@ -16,7 +16,7 @@ const SessionRecordForm: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNext = () => {
-    navigate("/friendrequest");
+    navigate("/sessionfeedback");
   };
 
   return (
