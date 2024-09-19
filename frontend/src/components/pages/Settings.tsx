@@ -20,6 +20,11 @@ interface UserData {
   updated_at: string;
 }
 
+// ユーザー名の最大文字数
+const MAX_USERNAME_LENGTH = 10;
+// メールアドレスの最大文字数
+const MAX_EMAIL_LENGTH = 15;
+
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
   borderRadius: theme.shape.borderRadius * 2,
@@ -149,6 +154,17 @@ const SettingsContainer = () => {
     navigate(-1);
   };
 
+  //文字列を切り捨てる
+  const truncateString = (str: string, num: number) => {
+    if (!str) {
+      return "";
+    }
+    if (str.length <= num) {
+      return str;
+    }
+    return str.slice(0, num) + "...";
+  };
+
   return (
     <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
       <Container sx={{ pt: 3 }}>
@@ -195,7 +211,7 @@ const SettingsContainer = () => {
                     </Box>
                   ) : (
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <Typography variant="h6">{user.username}</Typography>
+                      <Typography variant="h6">{truncateString(user.username, MAX_USERNAME_LENGTH)}</Typography>
                       <IconButton onClick={() => setEditName(true)} size="small" sx={{ ml: 1 }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
@@ -214,7 +230,7 @@ const SettingsContainer = () => {
                   ) : (
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Typography variant="body1" color="text.secondary">
-                        {user.email}
+                        {truncateString(user.email, MAX_EMAIL_LENGTH)}
                       </Typography>
                       <IconButton onClick={() => setEditEmail(true)} size="small" sx={{ ml: 1 }}>
                         <EditIcon fontSize="small" />
