@@ -1,4 +1,4 @@
-import { Box, Button, Container, LinearProgress, IconButton, Typography } from "@mui/material";
+import { Box, Container, LinearProgress, IconButton, Typography } from "@mui/material";
 import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import { MemoInputField } from "../utils/MemoInputField";
@@ -10,12 +10,11 @@ import { CircularLineSpinner } from "../utils/CircularLineSpinner";
 const WaitingContainer = () => {
   const navigate = useNavigate();
   const [memo, setMemo] = useState("");
-  const navigate = useNavigate();
   const scheduledTime = new Date("2024-09-20T07:51:00"); // mock
   const startedAt = new Date();
   const allWaitingTime = scheduledTime.getTime() - startedAt.getTime();
-  const [remainTimeProgressRaito, setRemainTimeProgressRaito] = useState(0);
-    
+  const [remainTimeProgressRatio, setRemainTimeProgressRatio] = useState(0);
+
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -26,7 +25,7 @@ const WaitingContainer = () => {
       const remainTime = scheduledTime.getTime() - now.getTime();
       const progressRaito = 1 - remainTime / allWaitingTime;
       const actualProgressRaito = Math.min(1, progressRaito);
-      setRemainTimeProgressRaito(actualProgressRaito);
+      setRemainTimeProgressRatio(actualProgressRaito);
       if (remainTime <= 0) {
         clearInterval(intervalId);
         navigate("/miccheck");
@@ -86,12 +85,8 @@ const WaitingContainer = () => {
 
         <Box mt={3} width="100%">
           <Box mt={3}>
-            <Typography>
-              セッション開始まで
-            </Typography>
-            <Typography>
-              もうしばらくお待ち下さい
-            </Typography>
+            <Typography>セッション開始まで</Typography>
+            <Typography>もうしばらくお待ち下さい</Typography>
           </Box>
           <Box
             sx={{
@@ -103,10 +98,11 @@ const WaitingContainer = () => {
               backgroundColor: "secondary.main",
               padding: 0,
               position: "relative",
-            }}>
+            }}
+          >
             <LinearProgress
               variant="determinate"
-              value={remainTimeProgressRaito * 100}
+              value={remainTimeProgressRatio * 100}
               sx={{
                 position: "absolute",
                 top: "50%",
@@ -119,19 +115,17 @@ const WaitingContainer = () => {
                 span: {
                   transition: "transform 0.8s linear",
                   WebkitTransform: "-webkit-transform 0.8s linear",
-                }
-              }} />
+                },
+              }}
+            />
           </Box>
-          <Box mt={2} display="flex" alignItems="center" ml="auto"
-            sx={{ width: "fit-content" }}>
-            <Typography pr={1}>
-              Now loading...
-            </Typography>
+          <Box mt={2} display="flex" alignItems="center" ml="auto" sx={{ width: "fit-content" }}>
+            <Typography pr={1}>Now loading...</Typography>
             <CircularLineSpinner size={18} strokeWidth={1.6} />
           </Box>
         </Box>
       </Container>
-    </Container >
+    </Container>
   );
 };
 
@@ -142,4 +136,3 @@ export const Waiting = () => {
     </BottomNavigationTemplate>
   );
 };
-
