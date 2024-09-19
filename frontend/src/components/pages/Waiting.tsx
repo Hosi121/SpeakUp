@@ -4,10 +4,12 @@ import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate"
 import { MemoInputField } from "../utils/MemoInputField";
 import { useEffect, useState } from "react";
 import { CircularLineSpinner } from "../utils/CircularLineSpinner";
+import { useNavigate } from "react-router-dom";
 
 const WaitingContainer = () => {
+  const navigate = useNavigate();
   const [memo, setMemo] = useState("");
-  const scheduledTime = new Date("2024-09-20T06:47:00"); // mock
+  const scheduledTime = new Date("2024-09-20T07:51:00"); // mock
   const startedAt = new Date();
   const allWaitingTime = scheduledTime.getTime() - startedAt.getTime();
   const [remainTimeProgressRaito, setRemainTimeProgressRaito] = useState(0);
@@ -21,6 +23,7 @@ const WaitingContainer = () => {
       setRemainTimeProgressRaito(actualProgressRaito);
       if (remainTime <= 0) {
         clearInterval(intervalId);
+        navigate("/miccheck");
       }
     }, 800);
   }, []);
