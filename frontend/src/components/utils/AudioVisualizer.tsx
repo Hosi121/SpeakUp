@@ -40,6 +40,22 @@ const AudioVisualizer: React.FC = () => {
     };
   }, []);
 
+  const compressArray = (array: Uint8Array): Uint8Array => {
+    const length = array.length * 0.7; // 高周波はカット
+    return new Uint8Array(10).map((_, i) => {
+      // startからendまでの平均値を取得
+      const start = Math.floor(i * (length / 10));
+      const end = Math.floor((i + 1) * (length / 10));
+      const sum = array.slice(start, end).reduce((acc, val) => acc + val, 0);
+      const average = sum / (end - start);
+      const max = 255 * 1.00 // 表示上の頭打ち振幅を100%にする
+      const min = 255 * 0.05 // 5%までは無音扱い
+      const actualValue = Math.max(0, Math.min(255, average));
+      const height = 25;
+      return Math.round(actualValue / (max - min) * height);
+    });
+  }
+
   const startListening = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -53,7 +69,7 @@ const AudioVisualizer: React.FC = () => {
       const updateAudioData = () => {
         if (analyserRef.current && dataArrayRef.current) {
           analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-          const scaledData = new Uint8Array(dataArrayRef.current.map((value) => Math.floor(value * 0.12)));
+          const scaledData = compressArray(dataArrayRef.current);
 
           setAudioData(scaledData);
         }
