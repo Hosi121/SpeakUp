@@ -95,7 +95,6 @@ export const Session = () => {
 
   let effectCount = 0;
   useEffect(() => {
-    console.log("effectCount", effectCount)
     if (effectCount > 0) {
       return;
     }
