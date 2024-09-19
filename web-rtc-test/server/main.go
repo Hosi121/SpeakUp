@@ -6,20 +6,15 @@ import (
 	"log"
 	"net/http"
 
-	"goserver2/middlewares"
-
-	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
-// WebSocketのアップグレード用
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true // 本番環境では適切なオリジン確認を行ってください
 	},
 }
 
-// メッセージ用の構造体
 type Message struct {
 	Type      string          `json:"type"`
 	Offer     json.RawMessage `json:"offer,omitempty"`
@@ -32,47 +27,43 @@ type UserInfoMessage struct {
 }
 
 // mock
-var matchings = map[int]int{
+var matchings map[int]int = map[int]int{
 	1: 2,
 	2: 1,
 }
 
-var wsToId = map[*websocket.Conn]int{}
-var idToWs = map[int]*websocket.Conn{}
+var wsToId map[*websocket.Conn]int = map[*websocket.Conn]int{}
+var idToWs map[int]*websocket.Conn = map[int]*websocket.Conn{}
 
 var clients = make(map[*websocket.Conn]bool)
 
 func main() {
-	router := gin.Default()
+	http.HandleFunc("/ws", handleConnections)
 
-	router.Use(middlewares.JWTAuthMiddleware())
-	// WebSocket接続用のエンドポイント
-	router.GET("/ws", handleConnections)
+	port := "8083"
+	log.Println("Server starting on :" + port)
+	err := http.ListenAndServe(":"+port, nil)
 
-	log.Println("Server starting on :8082")
-	err := router.Run(":8082")
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
 
-// WebSocket接続処理
-func handleConnections(c *gin.Context) {
-	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+func handleConnections(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("handleConnections")
+	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 	defer ws.Close()
 
 	clients[ws] = true
 
 	var msg UserInfoMessage
-	if err := ws.ReadJSON(&msg); err != nil {
-		log.Printf("error reading user info: %v", err)
-		return
-	}
+	ws.ReadJSON(&msg)
+	fmt.Printf("msg=%v\n", msg)
 	wsToId[ws] = msg.HashedId
+	idToWs[msg.HashedId] = ws
 	fmt.Printf("connect: hashedId=%d\n", msg.HashedId)
 
 	for {
@@ -85,18 +76,27 @@ func handleConnections(c *gin.Context) {
 		}
 
 		to := matchings[wsToId[ws]]
+		fmt.Printf("%d->%d\n", wsToId[ws], to)
 		sendMessage(msg, to)
 	}
 }
 
-// クライアントにメッセージを送信
+func broadcastMessage(msg Message, sender *websocket.Conn) {
+	for client := range clients {
+		if client != sender {
+			err := client.WriteJSON(msg)
+			if err != nil {
+				log.Printf("error: %v", err)
+				client.Close()
+				delete(clients, client)
+			}
+		}
+	}
+}
+
 func sendMessage(msg Message, to int) {
 	client := idToWs[to]
-	if client == nil {
-		log.Printf("error: no client with id %d", to)
-		return
-	}
-
+	fmt.Printf("%v\n", client)
 	err := client.WriteJSON(msg)
 	if err != nil {
 		log.Printf("error: %v", err)
