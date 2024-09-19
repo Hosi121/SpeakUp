@@ -105,7 +105,7 @@ const router = createBrowserRouter([
   {
     path: "friendrequest",
     element: <FriendRequest />,
-  }
+  },
   {
     path: "sessionfeedback",
     element: <SessionFeedback />,
