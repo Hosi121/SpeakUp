@@ -135,8 +135,8 @@ export const Session = () => {
           setIsOfferState(isOffer);
         }
       } else if (message.type == "offer" && !isOffer) {
-        console.log("Received offer. start call.")
-        setTimeout(() => startCall(true), 1000);
+        console.log("Received offer. start call after 2000ms.")
+        setTimeout(() => startCall(true), 2000);
       }
 
       if (!peerConnectionRef.current) {
@@ -213,7 +213,7 @@ export const Session = () => {
       console.log("not start call", forceExcute, isOffer)
       return;
     } else {
-      console.log("start call")
+      console.log("startCall()")
     }
     console.log("start call")
     const pc = createPeerConnection();
