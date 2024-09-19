@@ -68,7 +68,6 @@ export const Session = () => {
   const host = "10.70.174.101"
   const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
   let isOffer = false;
-  const [isOfferState, setIsOfferState] = useState<boolean>(false);
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
@@ -131,7 +130,6 @@ export const Session = () => {
       if (message.type == "callType") {
         if (message.isOffer != undefined) {
           isOffer = message.isOffer;
-          setIsOfferState(isOffer);
         }
       } else if (message.type == "offer" && !isOffer) {
         console.log("Received offer. start call after 1000ms.")
@@ -366,9 +364,6 @@ export const Session = () => {
         </Box>
       </HalfModal>
       <audio ref={remoteAudioRef} autoPlay />
-      <p>テスト用: isConnected={isConnected ? "true" : "false"}</p>
-      <p>テスト用: isInCall={isInCall ? "true" : "false"}</p>
-      <p>テスト用: isOffer={isOfferState ? "true" : "false"}</p>
 
       <button
         onClick={isInCall ? endCall : () => startCall(true)}
