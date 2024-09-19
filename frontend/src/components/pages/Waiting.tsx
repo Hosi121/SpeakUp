@@ -1,12 +1,19 @@
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Button, Container, IconButton, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import { MemoInputField } from "../utils/MemoInputField";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowBack } from "@mui/icons-material";
 
 const WaitingContainer = () => {
   const [memo, setMemo] = useState("");
+  const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   return (
     <Container sx={{ height: "100vh", padding: 3 }}>
@@ -18,8 +25,12 @@ const WaitingContainer = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          position: "relative",
         }}
       >
+        <IconButton onClick={handleGoBack} sx={{ position: "absolute", top: 0, left: 3 }}>
+          <ArrowBack sx={{ fontSize: 40 }} />
+        </IconButton>
         <Typography
           variant="h6"
           sx={{
@@ -49,11 +60,7 @@ const WaitingContainer = () => {
           <Typography variant="subtitle1" gutterBottom component="div">
             持ち込みメモ
           </Typography>
-          <MemoInputField
-            value={memo}
-            onChange={setMemo}
-            label="メモ入力"
-          />
+          <MemoInputField value={memo} onChange={setMemo} label="メモ入力" />
         </Box>
 
         <Button
