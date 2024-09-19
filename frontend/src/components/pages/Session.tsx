@@ -96,7 +96,6 @@ export const Session = () => {
   useEffect(() => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
     setTimeout(() => startCall(false), 3000);
-    console.log("通話開始")
     return () => {
       if (websocketRef.current) {
         websocketRef.current.close();
@@ -135,8 +134,8 @@ export const Session = () => {
           setIsOfferState(isOffer);
         }
       } else if (message.type == "offer" && !isOffer) {
-        console.log("Received offer. start call after 2000ms.")
-        setTimeout(() => startCall(true), 2000);
+        console.log("Received offer. start call after 1000ms.")
+        setTimeout(() => startCall(true), 1000);
       }
 
       if (!peerConnectionRef.current) {
