@@ -93,7 +93,12 @@ export const Session = () => {
   }, []);
 
 
+  let effectCount = 0;
   useEffect(() => {
+    if (effectCount > 0) {
+      return;
+    }
+    effectCount++;
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
     setTimeout(() => startCall(false), 3000);
     console.log("通話開始")
