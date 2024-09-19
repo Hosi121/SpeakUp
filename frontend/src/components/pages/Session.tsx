@@ -310,6 +310,10 @@ export const Session = () => {
           })
         );
       }
+
+      volumeAnalyzerRef.current = new AudioVolumeAnalyzer(setisSpeak);
+      volumeAnalyzerRef.current.start(stream);
+
     } catch (error) {
       console.error("Error starting call:", error);
       cleanupResources();
@@ -363,82 +367,9 @@ export const Session = () => {
   };
 
   // visualize speaker
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const dataArrayRef = useRef<Uint8Array | null>(null);
-  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const rafIdRef = useRef<number | null>(null);
-  const [isSpeak, setIsSpeak] = useState(false);
-
-  const opponentAudioContextRef = useRef<AudioContext | null>(null);
-  const opponentAnalyserRef = useRef<AnalyserNode | null>(null);
-  const opponentDataArrayRef = useRef<Uint8Array | null>(null);
-  const opponentSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const opponentRafIdRef = useRef<number | null>(null);
+  const volumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);
+  const [isSpeak, setisSpeak] = useState(false);
   const [isOpponentSpeak, setIsOpponentSpeak] = useState(false);
-
-  const judgeIsSpeak = (array: Uint8Array): boolean => {
-    const sum = array.reduce((acc, value) => acc + value, 0);
-    const border = 30;
-    const average = sum / array.length;
-    return average > border;
-  };
-
-  const startListening = async () => {
-    try {
-      if (!remoteAudioRef.current) {
-        return;
-      }
-
-      // 自分側の処理
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioContextRef.current = new AudioContext();
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      dataArrayRef.current = new Uint8Array(
-        analyserRef.current.frequencyBinCount
-      );
-      sourceRef.current =
-        audioContextRef.current.createMediaStreamSource(stream);
-      sourceRef.current.connect(analyserRef.current);
-
-      // 相手側の処理
-      const opponentStream = remoteAudioRef.current.srcObject;
-      if (!opponentStream) {
-        return;
-      }
-      opponentAudioContextRef.current = new AudioContext();
-      opponentAnalyserRef.current = opponentAudioContextRef.current.createAnalyser();
-      opponentDataArrayRef.current = new Uint8Array(
-        opponentAnalyserRef.current.frequencyBinCount
-      );
-      opponentSourceRef.current = opponentAudioContextRef.current.createMediaStreamSource(
-        opponentStream as MediaStream
-      );
-      opponentSourceRef.current.connect(opponentAnalyserRef.current);
-
-      const updateAudioData = () => {
-        if (analyserRef.current && dataArrayRef.current) {
-          analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-          setIsSpeak(judgeIsSpeak(dataArrayRef.current));
-        }
-        rafIdRef.current = requestAnimationFrame(updateAudioData);
-
-        if (opponentAnalyserRef.current && opponentDataArrayRef.current) {
-          opponentAnalyserRef.current.getByteFrequencyData(opponentDataArrayRef.current);
-          setIsOpponentSpeak(judgeIsSpeak(opponentDataArrayRef.current));
-        }
-        opponentRafIdRef.current = requestAnimationFrame(updateAudioData);
-      };
-
-      updateAudioData();
-    } catch (error) {
-      console.error("Error accessing microphone:", error);
-    }
-  };
-
-  useEffect(() => {
-    startListening();
-  }, []);
 
   return (
     <SessionBottomNavigationTemplate
@@ -452,7 +383,7 @@ export const Session = () => {
       <SessionContainer
         theme={theme}
         users={users}
-        isSpeak={isSpeak}
+        isSpeak={isSpeak && !isMuted}
         isOpponentSpeak={isOpponentSpeak}
       />
       <TopicPopup isVisible={showTopicPopup} onClose={handleCloseTopicPopup} />
@@ -577,3 +508,48 @@ export const Session = () => {
 };
 
 export default Session;
+
+
+class AudioVolumeAnalyzer {
+  private audioContext: AudioContext;
+  private analyser: AnalyserNode;
+  private dataArray: Uint8Array;
+  private source: MediaStreamAudioSourceNode | null = null;
+  private animationFrameId: number | null = null;
+  private setIsSpeak: (isSpeak: boolean) => void;
+
+  constructor(setIsSpeak: (isSpeak: boolean) => void) {
+    this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.setIsSpeak = setIsSpeak;
+  }
+
+  start(stream: MediaStream): void {
+    this.source = this.audioContext.createMediaStreamSource(stream);
+    this.source.connect(this.analyser);
+    this.updateVolume();
+  }
+
+  private updateVolume = () => {
+    this.analyser.getByteFrequencyData(this.dataArray);
+    const average = this.dataArray.reduce((acc, value) => acc + value, 0) / this.dataArray.length;
+    const volume = Math.round((average / 255) * 100);
+    this.setIsSpeak(volume > 20);
+
+    this.animationFrameId = requestAnimationFrame(this.updateVolume);
+  };
+
+  stop(): void {
+    if (this.source) {
+      this.source.disconnect();
+      this.source = null;
+    }
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    this.audioContext.close();
+  }
+}
