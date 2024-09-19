@@ -207,7 +207,6 @@ export const Session = () => {
 
   const startCall = async (forceExcute: boolean): Promise<void> => {
     if (!forceExcute && !isOffer) {
-      console.log("not start call", forceExcute, isOffer)
       console.log(`not start call forceExcute=${forceExcute}, isOffer=${isOffer}`)
       return;
     } else {
