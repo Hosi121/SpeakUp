@@ -21,6 +21,8 @@ const (
 	FieldEmail = "email"
 	// FieldAvatarURL holds the string denoting the avatar_url field in the database.
 	FieldAvatarURL = "avatar_url"
+	// FieldRank holds the string denoting the rank field in the database.
+	FieldRank = "rank"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -82,6 +84,7 @@ var Columns = []string{
 	FieldUsername,
 	FieldEmail,
 	FieldAvatarURL,
+	FieldRank,
 	FieldRole,
 	FieldCreatedAt,
 	FieldIsDeleted,
@@ -109,6 +112,10 @@ var (
 	UsernameValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator func(string) error
+	// DefaultRank holds the default value on creation for the "rank" field.
+	DefaultRank int
+	// RankValidator is a validator for the "rank" field. It is called by the builders before save.
+	RankValidator func(int) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultIsDeleted holds the default value on creation for the "is_deleted" field.
@@ -162,6 +169,11 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByAvatarURL orders the results by the avatar_url field.
 func ByAvatarURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAvatarURL, opts...).ToFunc()
+}
+
+// ByRank orders the results by the rank field.
+func ByRank(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRank, opts...).ToFunc()
 }
 
 // ByRole orders the results by the role field.

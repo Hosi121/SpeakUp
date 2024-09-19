@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import TopSection from "../utils/TopSection";
@@ -46,25 +46,14 @@ const MemoContainer = () => {
       <Container sx={{ pt: 3 }}>
         <TopSection />
         <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
-          <Typography
-            variant="h4"
-            sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}
-          >
-            <EditNoteIcon
-              sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }}
-            />
+          <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
+            <EditNoteIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
             持ち込みメモ
           </Typography>
-          <MemoInputField
-            label="メモ1"
-            value={memo1}
-            onChange={setMemo1}
-          />
-          <MemoInputField
-            label="メモ2"
-            value={memo2}
-            onChange={setMemo2}
-          />
+          <MemoInputField label="持ち込みメモ" value={memo1} onChange={setMemo1} />
+          <Box sx={{ mt: 3 }}>
+            <MemoInputField label="ワードリスト" value={memo2} onChange={setMemo2} />
+          </Box>
           <Button
             variant="contained"
             fullWidth

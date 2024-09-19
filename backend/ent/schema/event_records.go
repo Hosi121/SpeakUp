@@ -16,6 +16,10 @@ func (EVENT_RECORDS) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id"),
 		field.Int("event_id"),
+		field.Int("participates_bit").
+			Max(7).
+			Min(0).
+			Default(0),
 		field.String("records").
 			Default(""),
 	}

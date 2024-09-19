@@ -51,6 +51,20 @@ func (uc *USERSCreate) SetNillableAvatarURL(s *string) *USERSCreate {
 	return uc
 }
 
+// SetRank sets the "rank" field.
+func (uc *USERSCreate) SetRank(i int) *USERSCreate {
+	uc.mutation.SetRank(i)
+	return uc
+}
+
+// SetNillableRank sets the "rank" field if the given value is not nil.
+func (uc *USERSCreate) SetNillableRank(i *int) *USERSCreate {
+	if i != nil {
+		uc.SetRank(*i)
+	}
+	return uc
+}
+
 // SetRole sets the "role" field.
 func (uc *USERSCreate) SetRole(u users.Role) *USERSCreate {
 	uc.mutation.SetRole(u)
@@ -217,6 +231,10 @@ func (uc *USERSCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *USERSCreate) defaults() {
+	if _, ok := uc.mutation.Rank(); !ok {
+		v := users.DefaultRank
+		uc.mutation.SetRank(v)
+	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		v := users.DefaultCreatedAt()
 		uc.mutation.SetCreatedAt(v)
@@ -247,6 +265,14 @@ func (uc *USERSCreate) check() error {
 	if v, ok := uc.mutation.Email(); ok {
 		if err := users.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "USERS.email": %w`, err)}
+		}
+	}
+	if _, ok := uc.mutation.Rank(); !ok {
+		return &ValidationError{Name: "rank", err: errors.New(`ent: missing required field "USERS.rank"`)}
+	}
+	if v, ok := uc.mutation.Rank(); ok {
+		if err := users.RankValidator(v); err != nil {
+			return &ValidationError{Name: "rank", err: fmt.Errorf(`ent: validator failed for field "USERS.rank": %w`, err)}
 		}
 	}
 	if _, ok := uc.mutation.Role(); !ok {
@@ -303,6 +329,10 @@ func (uc *USERSCreate) createSpec() (*USERS, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.AvatarURL(); ok {
 		_spec.SetField(users.FieldAvatarURL, field.TypeString, value)
 		_node.AvatarURL = value
+	}
+	if value, ok := uc.mutation.Rank(); ok {
+		_spec.SetField(users.FieldRank, field.TypeInt, value)
+		_node.Rank = value
 	}
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(users.FieldRole, field.TypeEnum, value)

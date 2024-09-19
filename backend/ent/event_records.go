@@ -22,6 +22,8 @@ type EVENT_RECORDS struct {
 	UserID int `json:"user_id,omitempty"`
 	// EventID holds the value of the "event_id" field.
 	EventID int `json:"event_id,omitempty"`
+	// ParticipatesBit holds the value of the "participates_bit" field.
+	ParticipatesBit int `json:"participates_bit,omitempty"`
 	// Records holds the value of the "records" field.
 	Records string `json:"records,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -81,7 +83,7 @@ func (*EVENT_RECORDS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case event_records.FieldID, event_records.FieldUserID, event_records.FieldEventID:
+		case event_records.FieldID, event_records.FieldUserID, event_records.FieldEventID, event_records.FieldParticipatesBit:
 			values[i] = new(sql.NullInt64)
 		case event_records.FieldRecords:
 			values[i] = new(sql.NullString)
@@ -121,6 +123,12 @@ func (er *EVENT_RECORDS) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field event_id", values[i])
 			} else if value.Valid {
 				er.EventID = int(value.Int64)
+			}
+		case event_records.FieldParticipatesBit:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field participates_bit", values[i])
+			} else if value.Valid {
+				er.ParticipatesBit = int(value.Int64)
 			}
 		case event_records.FieldRecords:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -198,6 +206,9 @@ func (er *EVENT_RECORDS) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("event_id=")
 	builder.WriteString(fmt.Sprintf("%v", er.EventID))
+	builder.WriteString(", ")
+	builder.WriteString("participates_bit=")
+	builder.WriteString(fmt.Sprintf("%v", er.ParticipatesBit))
 	builder.WriteString(", ")
 	builder.WriteString("records=")
 	builder.WriteString(er.Records)

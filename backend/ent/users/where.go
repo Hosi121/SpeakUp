@@ -70,6 +70,11 @@ func AvatarURL(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldAvatarURL, v))
 }
 
+// Rank applies equality check predicate on the "rank" field. It's identical to RankEQ.
+func Rank(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldRank, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.USERS {
 	return predicate.USERS(sql.FieldEQ(FieldCreatedAt, v))
@@ -288,6 +293,46 @@ func AvatarURLEqualFold(v string) predicate.USERS {
 // AvatarURLContainsFold applies the ContainsFold predicate on the "avatar_url" field.
 func AvatarURLContainsFold(v string) predicate.USERS {
 	return predicate.USERS(sql.FieldContainsFold(FieldAvatarURL, v))
+}
+
+// RankEQ applies the EQ predicate on the "rank" field.
+func RankEQ(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldEQ(FieldRank, v))
+}
+
+// RankNEQ applies the NEQ predicate on the "rank" field.
+func RankNEQ(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldNEQ(FieldRank, v))
+}
+
+// RankIn applies the In predicate on the "rank" field.
+func RankIn(vs ...int) predicate.USERS {
+	return predicate.USERS(sql.FieldIn(FieldRank, vs...))
+}
+
+// RankNotIn applies the NotIn predicate on the "rank" field.
+func RankNotIn(vs ...int) predicate.USERS {
+	return predicate.USERS(sql.FieldNotIn(FieldRank, vs...))
+}
+
+// RankGT applies the GT predicate on the "rank" field.
+func RankGT(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldGT(FieldRank, v))
+}
+
+// RankGTE applies the GTE predicate on the "rank" field.
+func RankGTE(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldGTE(FieldRank, v))
+}
+
+// RankLT applies the LT predicate on the "rank" field.
+func RankLT(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldLT(FieldRank, v))
+}
+
+// RankLTE applies the LTE predicate on the "rank" field.
+func RankLTE(v int) predicate.USERS {
+	return predicate.USERS(sql.FieldLTE(FieldRank, v))
 }
 
 // RoleEQ applies the EQ predicate on the "role" field.
