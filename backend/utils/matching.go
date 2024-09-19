@@ -16,6 +16,12 @@ const (
 	SHUFFLE_NUM = 100
 )
 
+var (
+	dsn       string
+	db_client *ent.Client
+	ctx       context.Context
+)
+
 /* 参加情報用 */
 type RegistrationInfo struct {
 	user_id     int
@@ -34,16 +40,6 @@ func newRegiStration(info ent.EVENT_RECORDS) RegistrationInfo {
 }
 
 func getRankByUserID(user_id int) int {
-	// DBの用意
-	dsn := config.GetDSN()
-	db_client, err := ent.Open("mysql", dsn)
-	if err != nil {
-		slog.Error("Failed to open connection to database: %v", err)
-		return -1
-	}
-	defer db_client.Close()
-	ctx := context.Background()
-
 	// user_idからrankを取得
 	user, err := db_client.USERS.Query().
 		Where(
@@ -99,9 +95,7 @@ func Matching(event_id int) {
 		).
 		All(ctx)
 	if err != nil {
-		if !ent.IsNotFound(err) {
-			slog.Error("Failed to get matching info of session 1: %v", err)
-		}
+		logErrorExceptNotFound(err, "Failed to get matching info of session 1")
 	} else {
 		// 各レベルごとにシャッフル
 		shuffled := shuffleRegistration(info)
@@ -147,9 +141,7 @@ func Matching(event_id int) {
 		).
 		All(ctx)
 	if err != nil {
-		if !ent.IsNotFound(err) {
-			slog.Error("Failed to get matching info of session 2: %v", err)
-		}
+		logErrorExceptNotFound(err, "Failed to get matching info of session 2")
 		// matching_listをそのまま使う
 		matching_list = remakeList(matching_list, []RegistrationInfo{})
 	} else {
@@ -200,9 +192,7 @@ func Matching(event_id int) {
 		).
 		All(ctx)
 	if err != nil {
-		if !ent.IsNotFound(err) {
-			slog.Error("Failed to get matching info of session 3: %v", err)
-		}
+		logErrorExceptNotFound(err, "Failed to get matching info of session 3")
 		// matching_listをそのまま使う
 		matching_list = remakeList(matching_list, []RegistrationInfo{})
 	} else {
@@ -213,7 +203,6 @@ func Matching(event_id int) {
 	}
 	// 連続するマッチング同士で，Firstを入れ替える
 	matching_list = session3_swapping(matching_list)
-	// DBに格納
 	// マッチング結果をSESSIONSテーブルに格納
 	for i := 0; i < len(matching_list); i++ {
 		db_client.SESSIONS.Create().
@@ -222,6 +211,12 @@ func Matching(event_id int) {
 			SetRecordID(matching_list[i].First.record_id).
 			SetStatus("MATCHED").
 			Save(ctx)
+	}
+}
+
+func logErrorExceptNotFound(err error, contextMessage string) {
+	if !ent.IsNotFound(err) {
+		slog.Error("%s: %v", contextMessage, err)
 	}
 }
 
