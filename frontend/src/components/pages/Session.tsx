@@ -197,6 +197,7 @@ export const Session = () => {
   };
 
   const startCall = async (flag: boolean): Promise<void> => {
+    console.log("startCall func start")
     //if (!isOffer || flag) {
     //  return;
     //}
@@ -348,11 +349,11 @@ export const Session = () => {
         </Box>
       </HalfModal>
       <audio ref={remoteAudioRef} autoPlay />
-      <p>テスト用: isConnected={isConnected}</p>
-      <p>テスト用: isInCall={isInCall}</p>
+      <p>テスト用: isConnected={isConnected ? "true" : "false"}</p>
+      <p>テスト用: isInCall={isInCall ? "true" : "false"}</p>
 
       <button
-        onClick={isInCall ? endCall : () => startCall}
+        onClick={isInCall ? endCall : () => startCall(true)}
         style={{
           padding: "10px 20px",
           fontSize: "16px",
