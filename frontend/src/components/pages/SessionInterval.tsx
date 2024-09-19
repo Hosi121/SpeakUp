@@ -16,7 +16,7 @@ export const SessionInterval = () => {
     } else {
       navigate("/session");
     }
-  }, [countdown]);
+  }, [countdown, navigate]);
   return (
     <Container
       sx={{

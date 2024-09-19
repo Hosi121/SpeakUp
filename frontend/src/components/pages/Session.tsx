@@ -8,6 +8,7 @@ import SessionContainer from "../utils/SessionContainer";
 import api from "../../services/api";
 import { fetchMemo } from "../../services/memoService"; // Import the fetchMemo function
 import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { useNavigate } from "react-router-dom";
 
 const users = [
   { name: "User1", icon: <Person />, description: "英語" },
@@ -25,7 +26,17 @@ export const Session = () => {
   const [memo1, setMemo1] = useState(""); // メモ1を管理
   const [memo2, setMemo2] = useState(""); // メモ2を管理
   const [value, setValue] = useState("1");
+  const [countdown, setCountdown] = useState(303);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      navigate("/sessioninterval");
+    }
+  }, [countdown, navigate]);
   useEffect(() => {
     // コンポーネント読み込み時にメモを取得
     const getMemo = async () => {
