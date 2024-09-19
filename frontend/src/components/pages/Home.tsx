@@ -26,7 +26,7 @@ const HomeContainer = () => {
         <TopSection />
         <Container sx={{ mb: 3 }}>
           <TopWaves isFlipped={false} />
-          <Box sx={{ margin: "0 calc(50% - 50vw)", width: "100vw", height: "15vh", backgroundColor: "secondary.main", display: "grid", placeItems: "center" }}>
+          <Box sx={{ margin: "0 calc(50% - 50vw)", width: "100vw", height: "calc(15vh + 1px)", marginTop: "-1px", backgroundColor: "secondary.main", display: "grid", placeItems: "center" }}>
             <HomeLogo style={{ width: "70%" }} />
           </Box>
           <TopWaves isFlipped={true} />
