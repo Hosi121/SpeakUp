@@ -73,6 +73,7 @@ const SettingsContainer = () => {
     const fetchUserData = async () => {
       try {
         const response = await api.get<UserData>("/user/info");
+        console.log("Fetched user data:", response.data);
         setUser(response.data);
         setNewName(response.data.username);
         setNewEmail(response.data.email);
@@ -83,6 +84,12 @@ const SettingsContainer = () => {
   
     fetchUserData();
   }, []);
+
+  const getFullAvatarUrl = (avatarUrl: string) => {
+    if (!avatarUrl) return ''; // デフォルトのアバター画像のURLを設定することもできます
+    if (avatarUrl.startsWith('http')) return avatarUrl; // すでに完全なURLの場合
+    return `http://localhost:8081${avatarUrl}`; // ローカル開発環境の場合
+  };
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -167,7 +174,7 @@ const SettingsContainer = () => {
             <StyledPaper elevation={0}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                 <AvatarUpload>
-                  <Avatar src={user.avatar_url} sx={{ width: 100, height: 100 }} />
+                  <Avatar src={getFullAvatarUrl(user.avatar_url)} sx={{ width: 100, height: 100 }} />
                   <UploadButton component="label" size="small">
                     <AddIcon />
                     <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} />
