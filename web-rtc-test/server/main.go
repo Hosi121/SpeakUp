@@ -40,8 +40,9 @@ var clients = make(map[*websocket.Conn]bool)
 func main() {
 	http.HandleFunc("/ws", handleConnections)
 
-	log.Println("Server starting on :8080")
-	err := http.ListenAndServe(":8080", nil)
+	port := "8083"
+	log.Println("Server starting on :" + port)
+	err := http.ListenAndServe(":"+port, nil)
 
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -49,6 +50,7 @@ func main() {
 }
 
 func handleConnections(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("handleConnections")
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -59,6 +61,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	var msg UserInfoMessage
 	ws.ReadJSON(&msg)
+	fmt.Printf("msg=%v\n", msg)
 	wsToId[ws] = msg.HashedId
 	idToWs[msg.HashedId] = ws
 	fmt.Printf("connect: hashedId=%d\n", msg.HashedId)

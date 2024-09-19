@@ -1,4 +1,4 @@
-package signaling
+package controllers
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Hosi121/SpeakUp/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -41,22 +40,8 @@ var idToWs = map[int]*websocket.Conn{}
 
 var clients = make(map[*websocket.Conn]bool)
 
-func Signaling() {
-	router := gin.Default()
-
-	router.Use(middlewares.JWTAuthMiddleware())
-	// WebSocket接続用のエンドポイント
-	router.GET("/ws", handleConnections)
-
-	log.Println("Server starting on :8082")
-	err := router.Run(":8082")
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
-}
-
 // WebSocket接続処理
-func handleConnections(c *gin.Context) {
+func SignalingController(c *gin.Context) {
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -102,4 +87,8 @@ func sendMessage(msg Message, to int) {
 		client.Close()
 		delete(clients, client)
 	}
+}
+
+func handleHoge(c *gin.Context) {
+	c.Writer.Write([]byte("hoge"))
 }

@@ -6,6 +6,7 @@ import { Favorite, Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionContainer from "../utils/SessionContainer";
 import api from "../../services/api";
+import { WebSocketService } from "../../services/webSocketService";
 const users = [
   { name: "User1", icon: <Person />, description: "英語" },
   { name: "User2", icon: <Favorite />, description: "苗字" },
@@ -13,8 +14,7 @@ const users = [
 
 const theme = "好きな言葉";
 
-const host = "10.70.174.101"
-const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
+const WEBSOCKET_URL = "ws://10.70.174.101:8082/ws";
 const STUN_SERVERS = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -103,17 +103,21 @@ export const Session = () => {
   }, [cleanupResources]);
 
   const connectToSignalingServer = (): void => {
-    const ws = new WebSocket(WEBSOCKET_URL);
+    const ws = new WebSocketService(WEBSOCKET_URL);
 
-    ws.onopen = () => {
+    if (!ws.socket) {
+      console.error("Failed to connect to signaling server");
+      return;
+    }
+    ws.socket.onopen = () => {
       console.log("Connected to signaling server");
       setIsConnected(true);
 
       const idData: HashedId = { hashedId: 1 };
-      ws.send(JSON.stringify(idData));
+      ws.sendMessage(JSON.stringify(idData));
     };
 
-    ws.onmessage = async (event: MessageEvent) => {
+    ws.socket.onmessage = async (event: MessageEvent) => {
       const message: {
         type: string;
         offer?: RTCSessionDescriptionInit;
@@ -143,13 +147,13 @@ export const Session = () => {
       }
     };
 
-    ws.onclose = () => {
+    ws.socket.onclose = () => {
       console.log("Disconnected from signaling server");
       setIsConnected(false);
       cleanupResources();
     };
 
-    websocketRef.current = ws;
+    websocketRef.current = ws.socket;
   };
 
   const createPeerConnection = (): RTCPeerConnection => {
