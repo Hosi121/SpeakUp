@@ -35,8 +35,8 @@ type UserInfoMessage struct {
 
 // mock
 var matchings = map[int]int{
-	1: 2,
-	2: 1,
+	2: 4,
+	4: 2,
 }
 
 var wsToId = map[*websocket.Conn]int{}
