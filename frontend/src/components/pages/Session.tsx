@@ -95,7 +95,6 @@ export const Session = () => {
 
   useEffect(() => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
-    //setTimeout(() => startCall(false), 3000); // 3秒後に通話開始
     console.log("通話開始")
     return () => {
       if (websocketRef.current) {
@@ -134,10 +133,12 @@ export const Session = () => {
           isOffer = message.isOffer;
           setIsOfferState(isOffer);
           if (isOffer) {
+            console.log("this is offer. start call.")
             startCall();
           }
         }
       } else if (message.type == "offer" && !isOffer) {
+        console.log("Received offer. start call.")
         setTimeout(startCall, 1000);
       }
 
