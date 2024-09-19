@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Hosi121/SpeakUp/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -23,7 +24,8 @@ type Message struct {
 	Offer     json.RawMessage `json:"offer,omitempty"`
 	Answer    json.RawMessage `json:"answer,omitempty"`
 	Candidate json.RawMessage `json:"candidate,omitempty"`
-	HashedId  int             `json:"hashedId"`
+	HashedId  int             `json:"hashedId,omitempty"`
+	Token     string          `json:"token,omitempty"`
 }
 
 type UserInfoMessage struct {
@@ -43,10 +45,6 @@ var clients = make(map[*websocket.Conn]bool)
 
 // WebSocket接続処理
 func SignalingController(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	fmt.Printf("userId\n%v\n\nexists=%s\n", userID, exists)
-	fmt.Printf("c\n%s\n", c)
-
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -56,15 +54,10 @@ func SignalingController(c *gin.Context) {
 
 	clients[ws] = true
 
-	var msg UserInfoMessage
-	if err := ws.ReadJSON(&msg); err != nil {
-		log.Printf("error reading user info: %v", err)
-		return
-	}
-	wsToId[ws] = msg.HashedId
-	fmt.Printf("connect: hashedId=%d\n", msg.HashedId)
-
+	count := 0
 	for {
+		count++
+		fmt.Printf("count=%d\n", count)
 		var msg Message
 		err := ws.ReadJSON(&msg)
 		if err != nil {
@@ -73,8 +66,28 @@ func SignalingController(c *gin.Context) {
 			break
 		}
 
-		to := matchings[wsToId[ws]]
-		sendMessage(msg, to)
+		if msg.Type == "Authorization" {
+			token := msg.Token[7:]
+			userID, err := utils.ValidateJWT(token)
+			var response Message
+			if err == nil {
+				response = Message{Type: "AuthResult", Token: "Authentication successful"}
+			} else {
+				response = Message{Type: "AuthResult", Token: "Authentication failed"}
+			}
+			fmt.Printf("userID=%s\n", userID)
+
+			if err := ws.WriteJSON(response); err != nil {
+				fmt.Printf("Error sending response: %v\n", err)
+				return
+			}
+		} else if msg.Type == "init" {
+			wsToId[ws] = msg.HashedId
+			fmt.Printf("connect: hashedId=%d\n", msg.HashedId)
+		} else {
+			to := matchings[wsToId[ws]]
+			sendMessage(msg, to)
+		}
 	}
 }
 
