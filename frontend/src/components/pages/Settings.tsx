@@ -159,16 +159,16 @@ const SettingsContainer = () => {
 
   const getRankColor = (rank: number) => {
     switch (rank) {
-      case 5:
-        return "#F3B500";
-      case 4:
-        return "#C0C0C0";
-      case 3:
-        return "#CD7F32";
-      case 2:
-        return "#00BFFF";
       case 1:
         return "#00FF00";
+      case 2:
+        return "#00BFFF";
+      case 3:
+        return "#CD7F32";
+      case 4:
+        return "#C0C0C0";
+      case 5:
+        return "#F3B500";
       default:
         return "#000000";
     }
