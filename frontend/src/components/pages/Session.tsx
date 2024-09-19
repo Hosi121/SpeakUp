@@ -69,8 +69,6 @@ export const Session = () => {
   const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
   let isOffer = false;
 
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [isInCall, setIsInCall] = useState<boolean>(false);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const websocketRef = useRef<WebSocket | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
@@ -88,7 +86,6 @@ export const Session = () => {
     if (remoteAudioRef.current) {
       remoteAudioRef.current.srcObject = null;
     }
-    setIsInCall(false);
   }, []);
 
 
@@ -115,7 +112,6 @@ export const Session = () => {
         token: `Bearer ${token}`
       };
       ws.send(JSON.stringify(authMessage));
-      setIsConnected(true);
     };
 
     ws.onmessage = async (event: MessageEvent) => {
@@ -161,7 +157,6 @@ export const Session = () => {
 
     ws.onclose = () => {
       console.log("Disconnected from signaling server");
-      setIsConnected(false);
       cleanupResources();
     };
 
@@ -219,7 +214,6 @@ export const Session = () => {
       console.log("forceExcute")
     }
     console.log("start call")
-    setIsInCall(true);
 
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
@@ -267,7 +261,6 @@ export const Session = () => {
         }));
       }
 
-      setIsInCall(true);
     } catch (error) {
       console.error("Error handling offer:", error);
       cleanupResources();
@@ -364,25 +357,6 @@ export const Session = () => {
         </Box>
       </HalfModal>
       <audio ref={remoteAudioRef} autoPlay />
-
-      <button
-        onClick={isInCall ? endCall : () => startCall(true)}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor: !isConnected
-            ? "#ccc"
-            : isInCall
-              ? "#dc3545"
-              : "#28a745",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          cursor: !isConnected ? "default" : "pointer",
-        }}
-      >
-        {isInCall ? "End Call" : "Start Call"}
-      </button>
     </SessionBottomNavigationTemplate>
   );
 };
