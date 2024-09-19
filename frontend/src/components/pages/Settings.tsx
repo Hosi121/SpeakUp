@@ -11,7 +11,8 @@ import api from "../../services/api";
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
-interface UserData {
+
+export interface UserData {
   id: number;
   username: string;
   email: string;

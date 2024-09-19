@@ -4,7 +4,7 @@ import SessionCountDownModal from "./SessionCountDownModal";
 
 type SessionContainerProps = {
   theme: string;
-  users: { name: string; icon: JSX.Element; description: string }[]
+  users: { name: string; icon: JSX.Element; }[]
   isSpeak: boolean;
   isOpponentSpeak: boolean;
 }
@@ -52,7 +52,7 @@ const SessionContainer = ({ theme, users, isSpeak, isOpponentSpeak }: SessionCon
 export default SessionContainer;
 
 type UserCardProps = {
-  user: { name: string; icon: JSX.Element; description: string };
+  user: { name: string; icon: JSX.Element; };
   isSpeak: boolean;
   index: number;
 };
