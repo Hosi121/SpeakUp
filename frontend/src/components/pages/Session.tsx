@@ -94,7 +94,7 @@ export const Session = () => {
 
   useEffect(() => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
-    setTimeout(() => startCall(false), 3000); // 3秒後に通話開始
+    //setTimeout(() => startCall(false), 3000); // 3秒後に通話開始
     console.log("通話開始")
     return () => {
       if (websocketRef.current) {
@@ -140,7 +140,7 @@ export const Session = () => {
           await peerConnectionRef.current.setRemoteDescription(
             new RTCSessionDescription(message.answer)
           );
-          startCall(true);
+          //startCall(true);
         } else if (message.type === "ice-candidate" && message.candidate) {
           await peerConnectionRef.current.addIceCandidate(
             new RTCIceCandidate(message.candidate)
