@@ -326,6 +326,9 @@ func saveResultInDB(matching []Pair) {
 }
 
 func session2_swapping(matching_list []Pair) []Pair {
+	if len(matching_list) < 2 {
+		return matching_list
+	}
 	i := 0
 	if len(matching_list)%2 == 1 {
 		for ; i < len(matching_list)-3; i += 2 {
@@ -342,6 +345,9 @@ func session2_swapping(matching_list []Pair) []Pair {
 }
 
 func session3_swapping(matching_list []Pair) []Pair {
+	if len(matching_list) < 2 {
+		return matching_list
+	}
 	i := 0
 	if len(matching_list)%2 == 1 {
 		for ; i < len(matching_list)-3; i += 2 {
