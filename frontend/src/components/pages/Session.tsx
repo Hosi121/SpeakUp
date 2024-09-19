@@ -9,6 +9,7 @@ import api from "../../services/api";
 import { fetchMemo } from "../../services/memoService"; // Import the fetchMemo function
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
+import { TopicPopup } from "../utils/TopicPopup";
 
 const users = [
   { name: "User1", icon: <Person />, description: "英語" },
@@ -26,8 +27,20 @@ export const Session = () => {
   const [memo1, setMemo1] = useState(""); // メモ1を管理
   const [memo2, setMemo2] = useState(""); // メモ2を管理
   const [value, setValue] = useState("1");
-  const [countdown, setCountdown] = useState(303);
+  const [countdown, setCountdown] = useState(23);
   const navigate = useNavigate();
+
+  const [showTopicPopup, setShowTopicPopup] = useState(false);
+  const [isPriorityHighClicked, setIsPriorityHighClicked] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isPriorityHighClicked) {
+        setShowTopicPopup(true);
+      }
+    }, 8000); // 2 minutes and 3 seconds
+    return () => clearTimeout(timer);
+  }, [isPriorityHighClicked]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -56,6 +69,13 @@ export const Session = () => {
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
+  };
+  const handleCloseTopicPopup = () => {
+    setShowTopicPopup(false);
+  };
+  const handlePriorityHighClick = () => {
+    setShowTopicPopup(true);
+    setIsPriorityHighClicked(true);
   };
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
@@ -86,8 +106,9 @@ export const Session = () => {
   };
 
   return (
-    <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen}>
+    <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen} onPriorityHighClick={handlePriorityHighClick}>
       <SessionContainer theme={theme} users={users} />
+      <TopicPopup isVisible={showTopicPopup} onClose={handleCloseTopicPopup} />
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="">
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -104,7 +125,6 @@ export const Session = () => {
           </TabPanel>
         </TabContext>
       </HalfModal>
-
       <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
         <Box sx={{ overflow: "auto", pt: 1, pb: 1, maxHeight: "30vh" }}>
           <List>

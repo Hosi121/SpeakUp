@@ -1,16 +1,7 @@
 import { Card, CardContent, Typography, Avatar, Grid, Box, Container, Stack } from "@mui/material";
 import SessionCountDownModal from "./SessionCountDownModal";
-import { useEffect, useState } from "react";
-import { TopicPopup } from "./TopicPopup";
 
 const SessionContainer = ({ theme, users }: { theme: string; users: { name: string; icon: JSX.Element; description: string }[] }) => {
-  const [showTopicPopup, setShowTopicPopup] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowTopicPopup(true);
-    }, 123000);
-    return () => clearTimeout(timer);
-  }, []);
   return (
     <Container
       sx={{
@@ -71,7 +62,6 @@ const SessionContainer = ({ theme, users }: { theme: string; users: { name: stri
             ))}
           </Box>
         </Stack>
-        {showTopicPopup && <TopicPopup />}
       </Container>
     </Container>
   );

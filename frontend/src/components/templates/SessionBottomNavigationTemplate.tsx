@@ -8,15 +8,16 @@ type sessionBottomNavigationTemplateProps = {
   children: ReactNode;
   setMemoOpen: (open: boolean) => void;
   setAssistantOpen: (open: boolean) => void;
+  onPriorityHighClick: () => void;
 };
 
-export const SessionBottomNavigationTemplate = ({ value, isMute, children, setMemoOpen, setAssistantOpen }: sessionBottomNavigationTemplateProps) => {
+export const SessionBottomNavigationTemplate = ({ value, isMute, children, setMemoOpen, setAssistantOpen, onPriorityHighClick }: sessionBottomNavigationTemplateProps) => {
   return (
     <Box width={"100vw"} height={"100vh"}>
       <Box height={"calc(100vh - 70px)"} overflow={"auto"}>
         {children}
       </Box>
-      <SessionBottomNavigation value={value} isMute={isMute} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen} />
+      <SessionBottomNavigation value={value} isMute={isMute} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen} onPriorityHighClick={onPriorityHighClick} />
     </Box>
   );
 };
