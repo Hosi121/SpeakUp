@@ -67,6 +67,7 @@ export const Session = () => {
   //
   const host = "10.70.174.101"
   const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
+  let isOffer = false;
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
@@ -92,7 +93,7 @@ export const Session = () => {
 
   useEffect(() => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
-    setTimeout(startCall, 3000); // 3秒後に通話開始
+    setTimeout(() => startCall(false), 3000); // 3秒後に通話開始
     console.log("通話開始")
     return () => {
       if (websocketRef.current) {
@@ -123,6 +124,7 @@ export const Session = () => {
         offer?: RTCSessionDescriptionInit;
         answer?: RTCSessionDescriptionInit;
         candidate?: RTCIceCandidateInit;
+        isOffer?: boolean;
       } = JSON.parse(event.data);
 
       if (!peerConnectionRef.current) {
@@ -137,10 +139,13 @@ export const Session = () => {
           await peerConnectionRef.current.setRemoteDescription(
             new RTCSessionDescription(message.answer)
           );
+          startCall(true);
         } else if (message.type === "ice-candidate" && message.candidate) {
           await peerConnectionRef.current.addIceCandidate(
             new RTCIceCandidate(message.candidate)
           );
+        } else if (message.type === "callType" && message.isOffer) {
+          isOffer = message.isOffer;
         }
       } catch (error) {
         console.error("Error handling WebSocket message:", error);
@@ -190,7 +195,10 @@ export const Session = () => {
     return pc;
   };
 
-  const startCall = async (): Promise<void> => {
+  const startCall = async (flag: boolean): Promise<void> => {
+    if (!isOffer || flag) {
+      return;
+    }
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 

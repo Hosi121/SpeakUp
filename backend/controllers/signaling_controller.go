@@ -26,6 +26,7 @@ type Message struct {
 	Answer    json.RawMessage `json:"answer,omitempty"`
 	Candidate json.RawMessage `json:"candidate,omitempty"`
 	Token     string          `json:"token,omitempty"`
+	IsOffer   bool            `json:"isOffer,omitempty"`
 }
 
 type UserInfoMessage struct {
@@ -67,26 +68,30 @@ func SignalingController(c *gin.Context) {
 		}
 
 		if msg.Type == "Authorization" {
+			fmt.Println("Authorization ---")
 			token := msg.Token[7:]
-			userIDStr, err := utils.ValidateJWT(token)
-			var response Message
-			if err == nil {
-				response = Message{Type: "AuthResult", Token: "Authentication successful"}
-			} else {
-				response = Message{Type: "AuthResult", Token: "Authentication failed"}
-			}
+			userIDStr, _ := utils.ValidateJWT(token)
 			userId, _ := strconv.Atoi(userIDStr)
 			wsToId[ws] = userId
 			idToWs[userId] = ws
-			fmt.Printf("connect: hashedId=%d\n", userId)
+			fmt.Printf("connect: userId=%d\n", userId)
 
+			opponentId := matchings[userId]
+			var response Message
+			if opponentId < userId {
+				response = Message{Type: "callType", IsOffer: true}
+			} else {
+				response = Message{Type: "callType", IsOffer: false}
+			}
 			if err := ws.WriteJSON(response); err != nil {
 				fmt.Printf("Error sending response: %v\n", err)
 				return
 			}
 		} else {
-			to := matchings[wsToId[ws]]
-			sendMessage(msg, to)
+			fromId := wsToId[ws]
+			toId := matchings[fromId]
+			fmt.Printf("%d -> %d\n", fromId, toId)
+			sendMessage(msg, toId)
 		}
 	}
 }
