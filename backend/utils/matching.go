@@ -68,7 +68,6 @@ func newPair(f, s RegistrationInfo) Pair {
 
 /* マッチングに使う関数群 */
 func Matching(event_id int) {
-	var i int
 	// DBの用意
 	dsn := config.GetDSN()
 	db_client, err := ent.Open("mysql", dsn)
@@ -81,6 +80,7 @@ func Matching(event_id int) {
 
 	var matching_list []Pair
 	matching_list = []Pair{}
+
 	/* セッション１のマッチング */
 	// EVENT_RECORDSからセッション１に参加するユーザを取得する
 	info, err := db_client.EVENT_RECORDS.Query().
@@ -107,22 +107,8 @@ func Matching(event_id int) {
 
 	/* セッション２のマッチング */
 	// セッション１のマッチング結果から，セッション２に参加しないものを削除
-	for i = 0; i < len(matching_list); i++ {
-		if matching_list[i].First.session_bit == 1 || matching_list[i].First.session_bit == 5 {
-			matching_list[i].First.user_id = -1
-		}
-		if matching_list[i].Second.session_bit == 1 || matching_list[i].Second.session_bit == 5 {
-			matching_list[i].Second.user_id = -1
-		}
-	}
-	i = 0
-	for i < len(matching_list) { // 両ユーザが削除されたマッチングをリストから消す
-		if matching_list[i].First.user_id == -1 && matching_list[i].Second.user_id == -1 {
-			matching_list = append(matching_list[:i], matching_list[i+1:]...)
-		} else {
-			i++
-		}
-	}
+	var continue_user []RegistrationInfo
+	continue_user = removeNonparticipateUser(matching_list, 2)
 	// セッション２でマッチングに加わるユーザを取得する
 	info2, err := db_client.EVENT_RECORDS.Query().
 		Where(
@@ -136,12 +122,12 @@ func Matching(event_id int) {
 	if err != nil {
 		logErrorExceptNotFound(err, "Failed to get matching info of session 2")
 		// matching_listをそのまま使う
-		matching_list = remakeList(matching_list, []RegistrationInfo{})
+		matching_list = remakeList(continue_user, []RegistrationInfo{})
 	} else {
 		// 新たに加える方はシャッフル
 		shuffled := shuffleRegistration(info2)
 		// matching_listと合体
-		matching_list = remakeList(matching_list, shuffled)
+		matching_list = remakeList(continue_user, shuffled)
 	}
 	// 連続するマッチング同士で，Firstを入れ替える
 	matching_list = session2_swapping(matching_list)
@@ -150,22 +136,7 @@ func Matching(event_id int) {
 
 	/* セッション３のマッチング */
 	// セッション２のマッチング結果から，セッション３に参加しないものを削除
-	for i = 0; i < len(matching_list); i++ {
-		if matching_list[i].First.session_bit == 2 || matching_list[i].First.session_bit == 3 {
-			matching_list[i].First.user_id = -1
-		}
-		if matching_list[i].Second.session_bit == 2 || matching_list[i].Second.session_bit == 3 {
-			matching_list[i].Second.user_id = -1
-		}
-	}
-	i = 0
-	for i < len(matching_list) { // 両ユーザが削除されたマッチングをリストから消す
-		if matching_list[i].First.user_id == -1 && matching_list[i].Second.user_id == -1 {
-			matching_list = append(matching_list[:i], matching_list[i+1:]...)
-		} else {
-			i++
-		}
-	}
+	continue_user = removeNonparticipateUser(matching_list, 3)
 	// セッション２でマッチングに加わるユーザを取得する
 	info3, err := db_client.EVENT_RECORDS.Query().
 		Where(
@@ -179,12 +150,12 @@ func Matching(event_id int) {
 	if err != nil {
 		logErrorExceptNotFound(err, "Failed to get matching info of session 3")
 		// matching_listをそのまま使う
-		matching_list = remakeList(matching_list, []RegistrationInfo{})
+		matching_list = remakeList(continue_user, []RegistrationInfo{})
 	} else {
 		// 新たに加える方はシャッフル
 		shuffled := shuffleRegistration(info3)
 		// matching_listと合体
-		matching_list = remakeList(matching_list, shuffled)
+		matching_list = remakeList(continue_user, shuffled)
 	}
 	// 連続するマッチング同士で，相手を入れ替える
 	matching_list = session3_swapping(matching_list)
@@ -243,19 +214,18 @@ func makeMatchPair(regi_list []RegistrationInfo) []Pair {
 func makeMatchList(regi_list []Pair) []RegistrationInfo {
 	ret := []RegistrationInfo{}
 	for _, p := range regi_list {
-		if p.First.user_id != -1 {
+		if p.First.user_id > 0 {
 			ret = append(ret, p.First)
 		}
-		if p.Second.user_id != -1 {
+		if p.Second.user_id > 0 {
 			ret = append(ret, p.Second)
 		}
 	}
 	return ret
 }
 
-func remakeList(latest_list []Pair, embed_list []RegistrationInfo) []Pair {
+func remakeList(latest []RegistrationInfo, embed []RegistrationInfo) []Pair {
 	ret := []RegistrationInfo{}
-	latest := makeMatchList(latest_list)
 	// rank 1から順に latest->embedの順でlistに入れる
 	l_index := 0
 	e_index := 0
@@ -264,12 +234,25 @@ func remakeList(latest_list []Pair, embed_list []RegistrationInfo) []Pair {
 			ret = append(ret, latest[l_index])
 			l_index++
 		}
-		for e_index < len(embed_list) && embed_list[e_index].rank == r {
-			ret = append(ret, embed_list[e_index])
+		for e_index < len(embed) && embed[e_index].rank == r {
+			ret = append(ret, embed[e_index])
 			e_index++
 		}
 	}
 	return makeMatchPair(ret)
+}
+
+func removeNonparticipateUser(matching []Pair, next_session int) []RegistrationInfo {
+	ret := []RegistrationInfo{}
+	for _, p := range matching {
+		if p.First.session_bit&(1<<next_session-1) != 0 {
+			ret = append(ret, p.First)
+		}
+		if p.Second.session_bit&(1<<next_session-1) != 0 {
+			ret = append(ret, p.Second)
+		}
+	}
+	return ret
 }
 
 func saveResultInDB(matching []Pair) {
