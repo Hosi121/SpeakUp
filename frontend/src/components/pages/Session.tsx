@@ -205,6 +205,7 @@ export const Session = () => {
     return pc;
   };
 
+  let startCallCount = 0;
   const startCall = async (forceExcute: boolean): Promise<void> => {
     if (!forceExcute && !isOffer) {
       console.log("not start call", forceExcute, isOffer)
@@ -213,6 +214,10 @@ export const Session = () => {
     } else {
       console.log("startCall()")
     }
+    if (startCallCount > 0) {
+      return;
+    }
+    startCallCount++;
     if (forceExcute) {
       console.log("forceExcute")
     }
