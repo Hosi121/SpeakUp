@@ -1,18 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Avatar,
-  TextField,
-  Button,
-  Paper,
-  Grid,
-  Divider,
-  useTheme,
-  styled,
-  Container,
-} from "@mui/material";
+import { Box, Typography, IconButton, Avatar, TextField, Button, Paper, Grid, Divider, useTheme, styled, Container } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -21,6 +8,8 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import api from "../../services/api";
+import { ArrowBack } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 interface UserData {
   id: number;
   username: string;
@@ -68,6 +57,7 @@ const SettingsContainer = () => {
   const [editEmail, setEditEmail] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -81,13 +71,13 @@ const SettingsContainer = () => {
         console.error("Failed to fetch user data:", error);
       }
     };
-  
+
     fetchUserData();
   }, []);
 
   const getFullAvatarUrl = (avatarUrl: string) => {
-    if (!avatarUrl) return ''; // デフォルトのアバター画像のURLを設定することもできます
-    if (avatarUrl.startsWith('http')) return avatarUrl; // すでに完全なURLの場合
+    if (!avatarUrl) return ""; // デフォルトのアバター画像のURLを設定することもできます
+    if (avatarUrl.startsWith("http")) return avatarUrl; // すでに完全なURLの場合
     return `http://localhost:8081${avatarUrl}`; // ローカル開発環境の場合
   };
 
@@ -95,14 +85,14 @@ const SettingsContainer = () => {
     if (event.target.files && event.target.files[0]) {
       const formData = new FormData();
       formData.append("avatar", event.target.files[0]);
-  
+
       try {
         const response = await api.put("/user/avatar", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-        setUser((prevUser) => prevUser ? { ...prevUser, avatar_url: response.data.avatar_url } : null);
+        setUser((prevUser) => (prevUser ? { ...prevUser, avatar_url: response.data.avatar_url } : null));
       } catch (error) {
         console.error("Failed to upload avatar:", error);
         // Handle error (e.g., show notification)
@@ -143,7 +133,6 @@ const SettingsContainer = () => {
       updateUser();
     }
   };
-  
 
   const handleLogout = () => {
     // Implement logout logic
@@ -156,18 +145,31 @@ const SettingsContainer = () => {
     return <Typography>Loading...</Typography>;
   }
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
-    <Container
-      sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}
-    >
+    <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
       <Container sx={{ pt: 3 }}>
-        <Typography
-          variant="h4"
-          sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            pt: 2,
+            pb: 2,
+          }}
         >
-          <SettingsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
-          設定
-        </Typography>
+          <IconButton onClick={handleGoBack}>
+            <ArrowBack sx={{ fontSize: 40 }} />
+          </IconButton>
+          <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "left" }}>
+            <SettingsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
+            設定
+          </Typography>
+        </Box>
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
@@ -183,12 +185,7 @@ const SettingsContainer = () => {
                 <Box>
                   {editName ? (
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <StyledTextField
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                        variant="outlined"
-                        size="small"
-                      />
+                      <StyledTextField value={newName} onChange={(e) => setNewName(e.target.value)} variant="outlined" size="small" />
                       <IconButton onClick={handleSaveName} size="small" sx={{ ml: 1 }}>
                         <CheckIcon />
                       </IconButton>
@@ -206,12 +203,7 @@ const SettingsContainer = () => {
                   )}
                   {editEmail ? (
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <StyledTextField
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                        variant="outlined"
-                        size="small"
-                      />
+                      <StyledTextField value={newEmail} onChange={(e) => setNewEmail(e.target.value)} variant="outlined" size="small" />
                       <IconButton onClick={handleSaveEmail} size="small" sx={{ ml: 1 }}>
                         <CheckIcon />
                       </IconButton>
