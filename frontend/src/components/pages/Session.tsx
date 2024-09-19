@@ -1,6 +1,16 @@
 import { HalfModal } from "../utils/HalfModal";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Typography, Box, List, ListItem, Paper, ListItemText, TextField, Button, Tab } from "@mui/material";
+import {
+  Typography,
+  Box,
+  List,
+  ListItem,
+  Paper,
+  ListItemText,
+  TextField,
+  Button,
+  Tab,
+} from "@mui/material";
 import HomeLogo from "../../assets/homeLogo";
 import { Favorite, Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
@@ -10,6 +20,7 @@ import { fetchMemo } from "../../services/memoService"; // Import the fetchMemo 
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 import { TopicPopup } from "../utils/TopicPopup";
+import { AudioVolumeAnalyzer } from "../utils/AudioVolumeAnalyzer";
 
 const users = [
   { name: "User1", icon: <Person />, description: "英語" },
@@ -34,7 +45,8 @@ export const Session = () => {
   const [memo1, setMemo1] = useState(""); // メモ1を管理
   const [memo2, setMemo2] = useState(""); // メモ2を管理
   const [value, setValue] = useState("1");
-  const [countdown, setCountdown] = useState(23);
+  const [isMuted, setIsMuted] = useState(false);
+  const [countdown, setCountdown] = useState(303);
   const navigate = useNavigate();
 
   const [showTopicPopup, setShowTopicPopup] = useState(false);
@@ -99,16 +111,29 @@ export const Session = () => {
       });
 
       console.log("Response data:", response.data); // ここでレスポンスデータを確認
-      
+
       // 応答メッセージを表示
-      if (response.data && response.data.choices && response.data.choices[0].message.content) {
+      if (
+        response.data &&
+        response.data.choices &&
+        response.data.choices[0].message.content
+      ) {
         const assistantMessage = response.data.choices[0].message.content;
-        setMessages((prevMessages) => [...prevMessages, `Assistant: ${assistantMessage}`]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          `Assistant: ${assistantMessage}`,
+        ]);
       } else {
-        setMessages((prevMessages) => [...prevMessages, "Error: Invalid response format"]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          "Error: Invalid response format",
+        ]);
       }
     } catch (error) {
-      setMessages((prevMessages) => [...prevMessages, "Error: Failed to get response"]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        "Error: Failed to get response",
+      ]);
     } finally {
       setIsLoading(false); // ローディング状態を終了
     }
@@ -116,7 +141,7 @@ export const Session = () => {
 
   // WebRTC関連の処理
   // webbbb vimジャンプ用
-  const host = "10.70.174.101"
+  const host = "10.70.174.101";
   const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
   let isOffer = false;
 
@@ -139,7 +164,6 @@ export const Session = () => {
     }
   }, []);
 
-
   useEffect(() => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
     setTimeout(() => startCall(false), 2000);
@@ -159,8 +183,8 @@ export const Session = () => {
 
       const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
       const authMessage = {
-        type: 'Authorization',
-        token: `Bearer ${token}`
+        type: "Authorization",
+        token: `Bearer ${token}`,
       };
       ws.send(JSON.stringify(authMessage));
     };
@@ -179,7 +203,7 @@ export const Session = () => {
           isOffer = message.isOffer;
         }
       } else if (message.type == "offer" && !isOffer) {
-        console.log("Received offer. start call after 1000ms.")
+        console.log("Received offer. start call after 1000ms.");
         setTimeout(() => startCall(true), 1000);
       }
 
@@ -231,6 +255,8 @@ export const Session = () => {
     pc.ontrack = (event: RTCTrackEvent) => {
       if (remoteAudioRef.current && event.streams[0]) {
         remoteAudioRef.current.srcObject = event.streams[0];
+        opponentVolumeAnalyzerRef.current = new AudioVolumeAnalyzer(setIsOpponentSpeak);
+        opponentVolumeAnalyzerRef.current.start(event.streams[0]);
       }
     };
 
@@ -251,20 +277,22 @@ export const Session = () => {
   let startCallCount = 0;
   const startCall = async (forceExcute: boolean): Promise<void> => {
     if (!forceExcute && !isOffer) {
-      console.log("not start call", forceExcute, isOffer)
-      console.log(`not start call forceExcute=${forceExcute}, isOffer=${isOffer}`)
+      console.log("not start call", forceExcute, isOffer);
+      console.log(
+        `not start call forceExcute=${forceExcute}, isOffer=${isOffer}`
+      );
       return;
     } else {
-      console.log("startCall()")
+      console.log("startCall()");
     }
     if (startCallCount > 0) {
       return;
     }
     startCallCount++;
     if (forceExcute) {
-      console.log("forceExcute")
+      console.log("forceExcute");
     }
-    console.log("start call")
+    console.log("start call");
 
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
@@ -278,11 +306,16 @@ export const Session = () => {
       await pc.setLocalDescription(offer);
 
       if (websocketRef.current) {
-        websocketRef.current.send(JSON.stringify({
-          type: "offer",
-          offer: pc.localDescription,
-        }));
+        websocketRef.current.send(
+          JSON.stringify({
+            type: "offer",
+            offer: pc.localDescription,
+          })
+        );
       }
+
+      volumeAnalyzerRef.current = new AudioVolumeAnalyzer(setisSpeak);
+      volumeAnalyzerRef.current.start(stream);
 
     } catch (error) {
       console.error("Error starting call:", error);
@@ -290,8 +323,10 @@ export const Session = () => {
     }
   };
 
-  const handleOffer = async (offer: RTCSessionDescriptionInit): Promise<void> => {
-    console.log("handle offer")
+  const handleOffer = async (
+    offer: RTCSessionDescriptionInit
+  ): Promise<void> => {
+    console.log("handle offer");
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
@@ -306,15 +341,27 @@ export const Session = () => {
       await pc.setLocalDescription(answer);
 
       if (websocketRef.current) {
-        websocketRef.current.send(JSON.stringify({
-          type: "answer",
-          answer: pc.localDescription,
-        }));
+        websocketRef.current.send(
+          JSON.stringify({
+            type: "answer",
+            answer: pc.localDescription,
+          })
+        );
       }
-
     } catch (error) {
       console.error("Error handling offer:", error);
       cleanupResources();
+    }
+  };
+
+  const toggleMute = (): void => {
+    setIsMuted((prev) => !prev);
+    if (localStreamRef.current) {
+      const audioTrack = localStreamRef.current.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        setIsMuted(!audioTrack.enabled);
+      }
     }
   };
 
@@ -322,14 +369,35 @@ export const Session = () => {
     cleanupResources();
   };
 
+  // visualize speaker
+  const volumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);
+  const opponentVolumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);
+  const [isSpeak, setisSpeak] = useState(false);
+  const [isOpponentSpeak, setIsOpponentSpeak] = useState(false);
+
   return (
-    <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen} onPriorityHighClick={handlePriorityHighClick}>
-      <SessionContainer theme={theme} users={users} />
+    <SessionBottomNavigationTemplate
+      value="other"
+      isMute={isMuted}
+      toggleMute={toggleMute}
+      setMemoOpen={setMemoOpen}
+      setAssistantOpen={setAssistantOpen}
+      onPriorityHighClick={handlePriorityHighClick}
+    >
+      <SessionContainer
+        theme={theme}
+        users={users}
+        isSpeak={isSpeak && !isMuted}
+        isOpponentSpeak={isOpponentSpeak}
+      />
       <TopicPopup isVisible={showTopicPopup} onClose={handleCloseTopicPopup} />
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="">
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList onChange={handleChange} sx={{ display: "grid", placeContent: "center" }}>
+            <TabList
+              onChange={handleChange}
+              sx={{ display: "grid", placeContent: "center" }}
+            >
               <Tab label=" 持ち込みメモ" value="1" />
               <Tab label="ワードリスト" value="2" />
             </TabList>
@@ -342,7 +410,11 @@ export const Session = () => {
           </TabPanel>
         </TabContext>
       </HalfModal>
-      <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
+      <HalfModal
+        open={assistantOpen}
+        handleClose={handleAssistantClose}
+        title="アシスタント"
+      >
         <Box sx={{ overflow: "auto", pt: 1, pb: 1, maxHeight: "30vh" }}>
           <List>
             {/* アシスタントからの初期メッセージ */}
@@ -374,11 +446,20 @@ export const Session = () => {
 
             {/* メッセージのリスト */}
             {messages.map((message, index) => (
-              <ListItem key={index} sx={{ justifyContent: message.startsWith("You:") ? "flex-end" : "flex-start" }}>
+              <ListItem
+                key={index}
+                sx={{
+                  justifyContent: message.startsWith("You:")
+                    ? "flex-end"
+                    : "flex-start",
+                }}
+              >
                 <Paper
                   sx={{
                     padding: "5px",
-                    backgroundColor: message.startsWith("You:") ? "#f0f0f0" : "background.default",
+                    backgroundColor: message.startsWith("You:")
+                      ? "#f0f0f0"
+                      : "background.default",
                     maxWidth: "60%",
                     wordWrap: "break-word",
                   }}
@@ -415,7 +496,12 @@ export const Session = () => {
             }}
             disabled={isLoading} // ローディング中は入力を無効化
           />
-          <Button variant="contained" color="primary" onClick={handleSendMessage} disabled={isLoading}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSendMessage}
+            disabled={isLoading}
+          >
             {isLoading ? "送信中..." : "送信"}
           </Button>
         </Box>
@@ -426,3 +512,4 @@ export const Session = () => {
 };
 
 export default Session;
+

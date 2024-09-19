@@ -1,18 +1,17 @@
 import { Message, Mic, MicOff, PriorityHigh, Search } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction, Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 export type sessionBottomNavigation = "wordList" | "assistance" | "topic" | "other";
 type sessionBottomNavigationProps = {
   value: sessionBottomNavigation;
   isMute: boolean;
+  toggleMute: () => void;
   setMemoOpen: (open: boolean) => void;
   setAssistantOpen: (open: boolean) => void;
   onPriorityHighClick: () => void;
 };
 
-export const SessionBottomNavigation = ({ value, isMute, setMemoOpen, setAssistantOpen, onPriorityHighClick }: sessionBottomNavigationProps) => {
-  const navigate = useNavigate();
+export const SessionBottomNavigation = ({ value, isMute, toggleMute, setMemoOpen, setAssistantOpen, onPriorityHighClick }: sessionBottomNavigationProps) => {
   const sessionBottomNavigationToIndex = (value: sessionBottomNavigation): number => {
     switch (value) {
       case "wordList":
@@ -41,7 +40,7 @@ export const SessionBottomNavigation = ({ value, isMute, setMemoOpen, setAssista
           boxShadow: "0 0 5px rgba(0, 0, 0, 0.6)",
         }}
       >
-        <BottomNavigationAction onClick={() => navigate("")} icon={isMute ? <MicOff fontSize="large" /> : <Mic fontSize="large" />} />
+        <BottomNavigationAction onClick={toggleMute} icon={isMute ? <MicOff fontSize="large" /> : <Mic fontSize="large" />} />
         <BottomNavigationAction onClick={() => setMemoOpen(true)} icon={<Message fontSize="large" />} />
         <BottomNavigationAction onClick={() => setAssistantOpen(true)} icon={<Search fontSize="large" />} />
         <BottomNavigationAction onClick={onPriorityHighClick} icon={<PriorityHigh fontSize="large" />} />
