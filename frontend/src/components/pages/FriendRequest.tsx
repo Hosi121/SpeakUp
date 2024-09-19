@@ -1,10 +1,8 @@
-import React from 'react';
-import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton } from '@mui/material';
-import { Person, Star, ArrowBack } from '@mui/icons-material';
-import { styled } from '@mui/system';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton } from "@mui/material";
+import { Star, ArrowBack } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection";
-import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
 interface Friend {
   id: number;
@@ -16,56 +14,36 @@ interface Friend {
   isFriend: boolean;
 }
 
-const YellowButton = styled(Button)({
-  backgroundColor: '#FFD700',
-  color: 'black',
-  '&:hover': {
-    backgroundColor: '#FFD700',
+const friends: Friend[] = [
+  {
+    id: 1,
+    username: "Mike",
+    avatar: "",
+    topic: "好きなスポーツ",
+    date: "2024/5/15",
+    level: 3,
+    isFriend: true,
   },
-});
-
-const PinkButton = styled(Button)({
-  backgroundColor: '#FF69B4',
-  color: 'white',
-  '&:hover': {
-    backgroundColor: '#FF1493',
+  {
+    id: 2,
+    username: "ゆい",
+    avatar: "",
+    topic: "好きなスポーツ",
+    date: "2024/5/15",
+    level: 3,
+    isFriend: false,
   },
-});
+];
 
-const GrayButton = styled(Button)({
-  backgroundColor: '#E0E0E0',
-  color: 'black',
-  '&:hover': {
-    backgroundColor: '#E0E0E0',
-  },
-});
+interface FriendRequestComponentProps {
+  friends: Friend[];
+}
 
-const FriendRequestComponent: React.FC = () => {
+const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
   const navigate = useNavigate();
 
-  const friends: Friend[] = [
-    {
-      id: 1,
-      username: 'Mike',
-      avatar: '',
-      topic: '好きなスポーツ',
-      date: '2024/5/15',
-      level: 3,
-      isFriend: true,
-    },
-    {
-      id: 2,
-      username: 'ゆい',
-      avatar: '',
-      topic: '好きなスポーツ',
-      date: '2024/5/15',
-      level: 3,
-      isFriend: false,
-    },
-  ];
-
   const handleEndSession = () => {
-    navigate('/home');
+    navigate("/home");
   };
 
   const handleGoBack = () => {
@@ -97,13 +75,13 @@ const FriendRequestComponent: React.FC = () => {
           <IconButton onClick={handleGoBack}>
             <ArrowBack sx={{ fontSize: 40 }} />
           </IconButton>
-          <Typography variant="h6" sx={{ ml: 2 }}>フレンド申請</Typography>
+          <Typography variant="h6" sx={{ ml: 2 }} fontWeight="bolder">
+            フレンド申請
+          </Typography>
         </Box>
 
-        <Typography variant="body2" sx={{ marginBottom: 2 }}>
-          今日話した相手ともっと話したいときは、
-          フレンド申請をしてメッセージでセッション
-          の続きを話そう！
+        <Typography variant="body2" sx={{ marginBottom: 2 }} textAlign="left">
+          今日話した相手ともっと話したいときは、 フレンド申請をしてメッセージでセッション の続きを話そう！
         </Typography>
 
         <List sx={{ maxHeight: "50vh", overflow: "auto" }}>
@@ -112,7 +90,7 @@ const FriendRequestComponent: React.FC = () => {
               <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
                 <ListItemAvatar>
                   {friend.isFriend ? (
-                    <Avatar sx={{ bgcolor: 'gold' }}>
+                    <Avatar sx={{ bgcolor: "gold" }}>
                       <Star />
                     </Avatar>
                   ) : (
@@ -138,11 +116,11 @@ const FriendRequestComponent: React.FC = () => {
                   }
                 />
               </ListItem>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-                <GrayButton variant="contained" disabled={friend.isFriend}>
-                  {friend.isFriend ? 'フレンド申請済' : 'フレンド申請'}
-                </GrayButton>
-                <PinkButton variant="contained">メッセージ</PinkButton>
+              <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
+                <Button variant="contained" disabled={friend.isFriend}>
+                  {friend.isFriend ? "フレンド申請済" : "フレンド申請"}
+                </Button>
+                <Button variant="contained">メッセージ</Button>
               </Box>
             </Paper>
           ))}
@@ -150,12 +128,11 @@ const FriendRequestComponent: React.FC = () => {
       </Container>
 
       <Box sx={{ p: 2 }}>
-        <Typography variant="body2" sx={{ marginBottom: 2 }}>
-          フレンド申請は、
-          記録＞セッション履歴からでもできるよ！
+        <Typography variant="body2" sx={{ marginBottom: 2 }} textAlign="left">
+          フレンド申請は、 記録＞セッション履歴からでもできるよ！
         </Typography>
 
-        <Button variant="outlined" fullWidth onClick={handleEndSession}>
+        <Button variant="contained" fullWidth onClick={handleEndSession}>
           セッションを終わる→
         </Button>
       </Box>
@@ -164,9 +141,7 @@ const FriendRequestComponent: React.FC = () => {
 };
 
 export const FriendRequest: React.FC = () => {
-  return (
-    <FriendRequestComponent />
-  );
+  return <FriendRequestComponent friends={friends} />;
 };
 
 export default FriendRequest;
