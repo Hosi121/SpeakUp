@@ -135,7 +135,7 @@ export const Session = () => {
         }
       } else if (message.type == "offer" && !isOffer) {
         console.log("Received offer. start call.")
-        setTimeout(startCall, 1000);
+        setTimeout(() => startCall(true), 1000);
       }
 
       if (!peerConnectionRef.current) {
@@ -364,7 +364,7 @@ export const Session = () => {
       <p>テスト用: isOffer={isOfferState ? "true" : "false"}</p>
 
       <button
-        onClick={isInCall ? endCall : () => startCall()}
+        onClick={isInCall ? endCall : () => startCall(true)}
         style={{
           padding: "10px 20px",
           fontSize: "16px",
