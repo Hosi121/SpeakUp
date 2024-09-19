@@ -34,7 +34,8 @@ export const Session = () => {
   const [memo1, setMemo1] = useState(""); // メモ1を管理
   const [memo2, setMemo2] = useState(""); // メモ2を管理
   const [value, setValue] = useState("1");
-  const [countdown, setCountdown] = useState(23);
+  const [isMuted, setIsMuted] = useState(false);
+  const [countdown, setCountdown] = useState(303);
   const navigate = useNavigate();
 
   const [showTopicPopup, setShowTopicPopup] = useState(false);
@@ -99,7 +100,7 @@ export const Session = () => {
       });
 
       console.log("Response data:", response.data); // ここでレスポンスデータを確認
-      
+
       // 応答メッセージを表示
       if (response.data && response.data.choices && response.data.choices[0].message.content) {
         const assistantMessage = response.data.choices[0].message.content;
@@ -318,12 +319,23 @@ export const Session = () => {
     }
   };
 
+  const toggleMute = (): void => {
+    setIsMuted((prev) => !prev);
+    if (localStreamRef.current) {
+      const audioTrack = localStreamRef.current.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        setIsMuted(!audioTrack.enabled);
+      }
+    }
+  };
+
   const endCall = (): void => {
     cleanupResources();
   };
 
   return (
-    <SessionBottomNavigationTemplate value="other" isMute={false} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen} onPriorityHighClick={handlePriorityHighClick}>
+    <SessionBottomNavigationTemplate value="other" isMute={isMuted} toggleMute={toggleMute} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen} onPriorityHighClick={handlePriorityHighClick}>
       <SessionContainer theme={theme} users={users} />
       <TopicPopup isVisible={showTopicPopup} onClose={handleCloseTopicPopup} />
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="">
