@@ -10,6 +10,7 @@ import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate"
 import api from "../../services/api";
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 interface UserData {
   id: number;
   username: string;
@@ -20,10 +21,12 @@ interface UserData {
   updated_at: string;
 }
 
+const rank = 5;
+
 // ユーザー名の最大文字数
 const MAX_USERNAME_LENGTH = 10;
 // メールアドレスの最大文字数
-const MAX_EMAIL_LENGTH = 15;
+const MAX_EMAIL_LENGTH = 20;
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -154,6 +157,23 @@ const SettingsContainer = () => {
     navigate(-1);
   };
 
+  const getRankColor = (rank: number) => {
+    switch (rank) {
+      case 5:
+        return "#F3B500";
+      case 4:
+        return "#C0C0C0";
+      case 3:
+        return "#CD7F32";
+      case 2:
+        return "#00BFFF";
+      case 1:
+        return "#00FF00";
+      default:
+        return "#000000";
+    }
+  };
+
   //文字列を切り捨てる
   const truncateString = (str: string, num: number) => {
     if (!str) {
@@ -199,24 +219,27 @@ const SettingsContainer = () => {
                   </UploadButton>
                 </AvatarUpload>
                 <Box>
-                  {editName ? (
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <StyledTextField value={newName} onChange={(e) => setNewName(e.target.value)} variant="outlined" size="small" />
-                      <IconButton onClick={handleSaveName} size="small" sx={{ ml: 1 }}>
-                        <CheckIcon />
-                      </IconButton>
-                      <IconButton onClick={() => setEditName(false)} size="small">
-                        <CloseIcon />
-                      </IconButton>
-                    </Box>
-                  ) : (
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <Typography variant="h6">{truncateString(user.username, MAX_USERNAME_LENGTH)}</Typography>
-                      <IconButton onClick={() => setEditName(true)} size="small" sx={{ ml: 1 }}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  )}
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                    <MilitaryTechIcon sx={{ color: getRankColor(rank), marginRight: 1 }} />{" "}
+                    {editName ? (
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <StyledTextField value={newName} onChange={(e) => setNewName(e.target.value)} variant="outlined" size="small" />
+                        <IconButton onClick={handleSaveName} size="small" sx={{ ml: 1 }}>
+                          <CheckIcon />
+                        </IconButton>
+                        <IconButton onClick={() => setEditName(false)} size="small">
+                          <CloseIcon />
+                        </IconButton>
+                      </Box>
+                    ) : (
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography variant="h6">{truncateString(user.username, MAX_USERNAME_LENGTH)}</Typography>
+                        <IconButton onClick={() => setEditName(true)} size="small" sx={{ ml: 1 }}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    )}
+                  </Box>
                   {editEmail ? (
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <StyledTextField value={newEmail} onChange={(e) => setNewEmail(e.target.value)} variant="outlined" size="small" />
