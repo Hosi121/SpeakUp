@@ -132,10 +132,6 @@ export const Session = () => {
         if (message.isOffer != undefined) {
           isOffer = message.isOffer;
           setIsOfferState(isOffer);
-          if (isOffer) {
-            console.log("this is offer. start call.")
-            startCall();
-          }
         }
       } else if (message.type == "offer" && !isOffer) {
         console.log("Received offer. start call.")
@@ -211,7 +207,13 @@ export const Session = () => {
     return pc;
   };
 
-  const startCall = async (): Promise<void> => {
+  const startCall = async (forceExcute: boolean): Promise<void> => {
+    if (!forceExcute || !isOffer) {
+      console.log("not start call", forceExcute, isOffer)
+      return;
+    } else {
+      console.log("start call")
+    }
     console.log("start call")
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
