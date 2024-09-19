@@ -13,8 +13,6 @@ const users = [
 
 const theme = "好きな言葉";
 
-const host = "10.70.174.101"
-const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
 const STUN_SERVERS = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -68,6 +66,10 @@ export const Session = () => {
   const memo = "I'm Hanako. Please call me Hanako.";
 
   // WebRTC関連の処理
+  //
+  const host = "10.70.174.101"
+  const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
+
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -107,6 +109,13 @@ export const Session = () => {
 
     ws.onopen = () => {
       console.log("Connected to signaling server");
+
+      const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
+      const authMessage = {
+        type: 'authenticate',
+        token: `Bearer ${token}`
+      };
+      ws.send(JSON.stringify(authMessage));
       setIsConnected(true);
 
       const idData: HashedId = { hashedId: 1 };

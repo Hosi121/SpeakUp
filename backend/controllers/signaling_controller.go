@@ -23,6 +23,7 @@ type Message struct {
 	Offer     json.RawMessage `json:"offer,omitempty"`
 	Answer    json.RawMessage `json:"answer,omitempty"`
 	Candidate json.RawMessage `json:"candidate,omitempty"`
+	HashedId  int             `json:"hashedId"`
 }
 
 type UserInfoMessage struct {
@@ -42,6 +43,10 @@ var clients = make(map[*websocket.Conn]bool)
 
 // WebSocket接続処理
 func SignalingController(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	fmt.Printf("userId\n%v\n\nexists=%s\n", userID, exists)
+	fmt.Printf("c\n%s\n", c)
+
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Fatal(err)
