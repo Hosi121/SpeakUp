@@ -14,6 +14,7 @@ import SignUp from "./components/pages/SignUp.tsx";
 import { Record } from "./components/pages/Record.tsx";
 import { Memo } from "./components/pages/Memo.tsx";
 import { Message } from "./components/pages/Message.tsx";
+import SessionFeedback from "./components/pages/SessionFeedback.tsx";
 import FriendRequest from "./components/pages/FriendRequest.tsx";
 import Login from "./components/pages/Login.tsx";
 import { Stats } from "./components/pages/Stats.tsx";
@@ -104,6 +105,10 @@ const router = createBrowserRouter([
   {
     path: "friendrequest",
     element: <FriendRequest />,
+  }
+  {
+    path: "sessionfeedback",
+    element: <SessionFeedback />,
   }
 ]);
 
