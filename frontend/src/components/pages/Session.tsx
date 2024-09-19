@@ -20,8 +20,6 @@ const STUN_SERVERS = {
   ],
 };
 
-type HashedId = { hashedId: number };
-
 export const Session = () => {
   const [memoOpen, setMemoOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
@@ -112,14 +110,11 @@ export const Session = () => {
 
       const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
       const authMessage = {
-        type: 'authenticate',
+        type: 'Authorization',
         token: `Bearer ${token}`
       };
       ws.send(JSON.stringify(authMessage));
       setIsConnected(true);
-
-      const idData: HashedId = { hashedId: 1 };
-      ws.send(JSON.stringify(idData));
     };
 
     ws.onmessage = async (event: MessageEvent) => {
