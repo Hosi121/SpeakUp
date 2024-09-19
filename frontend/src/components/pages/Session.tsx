@@ -12,7 +12,7 @@ import {
   Tab,
 } from "@mui/material";
 import HomeLogo from "../../assets/homeLogo";
-import { Favorite, Person } from "@mui/icons-material";
+import { Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionContainer from "../utils/SessionContainer";
 import api from "../../services/api";
@@ -21,11 +21,7 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 import { TopicPopup } from "../utils/TopicPopup";
 import { AudioVolumeAnalyzer } from "../utils/AudioVolumeAnalyzer";
-
-const users = [
-  { name: "User1", icon: <Person />, description: "英語" },
-  { name: "User2", icon: <Favorite />, description: "苗字" },
-];
+import { UserData } from "./Settings";
 
 const theme = "好きな言葉";
 
@@ -35,6 +31,12 @@ const STUN_SERVERS = {
     { urls: "stun:stun1.l.google.com:19302" },
   ],
 };
+
+type UserCardData = {
+  name: string;
+  icon: JSX.Element;
+}
+
 
 export const Session = () => {
   const [memoOpen, setMemoOpen] = useState(false);
@@ -375,6 +377,27 @@ export const Session = () => {
   const [isSpeak, setisSpeak] = useState(false);
   const [isOpponentSpeak, setIsOpponentSpeak] = useState(false);
 
+  // userInfo
+  const initialUserCardInfo = { name: "", icon: <Person /> };
+  const [userCardInfo, setUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
+  const [opponentUserCardInfo, setOpponentUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userInfoResponse = await api.get<UserData>("/user/info");
+        const opponentUserCardDataResponse = await api.get<UserData>("/user/info");
+        const userInfo: UserCardData = { name: userInfoResponse.data.username, icon: <Person /> };
+        const opponentUserInfo: UserCardData = { name: opponentUserCardDataResponse.data.username, icon: <Person /> };
+        setUserCardInfo(userInfo);
+        setOpponentUserCardInfo(opponentUserInfo);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <SessionBottomNavigationTemplate
       value="other"
@@ -386,7 +409,7 @@ export const Session = () => {
     >
       <SessionContainer
         theme={theme}
-        users={users}
+        users={[userCardInfo, opponentUserCardInfo]}
         isSpeak={isSpeak && !isMuted}
         isOpponentSpeak={isOpponentSpeak}
       />

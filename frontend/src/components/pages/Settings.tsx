@@ -21,7 +21,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import api from "../../services/api";
-interface UserData {
+export interface UserData {
   id: number;
   username: string;
   email: string;
@@ -81,7 +81,7 @@ const SettingsContainer = () => {
         console.error("Failed to fetch user data:", error);
       }
     };
-  
+
     fetchUserData();
   }, []);
 
@@ -95,7 +95,7 @@ const SettingsContainer = () => {
     if (event.target.files && event.target.files[0]) {
       const formData = new FormData();
       formData.append("avatar", event.target.files[0]);
-  
+
       try {
         const response = await api.put("/user/avatar", formData, {
           headers: {
@@ -143,7 +143,7 @@ const SettingsContainer = () => {
       updateUser();
     }
   };
-  
+
 
   const handleLogout = () => {
     // Implement logout logic
