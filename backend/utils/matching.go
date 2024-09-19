@@ -102,14 +102,7 @@ func Matching(event_id int) {
 		// 先頭から2人ずつをマッチングさせる
 		matching_list = makeMatchPair(shuffled)
 		// マッチング結果をSESSIONSテーブルに格納
-		for i = 0; i < len(matching_list); i++ {
-			db_client.SESSIONS.Create().
-				SetUserID(matching_list[i].First.user_id).
-				SetMatchedUserID(matching_list[i].Second.user_id).
-				SetRecordID(matching_list[i].First.record_id).
-				SetStatus("MATCHED").
-				Save(ctx)
-		}
+		saveResultInDB(matching_list)
 	}
 
 	/* セッション２のマッチング */
@@ -152,16 +145,8 @@ func Matching(event_id int) {
 	}
 	// 連続するマッチング同士で，Firstを入れ替える
 	matching_list = session2_swapping(matching_list)
-	// DBに格納
 	// マッチング結果をSESSIONSテーブルに格納
-	for i := 0; i < len(matching_list); i++ {
-		db_client.SESSIONS.Create().
-			SetUserID(matching_list[i].First.user_id).
-			SetMatchedUserID(matching_list[i].Second.user_id).
-			SetRecordID(matching_list[i].First.record_id).
-			SetStatus("MATCHED").
-			Save(ctx)
-	}
+	saveResultInDB(matching_list)
 
 	/* セッション３のマッチング */
 	// セッション２のマッチング結果から，セッション３に参加しないものを削除
@@ -201,17 +186,10 @@ func Matching(event_id int) {
 		// matching_listと合体
 		matching_list = remakeList(matching_list, shuffled)
 	}
-	// 連続するマッチング同士で，Firstを入れ替える
+	// 連続するマッチング同士で，相手を入れ替える
 	matching_list = session3_swapping(matching_list)
 	// マッチング結果をSESSIONSテーブルに格納
-	for i := 0; i < len(matching_list); i++ {
-		db_client.SESSIONS.Create().
-			SetUserID(matching_list[i].First.user_id).
-			SetMatchedUserID(matching_list[i].Second.user_id).
-			SetRecordID(matching_list[i].First.record_id).
-			SetStatus("MATCHED").
-			Save(ctx)
-	}
+	saveResultInDB(matching_list)
 }
 
 func logErrorExceptNotFound(err error, contextMessage string) {
@@ -292,6 +270,31 @@ func remakeList(latest_list []Pair, embed_list []RegistrationInfo) []Pair {
 		}
 	}
 	return makeMatchPair(ret)
+}
+
+func saveResultInDB(matching []Pair) {
+	for i := 0; i < len(matching); i++ {
+		_, err := db_client.SESSIONS.Create().
+			SetUserID(matching[i].First.user_id).
+			SetMatchedUserID(matching[i].Second.user_id).
+			SetRecordID(matching[i].First.record_id).
+			SetStatus("MATCHED").
+			Save(ctx)
+		if err != nil {
+			slog.Error("Failed creating session: %v", err)
+		}
+		// 逆も然り
+		_, err2 := db_client.SESSIONS.Create().
+			SetUserID(matching[i].Second.user_id).
+			SetMatchedUserID(matching[i].First.user_id).
+			SetRecordID(matching[i].Second.record_id).
+			SetStatus("MATCHED").
+			Save(ctx)
+		if err2 != nil {
+			slog.Error("Failed creating session: %v", err)
+		}
+	}
+
 }
 
 func session2_swapping(matching_list []Pair) []Pair {
