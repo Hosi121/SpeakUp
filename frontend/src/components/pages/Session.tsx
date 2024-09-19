@@ -254,6 +254,8 @@ export const Session = () => {
     pc.ontrack = (event: RTCTrackEvent) => {
       if (remoteAudioRef.current && event.streams[0]) {
         remoteAudioRef.current.srcObject = event.streams[0];
+        volumeAnalyzerRef.current = new AudioVolumeAnalyzer(setIsOpponentSpeak);
+        volumeAnalyzerRef.current.start(event.streams[0]);
       }
     };
 
@@ -536,7 +538,7 @@ class AudioVolumeAnalyzer {
     this.analyser.getByteFrequencyData(this.dataArray);
     const average = this.dataArray.reduce((acc, value) => acc + value, 0) / this.dataArray.length;
     const volume = Math.round((average / 255) * 100);
-    this.setIsSpeak(volume > 20);
+    this.setIsSpeak(volume > 10);
 
     this.animationFrameId = requestAnimationFrame(this.updateVolume);
   };
