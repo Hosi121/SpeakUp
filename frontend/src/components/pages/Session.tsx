@@ -129,9 +129,11 @@ export const Session = () => {
       } = JSON.parse(event.data);
 
       if (!peerConnectionRef.current) {
+        console.log("message=", message.type)
         console.warn("Received message but peer connection is not established");
         return;
       }
+      console.log("on message", message)
 
       console.log("Received message type:", message.type);
       try {
@@ -225,6 +227,7 @@ export const Session = () => {
   };
 
   const handleOffer = async (offer: RTCSessionDescriptionInit): Promise<void> => {
+    console.log("handle offer")
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
