@@ -2,7 +2,6 @@ import { Card, CardContent, Typography, Avatar, Box, Container, Stack } from "@m
 import Grid from '@mui/material/Grid2';
 import SessionCountDownModal from "./SessionCountDownModal";
 
-//      <SessionContainer theme={theme} users={users} isSpeak={isSpeak} isOpponentSpeak={isOpponentSpeak} />
 type SessionContainerProps = {
   theme: string;
   users: { name: string; icon: JSX.Element; description: string }[]
