@@ -24,6 +24,7 @@ import AdminPage from "./components/pages/AdminPage.tsx";
 import FriendList from "./components/utils/FriendList.tsx";
 import Theme from "./styles/Theme.tsx";
 import { SessionHistoryFriendlist } from "./components/pages/SessionHistoryFriendlist.tsx";
+import TrophyNotification from "./components/pages/TrophyNotification.tsx";
 
 const router = createBrowserRouter([
   {
@@ -109,7 +110,11 @@ const router = createBrowserRouter([
   {
     path: "sessionfeedback",
     element: <SessionFeedback />,
-  }
+  },
+  {
+    path: "trophynotification",
+    element: <TrophyNotification />,
+  },
 ]);
 
 const rootElement = document.getElementById("root");
