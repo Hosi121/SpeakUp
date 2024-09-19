@@ -48,13 +48,13 @@ const AudioVisualizer: React.FC = () => {
       const end = Math.floor((i + 1) * (length / 10));
       const sum = array.slice(start, end).reduce((acc, val) => acc + val, 0);
       const average = sum / (end - start);
-      const max = 255 * 1.00 // 表示上の頭打ち振幅を100%にする
-      const min = 255 * 0.05 // 5%までは無音扱い
+      const max = 255 * 1.0; // 表示上の頭打ち振幅を100%にする
+      const min = 255 * 0.05; // 5%までは無音扱い
       const actualValue = Math.max(0, Math.min(255, average));
       const height = 25;
-      return Math.round(actualValue / (max - min) * height);
+      return Math.round((actualValue / (max - min)) * height);
     });
-  }
+  };
 
   const startListening = async () => {
     try {
@@ -86,7 +86,7 @@ const AudioVisualizer: React.FC = () => {
   return (
     <Box>
       {error ? (
-        <Typography color="error" align="center">
+        <Typography color="error" align="center" sx={{ mb: 2 }}>
           {error}
         </Typography>
       ) : (
