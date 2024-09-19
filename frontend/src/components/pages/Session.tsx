@@ -375,7 +375,6 @@ export const Session = () => {
   const opponentDataArrayRef = useRef<Uint8Array | null>(null);
   const opponentSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const opponentRafIdRef = useRef<number | null>(null);
-  const [opponentIsSpeak, opponentSetIsSpeak] = useState(false);
   const [isOpponentSpeak, setIsOpponentSpeak] = useState(false);
 
   const judgeIsSpeak = (array: Uint8Array): boolean => {
@@ -385,61 +384,61 @@ export const Session = () => {
     return average > border;
   };
 
-  const startListening = async () => {
-    try {
-      if (!remoteAudioRef.current) {
-        return;
-      }
+  //const startListening = async () => {
+  //  try {
+  //    if (!remoteAudioRef.current) {
+  //      return;
+  //    }
 
-      // 自分側の処理
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioContextRef.current = new AudioContext();
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      dataArrayRef.current = new Uint8Array(
-        analyserRef.current.frequencyBinCount
-      );
-      sourceRef.current =
-        audioContextRef.current.createMediaStreamSource(stream);
-      sourceRef.current.connect(analyserRef.current);
+  //    // 自分側の処理
+  //    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  //    audioContextRef.current = new AudioContext();
+  //    analyserRef.current = audioContextRef.current.createAnalyser();
+  //    dataArrayRef.current = new Uint8Array(
+  //      analyserRef.current.frequencyBinCount
+  //    );
+  //    sourceRef.current =
+  //      audioContextRef.current.createMediaStreamSource(stream);
+  //    sourceRef.current.connect(analyserRef.current);
 
-      // 相手側の処理
-      const opponentStream = remoteAudioRef.current.srcObject;
-      if (!opponentStream) {
-        return;
-      }
-      opponentAudioContextRef.current = new AudioContext();
-      opponentAnalyserRef.current = opponentAudioContextRef.current.createAnalyser();
-      opponentDataArrayRef.current = new Uint8Array(
-        opponentAnalyserRef.current.frequencyBinCount
-      );
-      opponentSourceRef.current = opponentAudioContextRef.current.createMediaStreamSource(
-        opponentStream as MediaStream
-      );
-      opponentSourceRef.current.connect(opponentAnalyserRef.current);
+  //    // 相手側の処理
+  //    const opponentStream = remoteAudioRef.current.srcObject;
+  //    if (!opponentStream) {
+  //      return;
+  //    }
+  //    opponentAudioContextRef.current = new AudioContext();
+  //    opponentAnalyserRef.current = opponentAudioContextRef.current.createAnalyser();
+  //    opponentDataArrayRef.current = new Uint8Array(
+  //      opponentAnalyserRef.current.frequencyBinCount
+  //    );
+  //    opponentSourceRef.current = opponentAudioContextRef.current.createMediaStreamSource(
+  //      opponentStream as MediaStream
+  //    );
+  //    opponentSourceRef.current.connect(opponentAnalyserRef.current);
 
-      const updateAudioData = () => {
-        if (analyserRef.current && dataArrayRef.current) {
-          analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-          setIsSpeak(judgeIsSpeak(dataArrayRef.current));
-        }
-        rafIdRef.current = requestAnimationFrame(updateAudioData);
+  //    const updateAudioData = () => {
+  //      if (analyserRef.current && dataArrayRef.current) {
+  //        analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+  //        setIsSpeak(judgeIsSpeak(dataArrayRef.current));
+  //      }
+  //      rafIdRef.current = requestAnimationFrame(updateAudioData);
 
-        if (opponentAnalyserRef.current && opponentDataArrayRef.current) {
-          opponentAnalyserRef.current.getByteFrequencyData(opponentDataArrayRef.current);
-          setIsOpponentSpeak(judgeIsSpeak(opponentDataArrayRef.current));
-        }
-        opponentRafIdRef.current = requestAnimationFrame(updateAudioData);
-      };
+  //      if (opponentAnalyserRef.current && opponentDataArrayRef.current) {
+  //        opponentAnalyserRef.current.getByteFrequencyData(opponentDataArrayRef.current);
+  //        setIsOpponentSpeak(judgeIsSpeak(opponentDataArrayRef.current));
+  //      }
+  //      opponentRafIdRef.current = requestAnimationFrame(updateAudioData);
+  //    };
 
-      updateAudioData();
-    } catch (error) {
-      console.error("Error accessing microphone:", error);
-    }
-  };
+  //    updateAudioData();
+  //  } catch (error) {
+  //    console.error("Error accessing microphone:", error);
+  //  }
+  //};
 
-  useEffect(() => {
-    startListening();
-  }, []);
+  //useEffect(() => {
+  //  startListening();
+  //}, []);
 
   return (
     <SessionBottomNavigationTemplate
