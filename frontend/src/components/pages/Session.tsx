@@ -196,11 +196,7 @@ export const Session = () => {
     return pc;
   };
 
-  const startCall = async (flag: boolean): Promise<void> => {
-    console.log("startCall func start")
-    //if (!isOffer || flag) {
-    //  return;
-    //}
+  const startCall = async (): Promise<void> => {
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
@@ -213,12 +209,10 @@ export const Session = () => {
       await pc.setLocalDescription(offer);
 
       if (websocketRef.current) {
-        websocketRef.current.send(
-          JSON.stringify({
-            type: "offer",
-            offer: pc.localDescription,
-          })
-        );
+        websocketRef.current.send(JSON.stringify({
+          type: "offer",
+          offer: pc.localDescription,
+        }));
       }
 
       setIsInCall(true);
@@ -228,9 +222,7 @@ export const Session = () => {
     }
   };
 
-  const handleOffer = async (
-    offer: RTCSessionDescriptionInit
-  ): Promise<void> => {
+  const handleOffer = async (offer: RTCSessionDescriptionInit): Promise<void> => {
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
@@ -240,16 +232,15 @@ export const Session = () => {
       stream.getTracks().forEach((track) => pc.addTrack(track, stream));
 
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
+
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
 
       if (websocketRef.current) {
-        websocketRef.current.send(
-          JSON.stringify({
-            type: "answer",
-            answer: pc.localDescription,
-          })
-        );
+        websocketRef.current.send(JSON.stringify({
+          type: "answer",
+          answer: pc.localDescription,
+        }));
       }
 
       setIsInCall(true);
@@ -353,7 +344,7 @@ export const Session = () => {
       <p>テスト用: isInCall={isInCall ? "true" : "false"}</p>
 
       <button
-        onClick={isInCall ? endCall : () => startCall(true)}
+        onClick={isInCall ? endCall : () => startCall()}
         style={{
           padding: "10px 20px",
           fontSize: "16px",
