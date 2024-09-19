@@ -143,9 +143,6 @@ export const Session = () => {
         console.warn("Received message but peer connection is not established");
         return;
       }
-      console.log("on message", message)
-
-      console.log("Received message type:", message.type);
       try {
         if (message.type === "offer" && message.offer) {
           await handleOffer(message.offer);
@@ -211,11 +208,14 @@ export const Session = () => {
   const startCall = async (forceExcute: boolean): Promise<void> => {
     if (!forceExcute && !isOffer) {
       console.log("not start call", forceExcute, isOffer)
+      console.log(`not start call forceExcute=${forceExcute}, isOffer=${isOffer}`)
       return;
     } else {
       console.log("startCall()")
     }
     console.log("start call")
+    setIsInCall(true);
+
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
@@ -234,7 +234,6 @@ export const Session = () => {
         }));
       }
 
-      setIsInCall(true);
     } catch (error) {
       console.error("Error starting call:", error);
       cleanupResources();
