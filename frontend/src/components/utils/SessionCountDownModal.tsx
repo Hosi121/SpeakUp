@@ -23,20 +23,21 @@ const SessionCountDownModal = () => {
   return (
     <Box
       sx={{
-        height: "80vh",
-        width: "90vw",
+        height: "calc(100vh - 70px)",
+        width: "100vw",
         bgcolor: "background.default",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "center",
+        p: 5,
       }}
     >
       <Box sx={{ textAlign: "center", mt: 4, width: "90%" }}>
         <Typography variant="h5" component="p" fontWeight="bold" textAlign="left">
           会話まで...
         </Typography>
-        <Typography variant="h1" component="p" color="primary" fontWeight="bold" sx={{ mt: 2, fontSize: "6rem" }}>
+        <Typography variant="h1" component="p" color="primary" fontWeight="bold" sx={{ mt: 2, mb: 4, fontSize: "6rem", fontFamily: "bangers" }}>
           {countdown}
         </Typography>
       </Box>
