@@ -91,6 +91,7 @@ export const Session = () => {
     setIsInCall(false);
   }, []);
 
+
   useEffect(() => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
     setTimeout(() => startCall(false), 3000); // 3秒後に通話開始
@@ -196,9 +197,9 @@ export const Session = () => {
   };
 
   const startCall = async (flag: boolean): Promise<void> => {
-    if (!isOffer || flag) {
-      return;
-    }
+    //if (!isOffer || flag) {
+    //  return;
+    //}
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
@@ -349,6 +350,25 @@ export const Session = () => {
       <audio ref={remoteAudioRef} autoPlay />
       <p>テスト用: isConnected={isConnected}</p>
       <p>テスト用: isInCall={isInCall}</p>
+
+      <button
+        onClick={isInCall ? endCall : () => startCall}
+        style={{
+          padding: "10px 20px",
+          fontSize: "16px",
+          backgroundColor: !isConnected
+            ? "#ccc"
+            : isInCall
+              ? "#dc3545"
+              : "#28a745",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: !isConnected ? "default" : "pointer",
+        }}
+      >
+        {isInCall ? "End Call" : "Start Call"}
+      </button>
     </SessionBottomNavigationTemplate>
   );
 };
