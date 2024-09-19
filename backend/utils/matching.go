@@ -20,6 +20,7 @@ var (
 	dsn       string
 	db_client *ent.Client
 	ctx       context.Context
+	admin     RegistrationInfo
 )
 
 /* 参加情報用 */
@@ -53,6 +54,48 @@ func getRankByUserID(user_id int) int {
 	return user.Rank
 }
 
+func getAdminUser(event_id int) {
+	res, err := db_client.USERS.Query().
+		Where(
+			users.RoleEQ("ADMIN"),
+		).
+		First(ctx)
+	if err != nil {
+		slog.Error("Failed to get admin user: %v", err)
+		return
+	}
+	admin.user_id = res.ID
+	admin.rank = 5
+	admin.session_bit = 0
+	// EVENT_RECORDSにrecordがないなら作る
+	rec, err := db_client.EVENT_RECORDS.Query().
+		Where(
+			event_records.EventIDEQ(event_id),
+			event_records.UserIDEQ(res.ID),
+		).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			// 新たにrecordを作成
+			rec, err := db_client.EVENT_RECORDS.Create().
+				SetUserID(res.ID).
+				SetEventID(event_id).
+				SetParticipatesBit(0).
+				Save(ctx)
+			if err != nil {
+				slog.Error("Failed to create admin's record: %v", err)
+			} else {
+				admin.record_id = rec.ID
+			}
+		}
+		slog.Error("Failed to get event records: %v", err)
+
+	} else {
+		admin.record_id = rec.ID
+	}
+	return
+}
+
 /* マッチング結果用 */
 type Pair struct {
 	First  RegistrationInfo
@@ -80,6 +123,7 @@ func Matching(event_id int) {
 
 	var matching_list []Pair
 	matching_list = []Pair{}
+	getAdminUser(event_id) // adminを用意
 
 	/* セッション１のマッチング */
 	// EVENT_RECORDSからセッション１に参加するユーザを取得する
@@ -126,7 +170,7 @@ func Matching(event_id int) {
 	} else {
 		// 新たに加える方はシャッフル
 		shuffled := shuffleRegistration(info2)
-		// matching_listと合体
+		// continue_userと合体
 		matching_list = remakeList(continue_user, shuffled)
 	}
 	// 連続するマッチング同士で，Firstを入れ替える
@@ -154,7 +198,7 @@ func Matching(event_id int) {
 	} else {
 		// 新たに加える方はシャッフル
 		shuffled := shuffleRegistration(info3)
-		// matching_listと合体
+		// continue_userと合体
 		matching_list = remakeList(continue_user, shuffled)
 	}
 	// 連続するマッチング同士で，相手を入れ替える
@@ -203,6 +247,7 @@ func makeMatchPair(regi_list []RegistrationInfo) []Pair {
 	// １人余る場合は運営とマッチング
 	if len(regi_list)%2 == 1 {
 		// Todo: 末尾に運営を追加
+		regi_list = append(regi_list, admin)
 	}
 	for i := 0; i < len(regi_list); i += 2 {
 		// 先頭から2人ペアを作成
