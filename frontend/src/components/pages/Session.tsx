@@ -94,7 +94,7 @@ export const Session = () => {
 
   useEffect(() => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
-    setTimeout(() => startCall(false), 3000);
+    setTimeout(() => startCall(false), 2000);
     return () => {
       if (websocketRef.current) {
         websocketRef.current.close();
