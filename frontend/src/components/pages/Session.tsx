@@ -255,8 +255,8 @@ export const Session = () => {
     pc.ontrack = (event: RTCTrackEvent) => {
       if (remoteAudioRef.current && event.streams[0]) {
         remoteAudioRef.current.srcObject = event.streams[0];
-        volumeAnalyzerRef.current = new AudioVolumeAnalyzer(setIsOpponentSpeak);
-        volumeAnalyzerRef.current.start(event.streams[0]);
+        opponentVolumeAnalyzerRef.current = new AudioVolumeAnalyzer(setIsOpponentSpeak);
+        opponentVolumeAnalyzerRef.current.start(event.streams[0]);
       }
     };
 
@@ -371,6 +371,7 @@ export const Session = () => {
 
   // visualize speaker
   const volumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);
+  const opponentVolumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);
   const [isSpeak, setisSpeak] = useState(false);
   const [isOpponentSpeak, setIsOpponentSpeak] = useState(false);
 
