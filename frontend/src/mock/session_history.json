@@ -1,0 +1,27 @@
+[
+  {
+    "avatar": "./image1.png",
+    "user": "Mike",
+    "theme": "好きなスポーツ",
+    "date": "2024/05/15",
+    "rank": 1,
+    "friedstate": "friend"
+  },
+  {
+    "avatar": "./image1.png",
+    "user": "ゆい",
+    "theme": "好きなスポーツ",
+    "date": "2024/05/15",
+    "rank": 1,
+    "friedstate": "pending"
+  },
+  {
+    "avatar": "./image1.png",
+    "user": "Mike",
+    "theme": "好きなスポーツ",
+    "date": "2024/05/15",
+    "rank": 1,
+    "friedstate": "unapplied"
+  }
+
+]

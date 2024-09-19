@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "time": "18:52",
+    "user": "Yuki",
+    "type": "friendRequest",
+    "message": "フレンド申請",
+    "profileIcon": "/path/to/friend-icon.png"
+  },
+  {
+    "id": 2,
+    "time": "3日前",
+    "user": "SPEAK UP!",
+    "type": "welcomeMessage",
+    "message": "へようこそ！",
+    "profileIcon": "/path/to/speakup-icon.png"
+  }
+]
+
