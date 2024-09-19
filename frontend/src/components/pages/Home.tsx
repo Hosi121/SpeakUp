@@ -11,6 +11,7 @@ import session from "../../mock/sessions.json";
 type SessionData = {
   dateTime: string;
   sessions: number[];
+  theme: string;
 };
 
 const HomeContainer = () => {
@@ -47,7 +48,7 @@ const HomeContainer = () => {
         >
           <h3>直近の参加予定</h3>
           <Typography sx={{ mt: 1, mb: 1, color: "primary.main", fontSize: "1.3rem", fontWeight: "bolder", textAlign: "center" }}>{sessionData[0]?.dateTime}</Typography>
-          {sessionData[0]?.sessions.map((session) => <Typography sx={{ color: "primary.main", textAlign: "center", fontSize: "0.9rem" }}>セッション{session}</Typography>)}
+          <Typography sx={{ color: "primary.main", fontSize: "1rem", fontWeight: "bolder", textAlign: "center" }}>テーマ: {sessionData[0]?.theme}</Typography>
         </Box>
 
         <Box
