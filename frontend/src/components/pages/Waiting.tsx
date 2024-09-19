@@ -1,12 +1,30 @@
-import { Box, Button, Container, Typography } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
+import { Box, Container, LinearProgress, Typography } from "@mui/material";
 import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import { MemoInputField } from "../utils/MemoInputField";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const WaitingContainer = () => {
   const [memo, setMemo] = useState("");
+  const scheduledTime = new Date("2024-09-20T06:47:00"); // mock
+  const startedAt = new Date();
+  const allWaitingTime = scheduledTime.getTime() - startedAt.getTime();
+  const [remainTimeProgressRaito, setRemainTimeProgressRaito] = useState(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      const remainTime = scheduledTime.getTime() - now.getTime();
+      const progressRaito = 1 - remainTime / allWaitingTime;
+      const actualProgressRaito = Math.min(1, progressRaito);
+      setRemainTimeProgressRaito(actualProgressRaito);
+      if (remainTime <= 0) {
+        clearInterval(intervalId);
+      }
+    }, 800);
+  }, []);
+
+  const scheduledTimeStr = `${scheduledTime.getMonth() + 1}月${scheduledTime.getDate()}日${scheduledTime.getHours()}:${scheduledTime.getMinutes().toString().padStart(2, "0")}`;
 
   return (
     <Container sx={{ height: "100vh", padding: 3 }}>
@@ -33,7 +51,7 @@ const WaitingContainer = () => {
             textAlign: "center",
           }}
         >
-          6月30日21:00〜
+          {scheduledTimeStr}〜
         </Typography>
 
         <Box
@@ -56,24 +74,37 @@ const WaitingContainer = () => {
           />
         </Box>
 
-        <Button
-          variant="contained"
+        <Box
           sx={{
-            mt: 4,
-            color: "#000",
-            bgcolor: "secondary.main",
-            "&:hover": { bgcolor: "secondary.dark" },
-            width: "80%",
-            maxWidth: "300px",
-          }}
-        >
-          <CircularProgress size={24} sx={{ mr: 3 }} />
-          セッション開始まで
-          <br />
-          しばらくお待ちください
-        </Button>
+            width: "100%",
+            mt: 2,
+            height: "22px",
+            border: "solid black 2px",
+            borderRadius: "5px",
+            backgroundColor: "secondary.main",
+            padding: 0,
+            position: "relative",
+          }}>
+          <LinearProgress
+            variant="determinate"
+            value={remainTimeProgressRaito * 100}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "98%",
+              borderRadius: "3px",
+              height: "66%",
+              backgroundColor: "transparent",
+              span: {
+                transition: "transform 0.8s linear",
+                WebkitTransform: "-webkit-transform 0.8s linear",
+              }
+            }} />
+        </Box>
       </Container>
-    </Container>
+    </Container >
   );
 };
 
