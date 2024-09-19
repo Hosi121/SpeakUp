@@ -128,8 +128,16 @@ export const Session = () => {
         isOffer?: boolean;
       } = JSON.parse(event.data);
 
+      if (message.type == "callType") {
+        if (message.isOffer) {
+          isOffer = message.isOffer;
+          startCall();
+        }
+      } else if (message.type == "offer" && !isOffer) {
+        setTimeout(startCall, 1000);
+      }
+
       if (!peerConnectionRef.current) {
-        console.log("message=", message.type)
         console.warn("Received message but peer connection is not established");
         return;
       }
