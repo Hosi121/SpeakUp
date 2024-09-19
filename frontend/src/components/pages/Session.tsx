@@ -132,8 +132,10 @@ export const Session = () => {
       if (message.type == "callType") {
         if (message.isOffer != undefined) {
           isOffer = message.isOffer;
-          setIsOfferState(message.isOffer);
-          startCall();
+          setIsOfferState(isOffer);
+          if (isOffer) {
+            startCall();
+          }
         }
       } else if (message.type == "offer" && !isOffer) {
         setTimeout(startCall, 1000);
@@ -153,7 +155,6 @@ export const Session = () => {
           await peerConnectionRef.current.setRemoteDescription(
             new RTCSessionDescription(message.answer)
           );
-          //startCall(true);
         } else if (message.type === "ice-candidate" && message.candidate) {
           await peerConnectionRef.current.addIceCandidate(
             new RTCIceCandidate(message.candidate)
