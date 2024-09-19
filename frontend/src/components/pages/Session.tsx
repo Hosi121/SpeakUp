@@ -213,6 +213,9 @@ export const Session = () => {
     } else {
       console.log("startCall()")
     }
+    if (forceExcute) {
+      console.log("forceExcute")
+    }
     console.log("start call")
     setIsInCall(true);
 
