@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Hosi121/SpeakUp/utils"
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,6 @@ type Message struct {
 	Offer     json.RawMessage `json:"offer,omitempty"`
 	Answer    json.RawMessage `json:"answer,omitempty"`
 	Candidate json.RawMessage `json:"candidate,omitempty"`
-	HashedId  int             `json:"hashedId,omitempty"`
 	Token     string          `json:"token,omitempty"`
 }
 
@@ -68,22 +68,22 @@ func SignalingController(c *gin.Context) {
 
 		if msg.Type == "Authorization" {
 			token := msg.Token[7:]
-			userID, err := utils.ValidateJWT(token)
+			userIDStr, err := utils.ValidateJWT(token)
 			var response Message
 			if err == nil {
 				response = Message{Type: "AuthResult", Token: "Authentication successful"}
 			} else {
 				response = Message{Type: "AuthResult", Token: "Authentication failed"}
 			}
-			fmt.Printf("userID=%s\n", userID)
+			userId, _ := strconv.Atoi(userIDStr)
+			wsToId[ws] = userId
+			idToWs[userId] = ws
+			fmt.Printf("connect: hashedId=%d\n", userId)
 
 			if err := ws.WriteJSON(response); err != nil {
 				fmt.Printf("Error sending response: %v\n", err)
 				return
 			}
-		} else if msg.Type == "init" {
-			wsToId[ws] = msg.HashedId
-			fmt.Printf("connect: hashedId=%d\n", msg.HashedId)
 		} else {
 			to := matchings[wsToId[ws]]
 			sendMessage(msg, to)
