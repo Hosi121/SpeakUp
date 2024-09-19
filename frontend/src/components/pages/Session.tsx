@@ -64,10 +64,11 @@ export const Session = () => {
   const memo = "I'm Hanako. Please call me Hanako.";
 
   // WebRTC関連の処理
-  //
+  // webbbb vimジャンプ用
   const host = "10.70.174.101"
   const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
   let isOffer = false;
+  const [isOfferState, setIsOfferState] = useState<boolean>(false);
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
@@ -129,8 +130,9 @@ export const Session = () => {
       } = JSON.parse(event.data);
 
       if (message.type == "callType") {
-        if (message.isOffer) {
+        if (message.isOffer != undefined) {
           isOffer = message.isOffer;
+          setIsOfferState(message.isOffer);
           startCall();
         }
       } else if (message.type == "offer" && !isOffer) {
@@ -355,6 +357,7 @@ export const Session = () => {
       <audio ref={remoteAudioRef} autoPlay />
       <p>テスト用: isConnected={isConnected ? "true" : "false"}</p>
       <p>テスト用: isInCall={isInCall ? "true" : "false"}</p>
+      <p>テスト用: isOffer={isOfferState ? "true" : "false"}</p>
 
       <button
         onClick={isInCall ? endCall : () => startCall()}
