@@ -10,6 +10,7 @@ import {
   TextField,
   Button,
   Tab,
+  Avatar,
 } from "@mui/material";
 import HomeLogo from "../../assets/homeLogo";
 import { Person } from "@mui/icons-material";
@@ -381,12 +382,22 @@ export const Session = () => {
   const initialUserCardInfo = { name: "", icon: <Person /> };
   const [userCardInfo, setUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
   const [opponentUserCardInfo, setOpponentUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
+
+  const getFullAvatarUrl = (avatarUrl: string) => {
+    if (!avatarUrl) return ''; // デフォルトのアバター画像のURLを設定することもできます
+    if (avatarUrl.startsWith('http')) return avatarUrl; // すでに完全なURLの場合
+    return `http://localhost:8081${avatarUrl}`; // ローカル開発環境の場合
+  };
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const userInfoResponse = await api.get<UserData>("/user/info");
         const opponentUserCardDataResponse = await api.get<UserData>("/user/info");
-        const userInfo: UserCardData = { name: userInfoResponse.data.username, icon: <Person /> };
+        const userInfo: UserCardData = {
+          name: userInfoResponse.data.username,
+          icon: <Avatar src={getFullAvatarUrl(userInfoResponse.data.avatar_url)} sx={{ width: 80, height: 80 }} />
+        };
         const opponentUserInfo: UserCardData = { name: opponentUserCardDataResponse.data.username, icon: <Person /> };
         setUserCardInfo(userInfo);
         setOpponentUserCardInfo(opponentUserInfo);
