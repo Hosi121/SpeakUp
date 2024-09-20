@@ -3,7 +3,9 @@ package mock
 import (
 	"context"
 	"log"
+	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/Hosi121/SpeakUp/ent"
 )
@@ -33,10 +35,47 @@ func CreateTestData(client *ent.Client) {
 		SetEmail("admin@example.com").
 		SetAvatarURL("https://example.com/avatar.png").
 		SetRole("ADMIN").
+		SetRank(rand.Intn(5) + 1).
 		Save(ctx)
 	if err != nil {
 		log.Fatalf("failed creating admin: %v", err)
+	} else {
+		log.Printf("created user: %v", admin)
 	}
-	log.Printf("created user: %v", admin)
+
+	// イベントの作成
+	theme, err := client.AI_THEMES.
+		Create().
+		SetThemeText("hogehoge").
+		Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating AI theme: %v", err)
+	} else {
+		log.Printf("created AI theme: %v", theme)
+	}
+
+	event, err := client.EVENTS.
+		Create().
+		SetEventStart(time.Date(2024, 9, 21, 15, 0, 0, 0, time.Local)).
+		SetEventEnd(time.Date(2024, 9, 21, 16, 0, 0, 0, time.Local)).
+		SetThemeID(theme.ID).
+		Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating event: %v", err)
+	} else {
+		log.Printf("created event: %v", event)
+	}
+
+	event2, err := client.EVENTS.
+		Create().
+		SetEventStart(time.Date(2024, 9, 31, 19, 0, 0, 0, time.Local)).
+		SetEventEnd(time.Date(2024, 9, 31, 20, 0, 0, 0, time.Local)).
+		SetThemeID(theme.ID).
+		Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating event: %v", err)
+	} else {
+		log.Printf("created event: %v", event2)
+	}
 
 }
