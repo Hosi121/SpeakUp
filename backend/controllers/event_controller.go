@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Hosi121/SpeakUp/ent" // あなたのプロジェクトの実際のパスに置き換えてください
+	"github.com/Hosi121/SpeakUp/ent"
+	"github.com/Hosi121/SpeakUp/ent/events"
 	"github.com/gin-gonic/gin"
 )
 
@@ -92,5 +93,46 @@ func CreateEvent(client *ent.Client) gin.HandlerFunc {
 			"event":   event,
 			"theme":   theme,
 		})
+	}
+}
+
+func GetEvents(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// イベントを取得し、関連するテーマ情報も含める
+		events, err := client.EVENTS.Query().
+			WithUses().                              // テーマ情報を含める
+			Order(ent.Desc(events.FieldEventStart)). // 開始時間の降順でソート
+			All(c)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch events"})
+			return
+		}
+
+		// レスポンス用のスライスを準備
+		var response []gin.H
+
+		for _, event := range events {
+			theme := event.Edges.Uses
+			if theme == nil {
+				// テーマが見つからない場合はスキップ
+				continue
+			}
+
+			response = append(response, gin.H{
+				"id":          event.ID,
+				"event_start": event.EventStart.Format(time.RFC3339),
+				"event_end":   event.EventEnd.Format(time.RFC3339),
+				"theme_id":    event.ThemeID,
+				"theme": gin.H{
+					"theme_text": theme.ThemeText,
+					"topic1":     theme.Topic1,
+					"topic2":     theme.Topic2,
+					"topic3":     theme.Topic3,
+				},
+			})
+		}
+
+		c.JSON(http.StatusOK, response)
 	}
 }
