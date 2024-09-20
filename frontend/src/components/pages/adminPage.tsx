@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { 
   Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, 
   TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert,
-  List, ListItem, ListItemText, ListItemAvatar, Avatar
+  List, ListItem, ListItemText, ListItemAvatar, Avatar, CircularProgress
 } from '@mui/material';
 import api from '../../services/api';
 import { ChatResponse, Event, EventDetails, User } from '../../types';
@@ -19,6 +19,7 @@ const AdminPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchInitialEvents = async () => {
@@ -103,12 +104,24 @@ const AdminPage: React.FC = () => {
   };
 
   const handleSearchUsers = async () => {
+    setIsLoading(true);
     try {
       const response = await api.get(`/users/search?q=${searchQuery}`);
-      setUsers(response.data);
+      const usersWithAvatars = await Promise.all(response.data.map(async (user: User) => {
+        try {
+          const avatarResponse = await api.get(`/users/${user.id}/avatar`);
+          return { ...user, avatarURL: avatarResponse.data.avatarURL };
+        } catch (error) {
+          console.error(`Failed to fetch avatar for user ${user.id}`, error);
+          return { ...user, avatarURL: '' };
+        }
+      }));
+      setUsers(usersWithAvatars);
     } catch (error) {
       console.error('Failed to search users', error);
       setErrorMessage('ユーザーの検索に失敗しました');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -240,17 +253,22 @@ const AdminPage: React.FC = () => {
               variant="contained" 
               sx={{ ml: 2 }}
               onClick={handleSearchUsers}
+              disabled={isLoading}
             >
-              検索
+              {isLoading ? <CircularProgress size={24} /> : '検索'}
             </Button>
           </Box>
           
           <List sx={{ mt: 2 }}>
-            {users && users.length > 0 ? (
+            {isLoading ? (
+              <ListItem>
+                <CircularProgress />
+              </ListItem>
+            ) : users && users.length > 0 ? (
               users.map((user) => (
                 <ListItem key={user.id}>
                   <ListItemAvatar>
-                    <Avatar src={user.avatarURL} alt={user.username} />
+                    <Avatar src={user.avatarURL || '/default-avatar.png'} alt={user.username} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={user.username}
