@@ -126,7 +126,6 @@ if (rootElement) {
         <SessionStepContextProvider>
           <RouterProvider router={router} />
           <CssBaseline />
-          <RouterProvider router={router} />
         </SessionStepContextProvider>
       </ThemeProvider>
     </StrictMode>
