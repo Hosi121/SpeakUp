@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert, List, ListItem, ListItemText, ListItemAvatar, Avatar, CircularProgress } from "@mui/material";
 import api from "../../services/api";
-import { ChatResponse, Event, EventDetails, User } from "../../types";
+import { ChatResponse, Event, EventDetails, User } from "../../types/types";
 
 const AdminPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
