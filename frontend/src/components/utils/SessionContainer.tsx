@@ -1,16 +1,15 @@
-import { Card, CardContent, Typography, Avatar, Grid, Box, Container, Stack } from "@mui/material";
+import { Card, CardContent, Typography, Avatar, Box, Container, Stack } from "@mui/material";
+import Grid from '@mui/material/Grid2';
 import SessionCountDownModal from "./SessionCountDownModal";
-import { useEffect, useState } from "react";
-import { TopicPopup } from "./TopicPopup";
 
-const SessionContainer = ({ theme, users }: { theme: string; users: { name: string; icon: JSX.Element; description: string }[] }) => {
-  const [showTopicPopup, setShowTopicPopup] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowTopicPopup(true);
-    }, 123000);
-    return () => clearTimeout(timer);
-  }, []);
+type SessionContainerProps = {
+  theme: string;
+  users: { name: string; icon: JSX.Element; }[]
+  isSpeak: boolean;
+  isOpponentSpeak: boolean;
+}
+
+const SessionContainer = ({ theme, users, isSpeak, isOpponentSpeak }: SessionContainerProps) => {
   return (
     <Container
       sx={{
@@ -41,40 +40,51 @@ const SessionContainer = ({ theme, users }: { theme: string; users: { name: stri
             テーマ: {theme}
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", mb: 2 }}>
-            {users.map((user, index) => (
-              <Card
-                key={index}
-                sx={{
-                  bgcolor: "secondary.main",
-                  mb: 2,
-                  width: "100%",
-                  height: "25vh",
-                  borderRadius: 5,
-                  border: "6px solid #eee",
-                  boxSizing: "border-box",
-                  p: 1,
-                  display: "grid",
-                  placeContent: "center",
-                }}
-              >
-                <CardContent>
-                  <Grid container spacing={2} justifyContent="center">
-                    <Grid item>
-                      <Avatar sx={{ bgcolor: "#eee", width: "80px", height: "80px" }}>{user.icon}</Avatar>
-                      <Typography variant="h6" align="center" sx={{ mt: 1 }}>
-                        {user.name}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            ))}
+            <UserCard user={users[0]} isSpeak={isSpeak} index={0} />
+            <UserCard user={users[1]} isSpeak={isOpponentSpeak} index={1} />
           </Box>
         </Stack>
-        {showTopicPopup && <TopicPopup />}
       </Container>
     </Container>
   );
 };
 
 export default SessionContainer;
+
+type UserCardProps = {
+  user: { name: string; icon: JSX.Element; };
+  isSpeak: boolean;
+  index: number;
+};
+
+const UserCard = ({ user, isSpeak, index }: UserCardProps) => {
+  return (
+    <Card
+      key={index}
+      sx={{
+        bgcolor: "secondary.main",
+        mb: 2,
+        width: "100%",
+        height: "25vh",
+        borderRadius: 5,
+        border: "6px solid",
+        boxSizing: "border-box",
+        p: 1,
+        display: "grid",
+        placeContent: "center",
+        borderColor: isSpeak ? "primary.main" : "#eee",
+      }}
+    >
+      <CardContent>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid>
+            <Avatar sx={{ bgcolor: "#eee", width: "80px", height: "80px" }}>{user.icon}</Avatar>
+            <Typography variant="h6" align="center" sx={{ mt: 1 }}>
+              {user.name}
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  )
+};

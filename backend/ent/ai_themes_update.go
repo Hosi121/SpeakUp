@@ -43,6 +43,48 @@ func (au *AITHEMESUpdate) SetNillableThemeText(s *string) *AITHEMESUpdate {
 	return au
 }
 
+// SetTopic1 sets the "topic1" field.
+func (au *AITHEMESUpdate) SetTopic1(s string) *AITHEMESUpdate {
+	au.mutation.SetTopic1(s)
+	return au
+}
+
+// SetNillableTopic1 sets the "topic1" field if the given value is not nil.
+func (au *AITHEMESUpdate) SetNillableTopic1(s *string) *AITHEMESUpdate {
+	if s != nil {
+		au.SetTopic1(*s)
+	}
+	return au
+}
+
+// SetTopic2 sets the "topic2" field.
+func (au *AITHEMESUpdate) SetTopic2(s string) *AITHEMESUpdate {
+	au.mutation.SetTopic2(s)
+	return au
+}
+
+// SetNillableTopic2 sets the "topic2" field if the given value is not nil.
+func (au *AITHEMESUpdate) SetNillableTopic2(s *string) *AITHEMESUpdate {
+	if s != nil {
+		au.SetTopic2(*s)
+	}
+	return au
+}
+
+// SetTopic3 sets the "topic3" field.
+func (au *AITHEMESUpdate) SetTopic3(s string) *AITHEMESUpdate {
+	au.mutation.SetTopic3(s)
+	return au
+}
+
+// SetNillableTopic3 sets the "topic3" field if the given value is not nil.
+func (au *AITHEMESUpdate) SetNillableTopic3(s *string) *AITHEMESUpdate {
+	if s != nil {
+		au.SetTopic3(*s)
+	}
+	return au
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (au *AITHEMESUpdate) SetCreatedAt(t time.Time) *AITHEMESUpdate {
 	au.mutation.SetCreatedAt(t)
@@ -137,6 +179,15 @@ func (au *AITHEMESUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.ThemeText(); ok {
 		_spec.SetField(ai_themes.FieldThemeText, field.TypeString, value)
 	}
+	if value, ok := au.mutation.Topic1(); ok {
+		_spec.SetField(ai_themes.FieldTopic1, field.TypeString, value)
+	}
+	if value, ok := au.mutation.Topic2(); ok {
+		_spec.SetField(ai_themes.FieldTopic2, field.TypeString, value)
+	}
+	if value, ok := au.mutation.Topic3(); ok {
+		_spec.SetField(ai_themes.FieldTopic3, field.TypeString, value)
+	}
 	if value, ok := au.mutation.CreatedAt(); ok {
 		_spec.SetField(ai_themes.FieldCreatedAt, field.TypeTime, value)
 	}
@@ -215,6 +266,48 @@ func (auo *AITHEMESUpdateOne) SetThemeText(s string) *AITHEMESUpdateOne {
 func (auo *AITHEMESUpdateOne) SetNillableThemeText(s *string) *AITHEMESUpdateOne {
 	if s != nil {
 		auo.SetThemeText(*s)
+	}
+	return auo
+}
+
+// SetTopic1 sets the "topic1" field.
+func (auo *AITHEMESUpdateOne) SetTopic1(s string) *AITHEMESUpdateOne {
+	auo.mutation.SetTopic1(s)
+	return auo
+}
+
+// SetNillableTopic1 sets the "topic1" field if the given value is not nil.
+func (auo *AITHEMESUpdateOne) SetNillableTopic1(s *string) *AITHEMESUpdateOne {
+	if s != nil {
+		auo.SetTopic1(*s)
+	}
+	return auo
+}
+
+// SetTopic2 sets the "topic2" field.
+func (auo *AITHEMESUpdateOne) SetTopic2(s string) *AITHEMESUpdateOne {
+	auo.mutation.SetTopic2(s)
+	return auo
+}
+
+// SetNillableTopic2 sets the "topic2" field if the given value is not nil.
+func (auo *AITHEMESUpdateOne) SetNillableTopic2(s *string) *AITHEMESUpdateOne {
+	if s != nil {
+		auo.SetTopic2(*s)
+	}
+	return auo
+}
+
+// SetTopic3 sets the "topic3" field.
+func (auo *AITHEMESUpdateOne) SetTopic3(s string) *AITHEMESUpdateOne {
+	auo.mutation.SetTopic3(s)
+	return auo
+}
+
+// SetNillableTopic3 sets the "topic3" field if the given value is not nil.
+func (auo *AITHEMESUpdateOne) SetNillableTopic3(s *string) *AITHEMESUpdateOne {
+	if s != nil {
+		auo.SetTopic3(*s)
 	}
 	return auo
 }
@@ -342,6 +435,15 @@ func (auo *AITHEMESUpdateOne) sqlSave(ctx context.Context) (_node *AI_THEMES, er
 	}
 	if value, ok := auo.mutation.ThemeText(); ok {
 		_spec.SetField(ai_themes.FieldThemeText, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.Topic1(); ok {
+		_spec.SetField(ai_themes.FieldTopic1, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.Topic2(); ok {
+		_spec.SetField(ai_themes.FieldTopic2, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.Topic3(); ok {
+		_spec.SetField(ai_themes.FieldTopic3, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.CreatedAt(); ok {
 		_spec.SetField(ai_themes.FieldCreatedAt, field.TypeTime, value)

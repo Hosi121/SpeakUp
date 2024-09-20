@@ -3,13 +3,13 @@ import topics from "../../mock/topics.json";
 import { useEffect, useState } from "react";
 import { Close } from "@mui/icons-material";
 
-export const TopicPopup = () => {
-  const [topicData, setTopicData] = useState<string[]>([]);
-  const [isVisible, setIsVisible] = useState(true);
+type TopicPopupProps = {
+  isVisible: boolean;
+  onClose: () => void;
+};
 
-  const handleClose = () => {
-    setIsVisible(false);
-  };
+export const TopicPopup = ({ isVisible, onClose }: TopicPopupProps) => {
+  const [topicData, setTopicData] = useState<string[]>([]);
 
   useEffect(() => {
     const allTopics = topics.flatMap((topic) => topic.topics);
@@ -24,7 +24,7 @@ export const TopicPopup = () => {
       <CardContent>
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={onClose}
           sx={{
             position: "absolute",
             right: 8,

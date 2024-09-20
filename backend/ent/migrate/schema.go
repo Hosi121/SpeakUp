@@ -34,6 +34,9 @@ var (
 	AiThemeSsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "theme_text", Type: field.TypeString},
+		{Name: "topic1", Type: field.TypeString},
+		{Name: "topic2", Type: field.TypeString},
+		{Name: "topic3", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// AiThemeSsTable holds the schema information for the "ai_theme_ss" table.

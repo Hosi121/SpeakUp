@@ -11,6 +11,8 @@ func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
 	router.GET("/user/info", controllers.GetUserInfo(client))
 	router.PUT("/user/update", controllers.UpdateUserInfo(client))
 	router.PUT("/user/avatar", controllers.UpdateAvatar(client))
+	router.GET("/users/:userId/avatar", controllers.GetUserAvatar(client))
+	router.GET("/users/search", controllers.SearchUsers(client))
 
 	// Memo routes
 	router.GET("/memo", controllers.GetMemo(client))
@@ -18,4 +20,7 @@ func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
 
 	router.GET("/friend/me", controllers.GetFriendList())
 	router.GET("/friend/:friendname", controllers.GetFriendByName())
+	router.POST("/events", controllers.CreateEvent(client))
+	router.GET("/events", controllers.GetEvents(client))
+
 }

@@ -32,7 +32,7 @@ func init() {
 	ai_themesFields := schema.AI_THEMES{}.Fields()
 	_ = ai_themesFields
 	// ai_themesDescCreatedAt is the schema descriptor for created_at field.
-	ai_themesDescCreatedAt := ai_themesFields[1].Descriptor()
+	ai_themesDescCreatedAt := ai_themesFields[4].Descriptor()
 	// ai_themes.DefaultCreatedAt holds the default value on creation for the created_at field.
 	ai_themes.DefaultCreatedAt = ai_themesDescCreatedAt.Default.(time.Time)
 	callsFields := schema.CALLS{}.Fields()

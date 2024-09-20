@@ -16,6 +16,12 @@ const (
 	FieldID = "id"
 	// FieldThemeText holds the string denoting the theme_text field in the database.
 	FieldThemeText = "theme_text"
+	// FieldTopic1 holds the string denoting the topic1 field in the database.
+	FieldTopic1 = "topic1"
+	// FieldTopic2 holds the string denoting the topic2 field in the database.
+	FieldTopic2 = "topic2"
+	// FieldTopic3 holds the string denoting the topic3 field in the database.
+	FieldTopic3 = "topic3"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeUsed holds the string denoting the used edge name in mutations.
@@ -35,6 +41,9 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldThemeText,
+	FieldTopic1,
+	FieldTopic2,
+	FieldTopic3,
 	FieldCreatedAt,
 }
 
@@ -64,6 +73,21 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByThemeText orders the results by the theme_text field.
 func ByThemeText(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldThemeText, opts...).ToFunc()
+}
+
+// ByTopic1 orders the results by the topic1 field.
+func ByTopic1(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTopic1, opts...).ToFunc()
+}
+
+// ByTopic2 orders the results by the topic2 field.
+func ByTopic2(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTopic2, opts...).ToFunc()
+}
+
+// ByTopic3 orders the results by the topic3 field.
+func ByTopic3(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTopic3, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

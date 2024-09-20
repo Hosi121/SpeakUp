@@ -591,6 +591,9 @@ type AITHEMESMutation struct {
 	typ           string
 	id            *int
 	theme_text    *string
+	topic1        *string
+	topic2        *string
+	topic3        *string
 	created_at    *time.Time
 	clearedFields map[string]struct{}
 	used          map[int]struct{}
@@ -735,6 +738,114 @@ func (m *AITHEMESMutation) ResetThemeText() {
 	m.theme_text = nil
 }
 
+// SetTopic1 sets the "topic1" field.
+func (m *AITHEMESMutation) SetTopic1(s string) {
+	m.topic1 = &s
+}
+
+// Topic1 returns the value of the "topic1" field in the mutation.
+func (m *AITHEMESMutation) Topic1() (r string, exists bool) {
+	v := m.topic1
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTopic1 returns the old "topic1" field's value of the AI_THEMES entity.
+// If the AI_THEMES object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AITHEMESMutation) OldTopic1(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTopic1 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTopic1 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTopic1: %w", err)
+	}
+	return oldValue.Topic1, nil
+}
+
+// ResetTopic1 resets all changes to the "topic1" field.
+func (m *AITHEMESMutation) ResetTopic1() {
+	m.topic1 = nil
+}
+
+// SetTopic2 sets the "topic2" field.
+func (m *AITHEMESMutation) SetTopic2(s string) {
+	m.topic2 = &s
+}
+
+// Topic2 returns the value of the "topic2" field in the mutation.
+func (m *AITHEMESMutation) Topic2() (r string, exists bool) {
+	v := m.topic2
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTopic2 returns the old "topic2" field's value of the AI_THEMES entity.
+// If the AI_THEMES object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AITHEMESMutation) OldTopic2(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTopic2 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTopic2 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTopic2: %w", err)
+	}
+	return oldValue.Topic2, nil
+}
+
+// ResetTopic2 resets all changes to the "topic2" field.
+func (m *AITHEMESMutation) ResetTopic2() {
+	m.topic2 = nil
+}
+
+// SetTopic3 sets the "topic3" field.
+func (m *AITHEMESMutation) SetTopic3(s string) {
+	m.topic3 = &s
+}
+
+// Topic3 returns the value of the "topic3" field in the mutation.
+func (m *AITHEMESMutation) Topic3() (r string, exists bool) {
+	v := m.topic3
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTopic3 returns the old "topic3" field's value of the AI_THEMES entity.
+// If the AI_THEMES object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AITHEMESMutation) OldTopic3(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTopic3 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTopic3 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTopic3: %w", err)
+	}
+	return oldValue.Topic3, nil
+}
+
+// ResetTopic3 resets all changes to the "topic3" field.
+func (m *AITHEMESMutation) ResetTopic3() {
+	m.topic3 = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *AITHEMESMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -859,9 +970,18 @@ func (m *AITHEMESMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AITHEMESMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 5)
 	if m.theme_text != nil {
 		fields = append(fields, ai_themes.FieldThemeText)
+	}
+	if m.topic1 != nil {
+		fields = append(fields, ai_themes.FieldTopic1)
+	}
+	if m.topic2 != nil {
+		fields = append(fields, ai_themes.FieldTopic2)
+	}
+	if m.topic3 != nil {
+		fields = append(fields, ai_themes.FieldTopic3)
 	}
 	if m.created_at != nil {
 		fields = append(fields, ai_themes.FieldCreatedAt)
@@ -876,6 +996,12 @@ func (m *AITHEMESMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case ai_themes.FieldThemeText:
 		return m.ThemeText()
+	case ai_themes.FieldTopic1:
+		return m.Topic1()
+	case ai_themes.FieldTopic2:
+		return m.Topic2()
+	case ai_themes.FieldTopic3:
+		return m.Topic3()
 	case ai_themes.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -889,6 +1015,12 @@ func (m *AITHEMESMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case ai_themes.FieldThemeText:
 		return m.OldThemeText(ctx)
+	case ai_themes.FieldTopic1:
+		return m.OldTopic1(ctx)
+	case ai_themes.FieldTopic2:
+		return m.OldTopic2(ctx)
+	case ai_themes.FieldTopic3:
+		return m.OldTopic3(ctx)
 	case ai_themes.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -906,6 +1038,27 @@ func (m *AITHEMESMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetThemeText(v)
+		return nil
+	case ai_themes.FieldTopic1:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTopic1(v)
+		return nil
+	case ai_themes.FieldTopic2:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTopic2(v)
+		return nil
+	case ai_themes.FieldTopic3:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTopic3(v)
 		return nil
 	case ai_themes.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -965,6 +1118,15 @@ func (m *AITHEMESMutation) ResetField(name string) error {
 	switch name {
 	case ai_themes.FieldThemeText:
 		m.ResetThemeText()
+		return nil
+	case ai_themes.FieldTopic1:
+		m.ResetTopic1()
+		return nil
+	case ai_themes.FieldTopic2:
+		m.ResetTopic2()
+		return nil
+	case ai_themes.FieldTopic3:
+		m.ResetTopic3()
 		return nil
 	case ai_themes.FieldCreatedAt:
 		m.ResetCreatedAt()

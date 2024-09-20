@@ -50,9 +50,14 @@ func main() {
 
 	// Protected routes with Ent client
 	routes.ProtectedRoutes(protected, client)
+	routes.SignalingRoutes(r.Group("/"))
+
+	// Create test data
+	// mock.CreateTestData(client)
 
 	// Run the server on port 8081
 	if err := r.Run(":8081"); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
+
 }
