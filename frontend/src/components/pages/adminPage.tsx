@@ -1,11 +1,7 @@
-import { useState, useEffect } from 'react';
-import { 
-  Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, 
-  TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert,
-  List, ListItem, ListItemText, ListItemAvatar, Avatar, CircularProgress
-} from '@mui/material';
-import api from '../../services/api';
-import { ChatResponse, Event, EventDetails, User } from '../../types';
+import { useState, useEffect } from "react";
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert, List, ListItem, ListItemText, ListItemAvatar, Avatar, CircularProgress } from "@mui/material";
+import api from "../../services/api";
+import { ChatResponse, Event, EventDetails, User } from "../../types";
 
 const AdminPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -17,7 +13,7 @@ const AdminPage: React.FC = () => {
   const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [events, setEvents] = useState<Event[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -26,8 +22,8 @@ const AdminPage: React.FC = () => {
       try {
         await fetchEvents();
       } catch (error) {
-        console.error('Failed to fetch initial events', error);
-        setErrorMessage('初期イベントの取得に失敗しました');
+        console.error("Failed to fetch initial events", error);
+        setErrorMessage("初期イベントの取得に失敗しました");
       }
     };
     fetchInitialEvents();
@@ -107,19 +103,21 @@ const AdminPage: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await api.get(`/users/search?q=${searchQuery}`);
-      const usersWithAvatars = await Promise.all(response.data.map(async (user: User) => {
-        try {
-          const avatarResponse = await api.get(`/users/${user.id}/avatar`);
-          return { ...user, avatarURL: avatarResponse.data.avatarURL };
-        } catch (error) {
-          console.error(`Failed to fetch avatar for user ${user.id}`, error);
-          return { ...user, avatarURL: '' };
-        }
-      }));
+      const usersWithAvatars = await Promise.all(
+        response.data.map(async (user: User) => {
+          try {
+            const avatarResponse = await api.get(`/users/${user.id}/avatar`);
+            return { ...user, avatarURL: avatarResponse.data.avatarURL };
+          } catch (error) {
+            console.error(`Failed to fetch avatar for user ${user.id}`, error);
+            return { ...user, avatarURL: "" };
+          }
+        })
+      );
       setUsers(usersWithAvatars);
     } catch (error) {
-      console.error('Failed to search users', error);
-      setErrorMessage('ユーザーの検索に失敗しました');
+      console.error("Failed to search users", error);
+      setErrorMessage("ユーザーの検索に失敗しました");
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +159,7 @@ const AdminPage: React.FC = () => {
             </Paper>
           )}
 
-          <Paper sx={{ mt: 4, p: 2 }}>
+          {/* <Paper sx={{ mt: 4, p: 2 }}>
             <Typography variant="h6">イベントリスト</Typography>
 
             <List>
@@ -197,7 +195,7 @@ const AdminPage: React.FC = () => {
                 </ListItem>
               )}
             </List>
-          </Paper>
+          </Paper> */}
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>イベント作成</DialogTitle>
             <DialogContent>
@@ -217,29 +215,14 @@ const AdminPage: React.FC = () => {
                 />
               </Box>
               <Box sx={{ mt: 2 }}>
-                <TextField
-                  fullWidth
-                  label="テーマ"
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value)}
-                />
-                <Button
-                  variant="outlined"
-                  sx={{ mt: 1 }}
-                  onClick={handleGenerateTheme}
-                >
+                <TextField fullWidth label="テーマ" value={theme} onChange={(e) => setTheme(e.target.value)} />
+                <Button variant="outlined" sx={{ mt: 1 }} onClick={handleGenerateTheme}>
                   AIによる生成
                 </Button>
               </Box>
               {[0, 1, 2].map((index) => (
                 <Box sx={{ mt: 2 }} key={index}>
-                  <TextField
-                    fullWidth
-                    label={`トピック ${index + 1}`}
-                    value={topics[index]}
-                    onChange={(e) => handleTopicChange(index, e.target.value)}
-                    placeholder="ここにトピックを入力してください"
-                  />
+                  <TextField fullWidth label={`トピック ${index + 1}`} value={topics[index]} onChange={(e) => handleTopicChange(index, e.target.value)} placeholder="ここにトピックを入力してください" />
                 </Box>
               ))}
             </DialogContent>
@@ -256,23 +239,13 @@ const AdminPage: React.FC = () => {
       {activeTab === 1 && (
         <Box sx={{ mt: 4 }}>
           <Typography variant="h6">ユーザー情報検索</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-            <TextField
-              fullWidth
-              label="ユーザー名で検索"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button 
-              variant="contained" 
-              sx={{ ml: 2 }}
-              onClick={handleSearchUsers}
-              disabled={isLoading}
-            >
-              {isLoading ? <CircularProgress size={24} /> : '検索'}
+          <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+            <TextField fullWidth label="ユーザー名で検索" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <Button variant="contained" sx={{ ml: 2 }} onClick={handleSearchUsers} disabled={isLoading}>
+              {isLoading ? <CircularProgress size={24} /> : "検索"}
             </Button>
           </Box>
-          
+
           <List sx={{ mt: 2 }}>
             {isLoading ? (
               <ListItem>
@@ -282,7 +255,7 @@ const AdminPage: React.FC = () => {
               users.map((user) => (
                 <ListItem key={user.id}>
                   <ListItemAvatar>
-                    <Avatar src={user.avatarURL || '/default-avatar.png'} alt={user.username} />
+                    <Avatar src={user.avatarURL || "/default-avatar.png"} alt={user.username} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={user.username}
@@ -307,16 +280,8 @@ const AdminPage: React.FC = () => {
         </Box>
       )}
 
-      <Snackbar
-        open={!!successMessage || !!errorMessage}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={successMessage ? "success" : "error"}
-          sx={{ width: '100%' }}
-        >
+      <Snackbar open={!!successMessage || !!errorMessage} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={successMessage ? "success" : "error"} sx={{ width: "100%" }}>
           {successMessage || errorMessage}
         </Alert>
       </Snackbar>
