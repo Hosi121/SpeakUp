@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/Hosi121/SpeakUp/ent"
@@ -181,6 +182,75 @@ func UpdateAvatar(client *ent.Client) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"message":    "Avatar uploaded successfully",
 			"avatar_url": "http://localhost:8081/upload/" + filename, // 画像のURLを返す
+		})
+	}
+}
+
+func SearchUsers(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		query := c.Query("q")
+		if query == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Search query is required"})
+			return
+		}
+
+		// Search for users with a username containing the query string
+		searchedUsers, err := client.USERS.
+			Query().
+			Where(users.UsernameContains(query)).
+			Limit(10). // Limit the number of results
+			All(context.Background())
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search users", "details": err.Error()})
+			return
+		}
+
+		// Convert the user entities to a response format
+		var userResponses []gin.H
+		for _, user := range searchedUsers {
+			userResponses = append(userResponses, gin.H{
+				"id":        user.ID,
+				"username":  user.Username,
+				"email":     user.Email,
+				"createdAt": user.CreatedAt,
+			})
+		}
+
+		c.JSON(http.StatusOK, userResponses)
+	}
+}
+
+// GetUserAvatar handles the GET /users/{userId}/avatar endpoint
+func GetUserAvatar(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userID, err := strconv.Atoi(c.Param("userId"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+
+		user, err := client.USERS.Get(context.Background(), userID)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user", "details": err.Error()})
+			}
+			return
+		}
+
+		// Check if user has an avatar
+		if user.AvatarURL == "" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User has no avatar"})
+			return
+		}
+
+		// Construct the full avatar URL
+		avatarURL := "http://localhost:8081" + user.AvatarURL
+
+		c.JSON(http.StatusOK, gin.H{
+			"avatarURL": avatarURL,
 		})
 	}
 }
