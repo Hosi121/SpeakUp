@@ -20,6 +20,10 @@ export const SessionInterval = () => {
       return () => clearTimeout(timer);
     } else {
       navigate("/session");
+      if (learnedExpressions === "") {
+        setLearnedExpressions(memoValue);
+        return;
+      }
       const newLearnedExpression = learnedExpressions + "\n" + memoValue;
       setLearnedExpressions(newLearnedExpression);
     }
@@ -34,7 +38,6 @@ export const SessionInterval = () => {
       }}
     >
       <Container sx={{ pt: 3 }}>
-        {learnedExpressions}
         <TopSection />
         <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
           <Typography
