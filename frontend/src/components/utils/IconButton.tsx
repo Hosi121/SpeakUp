@@ -1,4 +1,4 @@
-import { Button, Icon } from "@mui/material";
+import { Button, Icon, Typography } from "@mui/material";
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +28,9 @@ export const IconButton = ({ icon, text, url }: IconButtonProps) => {
       onClick={() => navigate("/" + url)}
     >
       <Icon sx={{ width: "fit-content", height: "fit-content", color: "#000" }}>{icon}</Icon>
-      {text}
+      <Typography fontWeight="bolder" fontSize="1rem">
+        {text}
+      </Typography>
     </Button>
   );
 };
