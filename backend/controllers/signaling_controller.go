@@ -1,12 +1,17 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"strconv"
 
+	"github.com/Hosi121/SpeakUp/config"
+	"github.com/Hosi121/SpeakUp/ent"
+	"github.com/Hosi121/SpeakUp/ent/sessions"
 	"github.com/Hosi121/SpeakUp/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -34,6 +39,7 @@ type UserInfoMessage struct {
 }
 
 // mock
+
 var matchings = map[int]int{
 	2: 4,
 	4: 2,
@@ -76,7 +82,9 @@ func SignalingController(c *gin.Context) {
 			idToWs[userId] = ws
 			fmt.Printf("connect: userId=%d\n", userId)
 
+			setMatchings(1) // Todo: event_idを何らかの形で取得する
 			opponentId := matchings[userId]
+			// Todo: ↑に当てはまるマッチングのstatusをPROGRESSに変更
 			var response Message
 			if opponentId < userId {
 				response = Message{Type: "callType", IsOffer: true}
@@ -114,4 +122,39 @@ func sendMessage(msg Message, to int) {
 
 func handleHoge(c *gin.Context) {
 	c.Writer.Write([]byte("hoge"))
+}
+
+func setMatchings(event_id int) {
+	// matchingsの初期化
+	matchings = map[int]int{}
+	// DBの用意
+	dsn := config.GetDSN()
+	db_client, err := ent.Open("mysql", dsn)
+	if err != nil {
+		slog.Error("Failed to open connection to database: %v", err)
+		return
+	}
+	defer db_client.Close()
+	ctx := context.Background()
+	// statusがMATCHEDであるsessionを取得
+	res, err := db_client.SESSIONS.Query().
+		Where(
+			sessions.StatusEQ("MATCHED"),
+		).
+		All(ctx)
+	if err != nil {
+		slog.Error("Failed to get matchings: %v", err)
+		return
+	}
+	for _, match := range res {
+		user, opponent := match.UserID, match.MatchedUserID
+		_, exists := matchings[user]
+		if exists {
+			// 2週目なので処理終了
+			return
+		} else {
+			matchings[user] = opponent
+		}
+	}
+	return
 }
