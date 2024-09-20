@@ -19,6 +19,12 @@ type AI_THEMES struct {
 	ID int `json:"id,omitempty"`
 	// ThemeText holds the value of the "theme_text" field.
 	ThemeText string `json:"theme_text,omitempty"`
+	// Topic1 holds the value of the "topic1" field.
+	Topic1 string `json:"topic1,omitempty"`
+	// Topic2 holds the value of the "topic2" field.
+	Topic2 string `json:"topic2,omitempty"`
+	// Topic3 holds the value of the "topic3" field.
+	Topic3 string `json:"topic3,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -52,7 +58,7 @@ func (*AI_THEMES) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case ai_themes.FieldID:
 			values[i] = new(sql.NullInt64)
-		case ai_themes.FieldThemeText:
+		case ai_themes.FieldThemeText, ai_themes.FieldTopic1, ai_themes.FieldTopic2, ai_themes.FieldTopic3:
 			values[i] = new(sql.NullString)
 		case ai_themes.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -82,6 +88,24 @@ func (at *AI_THEMES) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field theme_text", values[i])
 			} else if value.Valid {
 				at.ThemeText = value.String
+			}
+		case ai_themes.FieldTopic1:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field topic1", values[i])
+			} else if value.Valid {
+				at.Topic1 = value.String
+			}
+		case ai_themes.FieldTopic2:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field topic2", values[i])
+			} else if value.Valid {
+				at.Topic2 = value.String
+			}
+		case ai_themes.FieldTopic3:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field topic3", values[i])
+			} else if value.Valid {
+				at.Topic3 = value.String
 			}
 		case ai_themes.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -132,6 +156,15 @@ func (at *AI_THEMES) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", at.ID))
 	builder.WriteString("theme_text=")
 	builder.WriteString(at.ThemeText)
+	builder.WriteString(", ")
+	builder.WriteString("topic1=")
+	builder.WriteString(at.Topic1)
+	builder.WriteString(", ")
+	builder.WriteString("topic2=")
+	builder.WriteString(at.Topic2)
+	builder.WriteString(", ")
+	builder.WriteString("topic3=")
+	builder.WriteString(at.Topic3)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(at.CreatedAt.Format(time.ANSIC))

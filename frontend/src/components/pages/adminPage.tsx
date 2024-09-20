@@ -8,6 +8,7 @@ import api from '../../services/api';
 interface EventDetails {
   dateTime: string;
   theme: string;
+  topics: string[];
 }
 
 interface ChatResponse {
@@ -25,6 +26,7 @@ const AdminPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dateTime, setDateTime] = useState<string>('');
   const [theme, setTheme] = useState<string>('');
+  const [topics, setTopics] = useState<string[]>(['', '', '']);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
@@ -39,6 +41,7 @@ const AdminPage: React.FC = () => {
     setOpenDialog(false);
     setDateTime('');
     setTheme('');
+    setTopics(['', '', '']);
   };
 
   const handleGenerateTheme = async () => {
@@ -52,11 +55,17 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const handleTopicChange = (index: number, value: string) => {
+    const newTopics = [...topics];
+    newTopics[index] = value;
+    setTopics(newTopics);
+  };
+
   const handleSubmit = () => {
     // TODO: Backendへのデータ送信処理をここに記述
     // 送信が成功したと仮定
     setSuccessMessage('成功');
-    setEventDetails({ dateTime, theme });
+    setEventDetails({ dateTime, theme, topics });
     handleCloseDialog();
   };
 
@@ -110,6 +119,12 @@ const AdminPage: React.FC = () => {
                 予定日時: {new Date(eventDetails.dateTime).toLocaleString()}
               </Typography>
               <Typography variant="body1">テーマ: {eventDetails.theme}</Typography>
+              <Typography variant="body1">トピック:</Typography>
+              <ul>
+                {eventDetails.topics.map((topic, index) => (
+                  <li key={index}>{topic || '(未入力)'}</li>
+                ))}
+              </ul>
             </Paper>
           )}
 
@@ -147,6 +162,19 @@ const AdminPage: React.FC = () => {
                   AIによる生成
                 </Button>
               </Box>
+              {[0, 1, 2].map((index) => (
+                <Box sx={{ mt: 2 }} key={index}>
+                  <TextField
+                    fullWidth
+                    label={`トピック ${index + 1}`}
+                    value={topics[index]}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleTopicChange(index, e.target.value)
+                    }
+                    placeholder="ここにトピックを入力してください"
+                  />
+                </Box>
+              ))}
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseDialog}>キャンセル</Button>

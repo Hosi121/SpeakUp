@@ -27,6 +27,24 @@ func (ac *AITHEMESCreate) SetThemeText(s string) *AITHEMESCreate {
 	return ac
 }
 
+// SetTopic1 sets the "topic1" field.
+func (ac *AITHEMESCreate) SetTopic1(s string) *AITHEMESCreate {
+	ac.mutation.SetTopic1(s)
+	return ac
+}
+
+// SetTopic2 sets the "topic2" field.
+func (ac *AITHEMESCreate) SetTopic2(s string) *AITHEMESCreate {
+	ac.mutation.SetTopic2(s)
+	return ac
+}
+
+// SetTopic3 sets the "topic3" field.
+func (ac *AITHEMESCreate) SetTopic3(s string) *AITHEMESCreate {
+	ac.mutation.SetTopic3(s)
+	return ac
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (ac *AITHEMESCreate) SetCreatedAt(t time.Time) *AITHEMESCreate {
 	ac.mutation.SetCreatedAt(t)
@@ -102,6 +120,15 @@ func (ac *AITHEMESCreate) check() error {
 	if _, ok := ac.mutation.ThemeText(); !ok {
 		return &ValidationError{Name: "theme_text", err: errors.New(`ent: missing required field "AI_THEMES.theme_text"`)}
 	}
+	if _, ok := ac.mutation.Topic1(); !ok {
+		return &ValidationError{Name: "topic1", err: errors.New(`ent: missing required field "AI_THEMES.topic1"`)}
+	}
+	if _, ok := ac.mutation.Topic2(); !ok {
+		return &ValidationError{Name: "topic2", err: errors.New(`ent: missing required field "AI_THEMES.topic2"`)}
+	}
+	if _, ok := ac.mutation.Topic3(); !ok {
+		return &ValidationError{Name: "topic3", err: errors.New(`ent: missing required field "AI_THEMES.topic3"`)}
+	}
 	if _, ok := ac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "AI_THEMES.created_at"`)}
 	}
@@ -134,6 +161,18 @@ func (ac *AITHEMESCreate) createSpec() (*AI_THEMES, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.ThemeText(); ok {
 		_spec.SetField(ai_themes.FieldThemeText, field.TypeString, value)
 		_node.ThemeText = value
+	}
+	if value, ok := ac.mutation.Topic1(); ok {
+		_spec.SetField(ai_themes.FieldTopic1, field.TypeString, value)
+		_node.Topic1 = value
+	}
+	if value, ok := ac.mutation.Topic2(); ok {
+		_spec.SetField(ai_themes.FieldTopic2, field.TypeString, value)
+		_node.Topic2 = value
+	}
+	if value, ok := ac.mutation.Topic3(); ok {
+		_spec.SetField(ai_themes.FieldTopic3, field.TypeString, value)
+		_node.Topic3 = value
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(ai_themes.FieldCreatedAt, field.TypeTime, value)
