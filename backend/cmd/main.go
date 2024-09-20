@@ -39,6 +39,11 @@ func main() {
 		log.Fatalf("failed to create schema: %v", err)
 	}
 
+	r.Use(func(c *gin.Context) {
+		c.Set("db", client)
+		c.Next()
+	})
+
 	// Unauthenticated routes
 	routes.SupabaseAuthRoutes(r, client)
 

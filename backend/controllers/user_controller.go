@@ -254,3 +254,31 @@ func GetUserAvatar(client *ent.Client) gin.HandlerFunc {
 		})
 	}
 }
+
+func SearchUserByID(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+
+		user, err := client.USERS.Get(context.Background(), id)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user", "details": err.Error()})
+			}
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"id":        user.ID,
+			"username":  user.Username,
+			"email":     user.Email,
+			"createdAt": user.CreatedAt,
+		})
+	}
+}
