@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/Hosi121/SpeakUp/ent"
@@ -206,18 +207,41 @@ func SearchUsers(client *ent.Client) gin.HandlerFunc {
 		}
 
 		// Convert the user entities to a response format
-		var userResponses []UserResponse
+		var userResponses []gin.H
 		for _, user := range searchedUsers {
-			userResponses = append(userResponses, UserResponse{
-				ID:        user.ID,
-				Username:  user.Username,
-				AvatarURL: user.AvatarURL,
-				Role:      "user", // Assuming all searched users have the "user" role
-				CreatedAt: user.CreatedAt,
-				UpdatedAt: user.UpdatedAt,
+			userResponses = append(userResponses, gin.H{
+				"id":        user.ID,
+				"username":  user.Username,
+				"email":     user.Email,
+				"createdAt": user.CreatedAt,
 			})
 		}
 
 		c.JSON(http.StatusOK, userResponses)
+	}
+}
+
+// GetUserAvatar handles the GET /users/{userId}/avatar endpoint
+func GetUserAvatar(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userID, err := strconv.Atoi(c.Param("userId"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+
+		user, err := client.USERS.Get(context.Background(), userID)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user", "details": err.Error()})
+			}
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"avatarURL": user.AvatarURL,
+		})
 	}
 }
