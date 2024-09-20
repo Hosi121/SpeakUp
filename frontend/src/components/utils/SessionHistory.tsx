@@ -50,31 +50,31 @@ const SessionHistory = ({ history }: SessionHistoryProps) => {
             />
           </Box>
           {data.friedstate === "friend" && (
-            <Box>
-              <Button variant="outlined" color="primary" style={{ marginRight: 8 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+              <Button sx={{ width: "55%" }} variant="contained" disabled color="primary">
                 フレンド申請済
               </Button>
-              <Button variant="contained" color="primary">
+              <Button sx={{ width: "43%" }} variant="contained" color="primary">
                 メッセージ
               </Button>
             </Box>
           )}
           {data.friedstate === "pending" && (
-            <Box>
-              <Button variant="outlined" color="primary" style={{ marginRight: 8 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+              <Button sx={{ width: "55%" }} variant="contained" disabled color="primary">
                 フレンド申請済
               </Button>
-              <Button variant="outlined" color="primary">
+              <Button sx={{ width: "43%" }} variant="contained" disabled color="primary">
                 メッセージ
               </Button>
             </Box>
           )}
           {data.friedstate === "unapplied" && (
-            <Box>
-              <Button variant="contained" color="primary" style={{ marginRight: 8 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+              <Button sx={{ width: "55%" }} variant="contained" color="primary">
                 フレンド申請
               </Button>
-              <Button variant="outlined" color="primary">
+              <Button sx={{ width: "43%" }} variant="contained" disabled color="primary">
                 メッセージ
               </Button>
             </Box>
