@@ -37,10 +37,10 @@ const STUN_SERVERS = {
 type UserCardData = {
   name: string;
   icon: JSX.Element;
-}
-
+};
 
 export const Session = () => {
+  const sessionTime = 300; // [s]
   const [memoOpen, setMemoOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [messages, setMessages] = useState<string[]>([]);
@@ -50,7 +50,7 @@ export const Session = () => {
   const [memo2, setMemo2] = useState(""); // メモ2を管理
   const [value, setValue] = useState("1");
   const [isMuted, setIsMuted] = useState(false);
-  const [countdown, setCountdown] = useState(303);
+  const [countdown, setCountdown] = useState(sessionTime + 3);
   const navigate = useNavigate();
   const { sessionStep, setSessionStep } = useContext(SessionStepContext);
 
@@ -265,7 +265,9 @@ export const Session = () => {
     pc.ontrack = (event: RTCTrackEvent) => {
       if (remoteAudioRef.current && event.streams[0]) {
         remoteAudioRef.current.srcObject = event.streams[0];
-        opponentVolumeAnalyzerRef.current = new AudioVolumeAnalyzer(setIsOpponentSpeak);
+        opponentVolumeAnalyzerRef.current = new AudioVolumeAnalyzer(
+          setIsOpponentSpeak
+        );
         opponentVolumeAnalyzerRef.current.start(event.streams[0]);
       }
     };
@@ -326,7 +328,6 @@ export const Session = () => {
 
       volumeAnalyzerRef.current = new AudioVolumeAnalyzer(setisSpeak);
       volumeAnalyzerRef.current.start(stream);
-
     } catch (error) {
       console.error("Error starting call:", error);
       cleanupResources();
@@ -387,12 +388,14 @@ export const Session = () => {
 
   // userInfo
   const initialUserCardInfo = { name: "", icon: <Person /> };
-  const [userCardInfo, setUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
-  const [opponentUserCardInfo, setOpponentUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
+  const [userCardInfo, setUserCardInfo] =
+    useState<UserCardData>(initialUserCardInfo);
+  const [opponentUserCardInfo, setOpponentUserCardInfo] =
+    useState<UserCardData>(initialUserCardInfo);
 
   const getFullAvatarUrl = (avatarUrl: string) => {
-    if (!avatarUrl) return ''; // デフォルトのアバター画像のURLを設定することもできます
-    if (avatarUrl.startsWith('http')) return avatarUrl; // すでに完全なURLの場合
+    if (!avatarUrl) return ""; // デフォルトのアバター画像のURLを設定することもできます
+    if (avatarUrl.startsWith("http")) return avatarUrl; // すでに完全なURLの場合
     return `http://localhost:8081${avatarUrl}`; // ローカル開発環境の場合
   };
 
@@ -400,12 +403,21 @@ export const Session = () => {
     const fetchUserData = async () => {
       try {
         const userInfoResponse = await api.get<UserData>("/user/info");
-        const opponentUserCardDataResponse = await api.get<UserData>("/user/info");
+        const opponentUserCardDataResponse =
+          await api.get<UserData>("/user/info");
         const userInfo: UserCardData = {
           name: userInfoResponse.data.username,
-          icon: <Avatar src={getFullAvatarUrl(userInfoResponse.data.avatar_url)} sx={{ width: 80, height: 80 }} />
+          icon: (
+            <Avatar
+              src={getFullAvatarUrl(userInfoResponse.data.avatar_url)}
+              sx={{ width: 80, height: 80 }}
+            />
+          ),
         };
-        const opponentUserInfo: UserCardData = { name: opponentUserCardDataResponse.data.username, icon: <Person /> };
+        const opponentUserInfo: UserCardData = {
+          name: opponentUserCardDataResponse.data.username,
+          icon: <Person />,
+        };
         setUserCardInfo(userInfo);
         setOpponentUserCardInfo(opponentUserInfo);
       } catch (error) {
@@ -553,4 +565,3 @@ export const Session = () => {
 };
 
 export default Session;
-

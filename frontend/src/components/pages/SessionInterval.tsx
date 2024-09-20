@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const SessionInterval = () => {
-  const [countdown, setCountdown] = useState(60);
+  const intervalTime = 60; // [s]
+  const [countdown, setCountdown] = useState(intervalTime);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,18 +30,42 @@ export const SessionInterval = () => {
       <Container sx={{ pt: 3 }}>
         <TopSection />
         <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
-          <Typography variant="h3" sx={{ mb: 1, textAlign: "left", color: "primary.main", fontFamily: "bangers" }}>
+          <Typography
+            variant="h3"
+            sx={{
+              mb: 1,
+              textAlign: "left",
+              color: "primary.main",
+              fontFamily: "bangers",
+            }}
+          >
             GREAT!
           </Typography>
           <Typography textAlign="left" sx={{ mb: 2 }}>
             今のセッションで学んだことをメモしておこう！
           </Typography>
-          <MemoInputField value={""} onChange={() => { }} label="学んだ表現" height="30vh" />
+          <MemoInputField
+            value={""}
+            onChange={() => {}}
+            label="学んだ表現"
+            height="30vh"
+          />
           <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Typography variant="h6" component="p" fontWeight="bold" textAlign="left">
+            <Typography
+              variant="h6"
+              component="p"
+              fontWeight="bold"
+              textAlign="left"
+            >
               次のセッションまで...
             </Typography>
-            <Typography variant="h1" component="p" color="primary" fontWeight="bold" sx={{ mt: 2, fontSize: "5rem", fontFamily: "bangers" }}>
+            <Typography
+              variant="h1"
+              component="p"
+              color="primary"
+              fontWeight="bold"
+              sx={{ mt: 2, fontSize: "5rem", fontFamily: "bangers" }}
+            >
               {countdown}
             </Typography>
           </Box>
