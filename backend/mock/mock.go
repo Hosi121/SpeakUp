@@ -13,36 +13,6 @@ import (
 func CreateTestData(client *ent.Client) {
 	ctx := context.Background()
 
-	// ユーザーの作成
-	for i := 1; i <= 30; i++ {
-		tail := strconv.Itoa(i)
-		user, err := client.USERS.
-			Create().
-			SetUsername("testuser" + tail).
-			SetEmail("testuser" + tail + "@example.com").
-			SetAvatarURL("https://example.com/avatar.png").
-			SetRole("USER").
-			Save(ctx)
-		if err != nil {
-			log.Fatalf("failed creating user: %v", err)
-		}
-
-		log.Printf("created user: %v", user)
-	}
-	admin, err := client.USERS.
-		Create().
-		SetUsername("admin").
-		SetEmail("admin@example.com").
-		SetAvatarURL("https://example.com/avatar.png").
-		SetRole("ADMIN").
-		SetRank(rand.Intn(5) + 1).
-		Save(ctx)
-	if err != nil {
-		log.Fatalf("failed creating admin: %v", err)
-	} else {
-		log.Printf("created user: %v", admin)
-	}
-
 	// イベントの作成
 	theme, err := client.AI_THEMES.
 		Create().
@@ -76,6 +46,49 @@ func CreateTestData(client *ent.Client) {
 		log.Fatalf("failed creating event: %v", err)
 	} else {
 		log.Printf("created event: %v", event2)
+	}
+
+	// ユーザーの作成＆イベント参加登録
+	for i := 1; i <= 30; i++ {
+		tail := strconv.Itoa(i)
+		user, err := client.USERS.
+			Create().
+			SetUsername("testuser" + tail).
+			SetEmail("testuser" + tail + "@example.com").
+			SetAvatarURL("https://example.com/avatar.png").
+			SetRole("USER").
+			Save(ctx)
+		if err != nil {
+			log.Fatalf("failed creating user: %v", err)
+		} else {
+			log.Printf("created user: %v", user)
+		}
+
+		// イベント参加登録
+		event_record, err := client.EVENT_RECORDS.
+			Create().
+			SetUserID(user.ID).
+			SetEventID(event.ID).
+			SetParticipatesBit(rand.Intn(7) + 1).
+			Save(ctx)
+		if err != nil {
+			log.Fatalf("failed creating record: %v", err)
+		} else {
+			log.Printf("created record: %v", event_record)
+		}
+	}
+	admin, err := client.USERS.
+		Create().
+		SetUsername("admin").
+		SetEmail("admin@example.com").
+		SetAvatarURL("https://example.com/avatar.png").
+		SetRole("ADMIN").
+		SetRank(rand.Intn(5) + 1).
+		Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating admin: %v", err)
+	} else {
+		log.Printf("created user: %v", admin)
 	}
 
 }
