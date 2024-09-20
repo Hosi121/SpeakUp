@@ -8,6 +8,7 @@ import (
 	"github.com/Hosi121/SpeakUp/ent"
 	"github.com/Hosi121/SpeakUp/middlewares"
 	"github.com/Hosi121/SpeakUp/routes"
+	"github.com/Hosi121/SpeakUp/utils"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -50,6 +51,8 @@ func main() {
 
 	// Protected routes with Ent client
 	routes.ProtectedRoutes(protected, client)
+
+	utils.Matching(1)
 
 	// Run the server on port 8081
 	if err := r.Run(":8081"); err != nil {

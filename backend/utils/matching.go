@@ -35,7 +35,7 @@ func newRegiStration(info ent.EVENT_RECORDS) RegistrationInfo {
 	var ret RegistrationInfo
 	ret.user_id = info.UserID
 	ret.rank = getRankByUserID(info.UserID)
-	ret.record_id = info.ID
+	ret.record_id = info.EventID
 	ret.session_bit = info.ParticipatesBit
 	return ret
 }
@@ -87,8 +87,9 @@ func getAdminUser(event_id int) {
 			} else {
 				admin.record_id = rec.ID
 			}
+		} else {
+			slog.Error("Failed to get event records: %v", err)
 		}
-		slog.Error("Failed to get event records: %v", err)
 
 	} else {
 		admin.record_id = rec.ID
@@ -112,14 +113,15 @@ func newPair(f, s RegistrationInfo) Pair {
 /* マッチングに使う関数群 */
 func Matching(event_id int) {
 	// DBの用意
-	dsn := config.GetDSN()
-	db_client, err := ent.Open("mysql", dsn)
+	dsn = config.GetDSN()
+	client, err := ent.Open("mysql", dsn)
 	if err != nil {
 		slog.Error("Failed to open connection to database: %v", err)
 		return
 	}
-	defer db_client.Close()
-	ctx := context.Background()
+	defer client.Close()
+	db_client = client
+	ctx = context.Background()
 
 	var matching_list []Pair
 	matching_list = []Pair{}
@@ -289,11 +291,12 @@ func remakeList(latest []RegistrationInfo, embed []RegistrationInfo) []Pair {
 
 func removeNonparticipateUser(matching []Pair, next_session int) []RegistrationInfo {
 	ret := []RegistrationInfo{}
+	next_session--
 	for _, p := range matching {
-		if p.First.session_bit&(1<<next_session-1) != 0 {
+		if p.First.session_bit&(1<<next_session) != 0 {
 			ret = append(ret, p.First)
 		}
-		if p.Second.session_bit&(1<<next_session-1) != 0 {
+		if p.Second.session_bit&(1<<next_session) != 0 {
 			ret = append(ret, p.Second)
 		}
 	}
