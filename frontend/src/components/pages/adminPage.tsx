@@ -45,7 +45,7 @@ const AdminPage: React.FC = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [events]);
 
   const fetchEvents = async () => {
     try {
@@ -138,16 +138,25 @@ const AdminPage: React.FC = () => {
           </Snackbar>
 
           {eventDetails && (
-            <Paper sx={{ mt: 4, p: 2 }}>
-              <Typography variant="h6">最後に作成したイベント</Typography>
+            <Paper sx={{ mt: 4, p: 5 }}>
+              <Typography variant="h6" fontWeight="bolder" color="primary.main" sx={{ mb: 1 }}>
+                最後に作成したイベント
+              </Typography>
               <Typography variant="body1">予定日時: {new Date(eventDetails.dateTime).toLocaleString()}</Typography>
-              <Typography variant="body1">テーマ: {eventDetails.theme}</Typography>
-              <Typography variant="body1">トピック:</Typography>
-              <ul>
+              <Typography variant="h6" fontWeight="bolder" fontSize="1.1rem" sx={{ mt: 3, mb: 1 }}>
+                テーマ
+              </Typography>
+              <Typography variant="body1">{eventDetails.theme}</Typography>
+              <Typography variant="h6" fontWeight="bolder" fontSize="1.1rem" sx={{ mt: 3, mb: 1 }}>
+                トピック
+              </Typography>
+              <List sx={{ width: "100%", p: 0 }}>
                 {eventDetails.topics.map((topic, index) => (
-                  <li key={index}>{topic || "(未入力)"}</li>
+                  <ListItem key={index} sx={{ p: 0 }}>
+                    <ListItemText sx={{ textAlign: "center" }}>{topic || "(未入力)"}</ListItemText>
+                  </ListItem>
                 ))}
-              </ul>
+              </List>
             </Paper>
           )}
 
@@ -161,15 +170,20 @@ const AdminPage: React.FC = () => {
                       primary={`${new Date(event.event_start).toLocaleString()} - ${new Date(event.event_end).toLocaleString()}`}
                       secondary={
                         <>
-                          <Typography component="span" variant="body2" color="text.primary">
-                            テーマ: {event.theme.theme_text}
+                          <Typography variant="h6" fontWeight="bolder" fontSize="1.1rem" sx={{ mt: 3, mb: 1 }}>
+                            テーマ
                           </Typography>
-                          <br />
-                          トピック1: {event.theme.topic1}
-                          <br />
-                          トピック2: {event.theme.topic2}
-                          <br />
-                          トピック3: {event.theme.topic3}
+                          <Typography variant="body1">{event.theme.theme_text}</Typography>
+                          <Typography variant="h6" fontWeight="bolder" fontSize="1.1rem" sx={{ mt: 3, mb: 1 }}>
+                            トピック
+                          </Typography>
+                          <List sx={{ width: "100%", p: 0 }}>
+                            <ListItem sx={{ p: 0 }}>
+                              <ListItemText sx={{ textAlign: "center" }}>トピック1: {event.theme.topic1 || "(未入力)"}</ListItemText>
+                              <ListItemText sx={{ textAlign: "center" }}>トピック2: {event.theme.topic2 || "(未入力)"}</ListItemText>
+                              <ListItemText sx={{ textAlign: "center" }}>トピック3: {event.theme.topic3 || "(未入力)"}</ListItemText>
+                            </ListItem>
+                          </List>
                         </>
                       }
                     />
