@@ -22,10 +22,10 @@ const FriendRequestComponent: React.FC = () => {
   const fetchUserInfo = async (userId: number): Promise<Friend> => {
     try {
       const [userResponse, avatarResponse] = await Promise.all([
-        api.get(`/user/info/${userId}`),
+        api.get(`/users/search/id/${userId}`),
         api.get(`/users/${userId}/avatar`)
       ]);
-
+      
       return {
         id: userId,
         username: userResponse.data.username,
