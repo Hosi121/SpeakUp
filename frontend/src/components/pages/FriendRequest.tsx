@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton } from "@mui/material";
 import { Star, ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
