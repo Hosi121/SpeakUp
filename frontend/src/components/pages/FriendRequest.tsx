@@ -57,14 +57,20 @@ const FriendRequestComponent: React.FC = () => {
 
   const sendFriendRequest = async (targetUserId: number) => {
     try {
-      const response = await api.post('/friend/register', {
-        target_user_id: targetUserId,
-      });
+      const response = await api.post('/friend/register', { target_user_id: targetUserId });
       console.log('Friend request response:', response.data);
       return true;
     } catch (error: any) {
       console.error('Failed to send friend request:', error.response?.data || error.message);
-      setError(`Failed to send friend request: ${error.response?.data?.error || error.message}`);
+      let errorMessage = 'Failed to send friend request';
+      if (error.response) {
+        errorMessage += `: ${error.response.data.error || error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage += ': No response received from server';
+      } else {
+        errorMessage += `: ${error.message}`;
+      }
+      setError(errorMessage);
       return false;
     }
   };
