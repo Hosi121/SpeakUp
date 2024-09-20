@@ -240,8 +240,17 @@ func GetUserAvatar(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
+		// Check if user has an avatar
+		if user.AvatarURL == "" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User has no avatar"})
+			return
+		}
+
+		// Construct the full avatar URL
+		avatarURL := "http://localhost:8081" + user.AvatarURL
+
 		c.JSON(http.StatusOK, gin.H{
-			"avatarURL": user.AvatarURL,
+			"avatarURL": avatarURL,
 		})
 	}
 }
