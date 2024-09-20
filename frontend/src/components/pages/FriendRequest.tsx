@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton } from "@mui/material";
+import { useState, useEffect, useCallback } from 'react';
+import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton, Snackbar, CircularProgress } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection";
@@ -12,58 +12,62 @@ interface Friend {
   isFriend: boolean;
 }
 
-// カスタムフック: フレンド情報の取得
-const useFetchFriends = (userIds: number[]) => {
+const FriendRequestComponent: React.FC = () => {
+  const navigate = useNavigate();
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const userIds = [2, 3]; // セッションしたユーザーのID
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const friendsData = await Promise.all(
-          userIds.map(async (id) => {
-            const response = await api.get(`/users/${id}/avatar`);
-            return {
-              id,
-              username: `User ${id}`, // 実際のユーザー名を取得するAPIがある場合は、そちらを使用
-              avatar: response.data.avatarURL,
-              isFriend: false, // 初期状態では全てfalse
-            };
-          })
-        );
-        setFriends(friendsData);
-      } catch (error) {
-        console.error('Failed to fetch friends:', error);
-      }
-    };
-
-    fetchFriends();
-  }, [userIds]);
-
-  return friends;
-};
-
-// カスタムフック: フレンドリクエストの送信
-const useSendFriendRequest = () => {
-  const sendRequest = async (targetUserId: number) => {
+  const fetchUserInfo = async (userId: number): Promise<Friend> => {
     try {
-      await api.post('/friend/register', {
-        target_user_id: targetUserId,
-      });
-      return true;
-    } catch (error) {
-      console.error('Failed to send friend request:', error);
-      return false;
+      const [userResponse, avatarResponse] = await Promise.all([
+        api.get(`/user/info/${userId}`),
+        api.get(`/users/${userId}/avatar`)
+      ]);
+
+      return {
+        id: userId,
+        username: userResponse.data.username,
+        avatar: avatarResponse.data.avatarURL,
+        isFriend: false,
+      };
+    } catch (error: any) {
+      console.error(`Failed to fetch user info for user ${userId}:`, error);
+      throw error;
     }
   };
 
-  return sendRequest;
-};
+  const fetchFriends = useCallback(async () => {
+    setLoading(true);
+    try {
+      const friendsData = await Promise.all(userIds.map(fetchUserInfo));
+      setFriends(friendsData);
+    } catch (error: any) {
+      console.error('Failed to fetch friends:', error);
+      setError(`Failed to fetch friends: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-const FriendRequestComponent: React.FC = () => {
-  const navigate = useNavigate();
-  const userIds = [2, 3]; // セッションしたユーザーのID
-  const friends = useFetchFriends(userIds);
-  const sendFriendRequest = useSendFriendRequest();
+  useEffect(() => {
+    fetchFriends();
+  }, [fetchFriends]);
+
+  const sendFriendRequest = async (targetUserId: number) => {
+    try {
+      const response = await api.post('/friend/register', {
+        target_user_id: targetUserId,
+      });
+      console.log('Friend request response:', response.data);
+      return true;
+    } catch (error: any) {
+      console.error('Failed to send friend request:', error.response?.data || error.message);
+      setError(`Failed to send friend request: ${error.response?.data?.error || error.message}`);
+      return false;
+    }
+  };
 
   const handleEndSession = () => {
     navigate("/home");
@@ -76,9 +80,7 @@ const FriendRequestComponent: React.FC = () => {
   const handleFriendRequest = async (friendId: number) => {
     const success = await sendFriendRequest(friendId);
     if (success) {
-      // 成功時の処理（例：状態の更新）
       console.log('Friend request sent successfully');
-      // フレンドリストを更新する（該当するフレンドのisFriendをtrueに設定）
       setFriends(prevFriends =>
         prevFriends.map(friend =>
           friend.id === friendId ? { ...friend, isFriend: true } : friend
@@ -86,6 +88,18 @@ const FriendRequestComponent: React.FC = () => {
       );
     }
   };
+
+  const handleCloseError = () => {
+    setError(null);
+  };
+
+  if (loading) {
+    return (
+      <Container sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container
@@ -163,6 +177,13 @@ const FriendRequestComponent: React.FC = () => {
           セッションを終わる→
         </Button>
       </Box>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={handleCloseError}
+        message={error}
+      />
     </Container>
   );
 };
