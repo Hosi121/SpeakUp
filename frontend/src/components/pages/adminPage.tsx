@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, 
-  TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert 
+  TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert,
+  List, ListItem, ListItemText
 } from '@mui/material';
 import api from '../../services/api';
 
 interface EventDetails {
   dateTime: string;
   theme: string;
+  topics: string[];
 }
 
 interface ChatResponse {
@@ -21,17 +23,48 @@ interface ChatResponse {
   }>;
 }
 
+interface Event {
+  id: number;
+  event_start: string;
+  event_end: string;
+  theme_id: number;
+  theme: {
+    theme_text: string;
+    topic1: string;
+    topic2: string;
+    topic3: string;
+  };
+}
+
 const AdminPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dateTime, setDateTime] = useState<string>('');
   const [theme, setTheme] = useState<string>('');
+  const [topics, setTopics] = useState<string[]>(['', '', '']);
   const [successMessage, setSuccessMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      const response = await api.get('/events');
+      setEvents(response.data);
+    } catch (error) {
+      console.error('Failed to fetch events', error);
+      setErrorMessage('イベントの取得に失敗しました');
+    }
+  };
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
     setSuccessMessage('');
+    setErrorMessage('');
     setEventDetails(null);
   };
 
@@ -39,6 +72,7 @@ const AdminPage: React.FC = () => {
     setOpenDialog(false);
     setDateTime('');
     setTheme('');
+    setTopics(['', '', '']);
   };
 
   const handleGenerateTheme = async () => {
@@ -49,29 +83,42 @@ const AdminPage: React.FC = () => {
       setTheme(generatedTheme);
     } catch (error) {
       console.error('Failed to generate theme', error);
+      setErrorMessage('テーマの生成に失敗しました');
     }
   };
 
-  const handleSubmit = () => {
-    // TODO: Backendへのデータ送信処理をここに記述
-    // 送信が成功したと仮定
-    setSuccessMessage('成功');
-    setEventDetails({ dateTime, theme });
-    handleCloseDialog();
+  const handleTopicChange = (index: number, value: string) => {
+    const newTopics = [...topics];
+    newTopics[index] = value;
+    setTopics(newTopics);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const isoDateTime = new Date(dateTime).toISOString();
+      
+      const response = await api.post('/events', {
+        dateTime: isoDateTime,
+        theme,
+        topics
+      });
+      setSuccessMessage('イベントが正常に作成されました');
+      setEventDetails({ dateTime: isoDateTime, theme, topics });
+      handleCloseDialog();
+      fetchEvents(); // イベントリストを更新
+    } catch (error) {
+      console.error('Failed to create event', error);
+      setErrorMessage('イベントの作成に失敗しました');
+    }
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
-  const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+  const handleSnackbarClose = () => {
     setSuccessMessage('');
+    setErrorMessage('');
   };
 
   return (
@@ -84,34 +131,62 @@ const AdminPage: React.FC = () => {
       {activeTab === 0 && (
         <Box sx={{ mt: 4 }}>
           <Button variant="contained" onClick={handleOpenDialog}>
-            イベント作成欄
+            イベント作成
           </Button>
 
-          {successMessage && (
-            <Snackbar
-              open={true}
-              autoHideDuration={6000}
+          <Snackbar
+            open={!!successMessage || !!errorMessage}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+          >
+            <Alert
               onClose={handleSnackbarClose}
+              severity={successMessage ? "success" : "error"}
+              sx={{ width: '100%' }}
             >
-              <Alert
-                onClose={handleSnackbarClose}
-                severity="success"
-                sx={{ width: '100%' }}
-              >
-                {successMessage}
-              </Alert>
-            </Snackbar>
-          )}
+              {successMessage || errorMessage}
+            </Alert>
+          </Snackbar>
 
           {eventDetails && (
             <Paper sx={{ mt: 4, p: 2 }}>
-              <Typography variant="h6">イベント内容</Typography>
+              <Typography variant="h6">最後に作成したイベント</Typography>
               <Typography variant="body1">
                 予定日時: {new Date(eventDetails.dateTime).toLocaleString()}
               </Typography>
               <Typography variant="body1">テーマ: {eventDetails.theme}</Typography>
+              <Typography variant="body1">トピック:</Typography>
+              <ul>
+                {eventDetails.topics.map((topic, index) => (
+                  <li key={index}>{topic || '(未入力)'}</li>
+                ))}
+              </ul>
             </Paper>
           )}
+
+          <Paper sx={{ mt: 4, p: 2 }}>
+            <Typography variant="h6">イベントリスト</Typography>
+            <List>
+              {events.map((event) => (
+                <ListItem key={event.id}>
+                  <ListItemText
+                    primary={`${new Date(event.event_start).toLocaleString()} - ${new Date(event.event_end).toLocaleString()}`}
+                    secondary={
+                      <>
+                        <Typography component="span" variant="body2" color="text.primary">
+                          テーマ: {event.theme.theme_text}
+                        </Typography>
+                        <br />
+                        トピック1: {event.theme.topic1}<br />
+                        トピック2: {event.theme.topic2}<br />
+                        トピック3: {event.theme.topic3}
+                      </>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
 
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>イベント作成</DialogTitle>
@@ -127,6 +202,9 @@ const AdminPage: React.FC = () => {
                   }
                   InputLabelProps={{
                     shrink: true,
+                  }}
+                  inputProps={{
+                    step: 1, // 1秒単位
                   }}
                 />
               </Box>
@@ -147,6 +225,19 @@ const AdminPage: React.FC = () => {
                   AIによる生成
                 </Button>
               </Box>
+              {[0, 1, 2].map((index) => (
+                <Box sx={{ mt: 2 }} key={index}>
+                  <TextField
+                    fullWidth
+                    label={`トピック ${index + 1}`}
+                    value={topics[index]}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleTopicChange(index, e.target.value)
+                    }
+                    placeholder="ここにトピックを入力してください"
+                  />
+                </Box>
+              ))}
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseDialog}>キャンセル</Button>

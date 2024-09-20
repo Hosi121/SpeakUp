@@ -60,6 +60,21 @@ func ThemeText(v string) predicate.AI_THEMES {
 	return predicate.AI_THEMES(sql.FieldEQ(FieldThemeText, v))
 }
 
+// Topic1 applies equality check predicate on the "topic1" field. It's identical to Topic1EQ.
+func Topic1(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEQ(FieldTopic1, v))
+}
+
+// Topic2 applies equality check predicate on the "topic2" field. It's identical to Topic2EQ.
+func Topic2(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEQ(FieldTopic2, v))
+}
+
+// Topic3 applies equality check predicate on the "topic3" field. It's identical to Topic3EQ.
+func Topic3(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEQ(FieldTopic3, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.AI_THEMES {
 	return predicate.AI_THEMES(sql.FieldEQ(FieldCreatedAt, v))
@@ -128,6 +143,201 @@ func ThemeTextEqualFold(v string) predicate.AI_THEMES {
 // ThemeTextContainsFold applies the ContainsFold predicate on the "theme_text" field.
 func ThemeTextContainsFold(v string) predicate.AI_THEMES {
 	return predicate.AI_THEMES(sql.FieldContainsFold(FieldThemeText, v))
+}
+
+// Topic1EQ applies the EQ predicate on the "topic1" field.
+func Topic1EQ(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEQ(FieldTopic1, v))
+}
+
+// Topic1NEQ applies the NEQ predicate on the "topic1" field.
+func Topic1NEQ(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldNEQ(FieldTopic1, v))
+}
+
+// Topic1In applies the In predicate on the "topic1" field.
+func Topic1In(vs ...string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldIn(FieldTopic1, vs...))
+}
+
+// Topic1NotIn applies the NotIn predicate on the "topic1" field.
+func Topic1NotIn(vs ...string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldNotIn(FieldTopic1, vs...))
+}
+
+// Topic1GT applies the GT predicate on the "topic1" field.
+func Topic1GT(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldGT(FieldTopic1, v))
+}
+
+// Topic1GTE applies the GTE predicate on the "topic1" field.
+func Topic1GTE(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldGTE(FieldTopic1, v))
+}
+
+// Topic1LT applies the LT predicate on the "topic1" field.
+func Topic1LT(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldLT(FieldTopic1, v))
+}
+
+// Topic1LTE applies the LTE predicate on the "topic1" field.
+func Topic1LTE(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldLTE(FieldTopic1, v))
+}
+
+// Topic1Contains applies the Contains predicate on the "topic1" field.
+func Topic1Contains(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldContains(FieldTopic1, v))
+}
+
+// Topic1HasPrefix applies the HasPrefix predicate on the "topic1" field.
+func Topic1HasPrefix(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldHasPrefix(FieldTopic1, v))
+}
+
+// Topic1HasSuffix applies the HasSuffix predicate on the "topic1" field.
+func Topic1HasSuffix(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldHasSuffix(FieldTopic1, v))
+}
+
+// Topic1EqualFold applies the EqualFold predicate on the "topic1" field.
+func Topic1EqualFold(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEqualFold(FieldTopic1, v))
+}
+
+// Topic1ContainsFold applies the ContainsFold predicate on the "topic1" field.
+func Topic1ContainsFold(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldContainsFold(FieldTopic1, v))
+}
+
+// Topic2EQ applies the EQ predicate on the "topic2" field.
+func Topic2EQ(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEQ(FieldTopic2, v))
+}
+
+// Topic2NEQ applies the NEQ predicate on the "topic2" field.
+func Topic2NEQ(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldNEQ(FieldTopic2, v))
+}
+
+// Topic2In applies the In predicate on the "topic2" field.
+func Topic2In(vs ...string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldIn(FieldTopic2, vs...))
+}
+
+// Topic2NotIn applies the NotIn predicate on the "topic2" field.
+func Topic2NotIn(vs ...string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldNotIn(FieldTopic2, vs...))
+}
+
+// Topic2GT applies the GT predicate on the "topic2" field.
+func Topic2GT(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldGT(FieldTopic2, v))
+}
+
+// Topic2GTE applies the GTE predicate on the "topic2" field.
+func Topic2GTE(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldGTE(FieldTopic2, v))
+}
+
+// Topic2LT applies the LT predicate on the "topic2" field.
+func Topic2LT(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldLT(FieldTopic2, v))
+}
+
+// Topic2LTE applies the LTE predicate on the "topic2" field.
+func Topic2LTE(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldLTE(FieldTopic2, v))
+}
+
+// Topic2Contains applies the Contains predicate on the "topic2" field.
+func Topic2Contains(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldContains(FieldTopic2, v))
+}
+
+// Topic2HasPrefix applies the HasPrefix predicate on the "topic2" field.
+func Topic2HasPrefix(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldHasPrefix(FieldTopic2, v))
+}
+
+// Topic2HasSuffix applies the HasSuffix predicate on the "topic2" field.
+func Topic2HasSuffix(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldHasSuffix(FieldTopic2, v))
+}
+
+// Topic2EqualFold applies the EqualFold predicate on the "topic2" field.
+func Topic2EqualFold(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEqualFold(FieldTopic2, v))
+}
+
+// Topic2ContainsFold applies the ContainsFold predicate on the "topic2" field.
+func Topic2ContainsFold(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldContainsFold(FieldTopic2, v))
+}
+
+// Topic3EQ applies the EQ predicate on the "topic3" field.
+func Topic3EQ(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEQ(FieldTopic3, v))
+}
+
+// Topic3NEQ applies the NEQ predicate on the "topic3" field.
+func Topic3NEQ(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldNEQ(FieldTopic3, v))
+}
+
+// Topic3In applies the In predicate on the "topic3" field.
+func Topic3In(vs ...string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldIn(FieldTopic3, vs...))
+}
+
+// Topic3NotIn applies the NotIn predicate on the "topic3" field.
+func Topic3NotIn(vs ...string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldNotIn(FieldTopic3, vs...))
+}
+
+// Topic3GT applies the GT predicate on the "topic3" field.
+func Topic3GT(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldGT(FieldTopic3, v))
+}
+
+// Topic3GTE applies the GTE predicate on the "topic3" field.
+func Topic3GTE(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldGTE(FieldTopic3, v))
+}
+
+// Topic3LT applies the LT predicate on the "topic3" field.
+func Topic3LT(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldLT(FieldTopic3, v))
+}
+
+// Topic3LTE applies the LTE predicate on the "topic3" field.
+func Topic3LTE(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldLTE(FieldTopic3, v))
+}
+
+// Topic3Contains applies the Contains predicate on the "topic3" field.
+func Topic3Contains(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldContains(FieldTopic3, v))
+}
+
+// Topic3HasPrefix applies the HasPrefix predicate on the "topic3" field.
+func Topic3HasPrefix(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldHasPrefix(FieldTopic3, v))
+}
+
+// Topic3HasSuffix applies the HasSuffix predicate on the "topic3" field.
+func Topic3HasSuffix(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldHasSuffix(FieldTopic3, v))
+}
+
+// Topic3EqualFold applies the EqualFold predicate on the "topic3" field.
+func Topic3EqualFold(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldEqualFold(FieldTopic3, v))
+}
+
+// Topic3ContainsFold applies the ContainsFold predicate on the "topic3" field.
+func Topic3ContainsFold(v string) predicate.AI_THEMES {
+	return predicate.AI_THEMES(sql.FieldContainsFold(FieldTopic3, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

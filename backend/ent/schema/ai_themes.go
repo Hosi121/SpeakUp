@@ -17,6 +17,9 @@ type AI_THEMES struct {
 func (AI_THEMES) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("theme_text"),
+		field.String("topic1"),
+		field.String("topic2"),
+		field.String("topic3"),
 		field.Time("created_at").
 			Default(time.Now()),
 	}
