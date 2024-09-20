@@ -20,6 +20,7 @@ func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
 
 	router.GET("/friend/me", controllers.GetFriendList())
 	router.GET("/friend/:friendname", controllers.GetFriendByName())
+	router.POST("/friend/register", controllers.AddFriend())
 	router.POST("/events", controllers.CreateEvent(client))
 	router.GET("/events", controllers.GetEvents(client))
 
