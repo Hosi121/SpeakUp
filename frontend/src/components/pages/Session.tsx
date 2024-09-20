@@ -1,5 +1,5 @@
 import { HalfModal } from "../utils/HalfModal";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   Typography,
   Box,
@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { TopicPopup } from "../utils/TopicPopup";
 import { AudioVolumeAnalyzer } from "../utils/AudioVolumeAnalyzer";
 import { UserData } from "./Settings";
+import { SessionStepContext } from "../utils/SessionStepContextProvider";
 
 const theme = "好きな言葉";
 
@@ -51,6 +52,7 @@ export const Session = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [countdown, setCountdown] = useState(303);
   const navigate = useNavigate();
+  const { sessionStep, setSessionStep } = useContext(SessionStepContext);
 
   const [showTopicPopup, setShowTopicPopup] = useState(false);
   const [isPriorityHighClicked, setIsPriorityHighClicked] = useState(false);
@@ -70,6 +72,11 @@ export const Session = () => {
       return () => clearTimeout(timer);
     } else {
       navigate("/sessioninterval");
+      const nextStep = sessionStep + 1;
+      setSessionStep(nextStep);
+      if (nextStep >= 3) {
+        navigate("/sessionrecord");
+      }
     }
   }, [countdown, navigate]);
   useEffect(() => {

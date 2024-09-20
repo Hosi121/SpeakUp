@@ -25,6 +25,7 @@ import FriendList from "./components/utils/FriendList.tsx";
 import Theme from "./styles/Theme.tsx";
 import { SessionHistoryFriendlist } from "./components/pages/SessionHistoryFriendlist.tsx";
 import TrophyNotification from "./components/pages/TrophyNotification.tsx";
+import { SessionStepContext, SessionStepContextProvider } from "./components/utils/SessionStepContextProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -122,8 +123,11 @@ if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
       <ThemeProvider theme={Theme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
+        <SessionStepContextProvider>
+          <RouterProvider router={router} />
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </SessionStepContextProvider>
       </ThemeProvider>
     </StrictMode>
   );

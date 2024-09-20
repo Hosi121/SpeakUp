@@ -35,7 +35,7 @@ export const SessionInterval = () => {
           <Typography textAlign="left" sx={{ mb: 2 }}>
             今のセッションで学んだことをメモしておこう！
           </Typography>
-          <MemoInputField value={""} onChange={() => {}} label="学んだ表現" height="30vh" />
+          <MemoInputField value={""} onChange={() => { }} label="学んだ表現" height="30vh" />
           <Box sx={{ textAlign: "center", mt: 2 }}>
             <Typography variant="h6" component="p" fontWeight="bold" textAlign="left">
               次のセッションまで...
