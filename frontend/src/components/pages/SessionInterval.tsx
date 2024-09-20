@@ -2,13 +2,17 @@ import { Box, Container, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import TopSection from "../utils/TopSection";
 import { MemoInputField } from "../utils/MemoInputField";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SessionStepContext } from "../utils/SessionStepContextProvider";
 
 export const SessionInterval = () => {
   const intervalTime = 60; // [s]
   const [countdown, setCountdown] = useState(intervalTime);
   const navigate = useNavigate();
+  const [memoValue, setMemoValue] = useState("");
+  const { learnedExpressions, setLearnedExpressions } =
+    useContext(SessionStepContext);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -16,6 +20,8 @@ export const SessionInterval = () => {
       return () => clearTimeout(timer);
     } else {
       navigate("/session");
+      const newLearnedExpression = learnedExpressions + "\n" + memoValue;
+      setLearnedExpressions(newLearnedExpression);
     }
   }, [countdown, navigate]);
   return (
@@ -28,6 +34,7 @@ export const SessionInterval = () => {
       }}
     >
       <Container sx={{ pt: 3 }}>
+        {learnedExpressions}
         <TopSection />
         <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
           <Typography
@@ -45,8 +52,8 @@ export const SessionInterval = () => {
             今のセッションで学んだことをメモしておこう！
           </Typography>
           <MemoInputField
-            value={""}
-            onChange={() => {}}
+            value={memoValue}
+            setValue={setMemoValue}
             label="学んだ表現"
             height="30vh"
           />
