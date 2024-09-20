@@ -1,45 +1,69 @@
+import { useState, useEffect } from 'react';
 import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton } from "@mui/material";
-import { Star, ArrowBack } from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection";
+import api from "../../services/api";
 
 interface Friend {
   id: number;
   username: string;
   avatar: string;
-  topic: string;
-  date: string;
-  level: number;
   isFriend: boolean;
 }
 
-const friends: Friend[] = [
-  {
-    id: 1,
-    username: "Mike",
-    avatar: "",
-    topic: "好きなスポーツ",
-    date: "2024/5/15",
-    level: 3,
-    isFriend: true,
-  },
-  {
-    id: 2,
-    username: "ゆい",
-    avatar: "",
-    topic: "好きなスポーツ",
-    date: "2024/5/15",
-    level: 3,
-    isFriend: false,
-  },
-];
+// カスタムフック: フレンド情報の取得
+const useFetchFriends = (userIds: number[]) => {
+  const [friends, setFriends] = useState<Friend[]>([]);
 
-interface FriendRequestComponentProps {
-  friends: Friend[];
-}
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const friendsData = await Promise.all(
+          userIds.map(async (id) => {
+            const response = await api.get(`/users/${id}/avatar`);
+            return {
+              id,
+              username: `User ${id}`, // 実際のユーザー名を取得するAPIがある場合は、そちらを使用
+              avatar: response.data.avatarURL,
+              isFriend: false, // 初期状態では全てfalse
+            };
+          })
+        );
+        setFriends(friendsData);
+      } catch (error) {
+        console.error('Failed to fetch friends:', error);
+      }
+    };
 
-const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
+    fetchFriends();
+  }, [userIds]);
+
+  return friends;
+};
+
+// カスタムフック: フレンドリクエストの送信
+const useSendFriendRequest = () => {
+  const sendRequest = async (targetUserId: number) => {
+    try {
+      await api.post('/friend/register', {
+        target_user_id: targetUserId,
+      });
+      return true;
+    } catch (error) {
+      console.error('Failed to send friend request:', error);
+      return false;
+    }
+  };
+
+  return sendRequest;
+};
+
+const FriendRequestComponent: React.FC = () => {
   const navigate = useNavigate();
+  const userIds = [2, 3]; // セッションしたユーザーのID
+  const friends = useFetchFriends(userIds);
+  const sendFriendRequest = useSendFriendRequest();
 
   const handleEndSession = () => {
     navigate("/home");
@@ -47,6 +71,20 @@ const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+  const handleFriendRequest = async (friendId: number) => {
+    const success = await sendFriendRequest(friendId);
+    if (success) {
+      // 成功時の処理（例：状態の更新）
+      console.log('Friend request sent successfully');
+      // フレンドリストを更新する（該当するフレンドのisFriendをtrueに設定）
+      setFriends(prevFriends =>
+        prevFriends.map(friend =>
+          friend.id === friendId ? { ...friend, isFriend: true } : friend
+        )
+      );
+    }
   };
 
   return (
@@ -88,35 +126,25 @@ const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
             <Paper key={friend.id} elevation={3} sx={{ marginBottom: 2, padding: 2 }}>
               <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
                 <ListItemAvatar>
-                  {friend.isFriend ? (
-                    <Avatar sx={{ bgcolor: "gold" }}>
-                      <Star />
-                    </Avatar>
-                  ) : (
-                    <Avatar src={friend.avatar} alt={friend.username} />
-                  )}
+                  <Avatar src={friend.avatar} alt={friend.username} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={friend.username}
                   secondary={
                     <>
                       <Typography component="span" variant="body2" color="text.primary">
-                        話したテーマ：{friend.topic}
-                      </Typography>
-                      <br />
-                      <Typography component="span" variant="body2" color="text.primary">
-                        話した日付：{friend.date}
-                      </Typography>
-                      <br />
-                      <Typography component="span" variant="body2" color="text.primary">
-                        レベル {friend.level}
+                        User ID: {friend.id}
                       </Typography>
                     </>
                   }
                 />
               </ListItem>
               <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-                <Button variant="contained" disabled={friend.isFriend}>
+                <Button 
+                  variant="contained" 
+                  disabled={friend.isFriend}
+                  onClick={() => handleFriendRequest(friend.id)}
+                >
                   {friend.isFriend ? "フレンド申請済" : "フレンド申請"}
                 </Button>
                 <Button variant="contained">メッセージ</Button>
@@ -140,7 +168,7 @@ const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
 };
 
 export const FriendRequest: React.FC = () => {
-  return <FriendRequestComponent friends={friends} />;
+  return <FriendRequestComponent />;
 };
 
 export default FriendRequest;
