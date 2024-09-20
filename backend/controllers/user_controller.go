@@ -184,3 +184,40 @@ func UpdateAvatar(client *ent.Client) gin.HandlerFunc {
 		})
 	}
 }
+
+func SearchUsers(client *ent.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		query := c.Query("q")
+		if query == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Search query is required"})
+			return
+		}
+
+		// Search for users with a username containing the query string
+		searchedUsers, err := client.USERS.
+			Query().
+			Where(users.UsernameContains(query)).
+			Limit(10). // Limit the number of results
+			All(context.Background())
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search users", "details": err.Error()})
+			return
+		}
+
+		// Convert the user entities to a response format
+		var userResponses []UserResponse
+		for _, user := range searchedUsers {
+			userResponses = append(userResponses, UserResponse{
+				ID:        user.ID,
+				Username:  user.Username,
+				AvatarURL: user.AvatarURL,
+				Role:      "user", // Assuming all searched users have the "user" role
+				CreatedAt: user.CreatedAt,
+				UpdatedAt: user.UpdatedAt,
+			})
+		}
+
+		c.JSON(http.StatusOK, userResponses)
+	}
+}
