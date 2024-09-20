@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert, List, ListItem, ListItemText, ListItemAvatar, Avatar, CircularProgress } from "@mui/material";
 import api from "../../services/api";
-import { ChatResponse, Event, EventDetails, User } from "../../types/types";
+import { Event, EventDetails, User } from "../../types/types";
+import * as eventService from "../../services/eventService";
 
 const AdminPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -20,7 +21,8 @@ const AdminPage: React.FC = () => {
   useEffect(() => {
     const fetchInitialEvents = async () => {
       try {
-        await fetchEvents();
+        const fetchedEvents = await eventService.fetchEvents();
+        setEvents(fetchedEvents);
       } catch (error) {
         console.error("Failed to fetch initial events", error);
         setErrorMessage("初期イベントの取得に失敗しました");
@@ -28,14 +30,29 @@ const AdminPage: React.FC = () => {
     };
     fetchInitialEvents();
   }, []);
-  const fetchEvents = async () => {
+
+  const handleGenerateTheme = async () => {
     try {
-      const response = await api.get("/events");
-      setEvents(response.data);
+      const generatedTheme = await eventService.generateTheme();
+      setTheme(generatedTheme);
     } catch (error) {
-      console.error("Failed to fetch events", error);
-      setErrorMessage("イベントの取得に失敗しました");
-      setEvents([]);
+      setErrorMessage("テーマの生成に失敗しました");
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const isoDateTime = new Date(dateTime).toISOString();
+      const eventDetails: EventDetails = { dateTime: isoDateTime, theme, topics };
+      
+      await eventService.createEvent(eventDetails);
+      setSuccessMessage("イベントが正常に作成されました");
+      setEventDetails(eventDetails);
+      handleCloseDialog();
+      const fetchedEvents = await eventService.fetchEvents();
+      setEvents(fetchedEvents);
+    } catch (error) {
+      setErrorMessage("イベントの作成に失敗しました");
     }
   };
 
@@ -53,41 +70,10 @@ const AdminPage: React.FC = () => {
     setTopics(["", "", ""]);
   };
 
-  const handleGenerateTheme = async () => {
-    try {
-      const prompt = "イベントのテーマを提案してください。";
-      const response = await api.post<ChatResponse>("/chat/theme", { content: prompt });
-      const generatedTheme = response.data.choices[0].message.content;
-      setTheme(generatedTheme);
-    } catch (error) {
-      console.error("Failed to generate theme", error);
-      setErrorMessage("テーマの生成に失敗しました");
-    }
-  };
-
   const handleTopicChange = (index: number, value: string) => {
     const newTopics = [...topics];
     newTopics[index] = value;
     setTopics(newTopics);
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const isoDateTime = new Date(dateTime).toISOString();
-
-      const response = await api.post("/events", {
-        dateTime: isoDateTime,
-        theme,
-        topics,
-      });
-      setSuccessMessage("イベントが正常に作成されました");
-      setEventDetails({ dateTime: isoDateTime, theme, topics });
-      handleCloseDialog();
-      fetchEvents();
-    } catch (error) {
-      console.error("Failed to create event", error);
-      setErrorMessage("イベントの作成に失敗しました");
-    }
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -158,44 +144,6 @@ const AdminPage: React.FC = () => {
               </List>
             </Paper>
           )}
-
-          {/* <Paper sx={{ mt: 4, p: 2 }}>
-            <Typography variant="h6">イベントリスト</Typography>
-
-            <List>
-              {events && events.length > 0 ? (
-                events.map((event) => (
-                  <ListItem key={event.id}>
-                    <ListItemText
-                      primary={`${new Date(event.event_start).toLocaleString()} - ${new Date(event.event_end).toLocaleString()}`}
-                      secondary={
-                        <>
-                          <Typography variant="h6" fontWeight="bolder" fontSize="1.1rem" sx={{ mt: 3, mb: 1 }}>
-                            テーマ
-                          </Typography>
-                          <Typography variant="body1">{event.theme.theme_text}</Typography>
-                          <Typography variant="h6" fontWeight="bolder" fontSize="1.1rem" sx={{ mt: 3, mb: 1 }}>
-                            トピック
-                          </Typography>
-                          <List sx={{ width: "100%", p: 0 }}>
-                            <ListItem sx={{ p: 0 }}>
-                              <ListItemText sx={{ textAlign: "center" }}>トピック1: {event.theme.topic1 || "(未入力)"}</ListItemText>
-                              <ListItemText sx={{ textAlign: "center" }}>トピック2: {event.theme.topic2 || "(未入力)"}</ListItemText>
-                              <ListItemText sx={{ textAlign: "center" }}>トピック3: {event.theme.topic3 || "(未入力)"}</ListItemText>
-                            </ListItem>
-                          </List>
-                        </>
-                      }
-                    />
-                  </ListItem>
-                ))
-              ) : (
-                <ListItem>
-                  <ListItemText primary="イベントがありません" />
-                </ListItem>
-              )}
-            </List>
-          </Paper> */}
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>イベント作成</DialogTitle>
             <DialogContent>
