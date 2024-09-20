@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Box, Typography, TextField, Button, Paper, Container, Stack } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection";
+import { SessionStepContext } from "../utils/SessionStepContextProvider";
 
 const DashedBox = styled(Paper)({
   border: "2px dashed #FFD700",
@@ -12,7 +13,7 @@ const DashedBox = styled(Paper)({
 const SessionRecordForm: React.FC = () => {
   const [satisfaction, setSatisfaction] = useState<string>("");
   const [thoughts, setThoughts] = useState<string>("");
-  const [learnedExpressions, setLearnedExpressions] = useState<string>("");
+  const { learnedExpressions, setLearnedExpressions } = useContext(SessionStepContext);
   const navigate = useNavigate();
 
   const handleNext = () => {

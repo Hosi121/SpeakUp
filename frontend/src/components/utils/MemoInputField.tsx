@@ -1,17 +1,24 @@
 import { TextField } from "@mui/material";
+import { Dispatch, SetStateAction } from "react";
 
 interface MemoInputFieldProps {
   value: string;
-  onChange: (value: string) => void;
+  setValue: Dispatch<SetStateAction<string>>;
   label: string;
   maxLength?: number;
   height?: string;
 }
 
-export const MemoInputField: React.FC<MemoInputFieldProps> = ({ value, onChange, label, maxLength = 500, height = "300px" }) => {
+export const MemoInputField: React.FC<MemoInputFieldProps> = ({
+  value,
+  setValue,
+  label,
+  maxLength = 500,
+  height = "300px",
+}) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const text = event.target.value.slice(0, maxLength);
-    onChange(text);
+    setValue(text);
   };
 
   return (
