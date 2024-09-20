@@ -13,6 +13,7 @@ func ProtectedRoutes(router *gin.RouterGroup, client *ent.Client) {
 	router.PUT("/user/avatar", controllers.UpdateAvatar(client))
 	router.GET("/users/:userId/avatar", controllers.GetUserAvatar(client))
 	router.GET("/users/search", controllers.SearchUsers(client))
+	router.GET("/users/search/id/:id", controllers.SearchUserByID(client))
 
 	// Memo routes
 	router.GET("/memo", controllers.GetMemo(client))
