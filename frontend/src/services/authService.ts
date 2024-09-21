@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 // サインアップリクエストの型
 interface SignUpRequest {
@@ -30,7 +30,11 @@ interface SignInResponse {
 }
 
 // サインアップ関数
-export const signUp = async (username: string, email: string, password: string): Promise<SignUpResponse> => {
+export const signUp = async (
+  username: string,
+  email: string,
+  password: string
+): Promise<SignUpResponse> => {
   const requestData: SignUpRequest = {
     username,
     email,
@@ -38,28 +42,30 @@ export const signUp = async (username: string, email: string, password: string):
   };
 
   try {
-    const response = await api.post<SignUpResponse>('/signup', requestData);
+    const response = await api.post<SignUpResponse>("/signup", requestData);
     return response.data;
   } catch (err) {
-    throw new Error('サインアップに失敗しました。');
+    throw new Error("サインアップに失敗しました。");
   }
 };
 
 // ログイン関数
-export const signIn = async (email: string, password: string): Promise<void> => {
+export const signIn = async (
+  email: string,
+  password: string
+): Promise<void> => {
   const requestData: SignInRequest = {
     email,
     password,
   };
 
   try {
-    const response = await api.post<SignInResponse>('/signin', requestData);
-    // Use the correct 'token' from SignInResponse
-    localStorage.setItem("token", response.data.token);
-    // Optionally log user info or a success message
-    console.log(`Logged in as: ${response.data.user.username}`);
+    const response = await api.post<SignInResponse>("/signin", requestData);
+    // バックエンドから受け取ったトークンをlocalStorageに保存
+    localStorage.setItem("token", response.data.accessToken);
+    // 必要に応じてメッセージを表示
+    console.log(response.data.message);
   } catch (err) {
-    throw new Error('ログインに失敗しました。');
+    throw new Error("ログインに失敗しました。");
   }
 };
-
