@@ -46,13 +46,26 @@ const MemoContainer = () => {
       <Container sx={{ pt: 3 }}>
         <TopSection />
         <Stack sx={{ margin: "30px auto 0", width: "90%" }}>
-          <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}>
-            <EditNoteIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
+          <Typography
+            variant="h4"
+            sx={{ mb: 4, fontWeight: "bold", textAlign: "left" }}
+          >
+            <EditNoteIcon
+              sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }}
+            />
             持ち込みメモ
           </Typography>
-          <MemoInputField label="持ち込みメモ" value={memo1} onChange={setMemo1} />
+          <MemoInputField
+            label="持ち込みメモ"
+            value={memo1}
+            setValue={setMemo1}
+          />
           <Box sx={{ mt: 3 }}>
-            <MemoInputField label="ワードリスト" value={memo2} onChange={setMemo2} />
+            <MemoInputField
+              label="ワードリスト"
+              value={memo2}
+              setValue={setMemo2}
+            />
           </Box>
           <Button
             variant="contained"
