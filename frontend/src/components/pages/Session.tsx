@@ -141,7 +141,7 @@ export const Session = () => {
 
   // WebRTC関連の処理
   // webbbb vimジャンプ用
-  const host = "10.70.174.101";
+  const host = "192.168.100.105";
   const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
   let isOffer = false;
 
