@@ -1,17 +1,6 @@
 import { HalfModal } from "../utils/HalfModal";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import {
-  Typography,
-  Box,
-  List,
-  ListItem,
-  Paper,
-  ListItemText,
-  TextField,
-  Button,
-  Tab,
-  Avatar,
-} from "@mui/material";
+import { Typography, Box, List, ListItem, Paper, ListItemText, TextField, Button, Tab, Avatar } from "@mui/material";
 import HomeLogo from "../../assets/homeLogo";
 import { Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
@@ -28,10 +17,7 @@ import { SessionStepContext } from "../utils/SessionStepContextProvider";
 const theme = "好きな言葉";
 
 const STUN_SERVERS = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-  ],
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }],
 };
 
 type UserCardData = {
@@ -123,27 +109,14 @@ export const Session = () => {
       console.log("Response data:", response.data); // ここでレスポンスデータを確認
 
       // 応答メッセージを表示
-      if (
-        response.data &&
-        response.data.choices &&
-        response.data.choices[0].message.content
-      ) {
+      if (response.data && response.data.choices && response.data.choices[0].message.content) {
         const assistantMessage = response.data.choices[0].message.content;
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          `Assistant: ${assistantMessage}`,
-        ]);
+        setMessages((prevMessages) => [...prevMessages, `Assistant: ${assistantMessage}`]);
       } else {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          "Error: Invalid response format",
-        ]);
+        setMessages((prevMessages) => [...prevMessages, "Error: Invalid response format"]);
       }
     } catch (error) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        "Error: Failed to get response",
-      ]);
+      setMessages((prevMessages) => [...prevMessages, "Error: Failed to get response"]);
       console.log(error);
     } finally {
       setIsLoading(false); // ローディング状態を終了
@@ -226,13 +199,9 @@ export const Session = () => {
         if (message.type === "offer" && message.offer) {
           await handleOffer(message.offer);
         } else if (message.type === "answer" && message.answer) {
-          await peerConnectionRef.current.setRemoteDescription(
-            new RTCSessionDescription(message.answer)
-          );
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(message.answer));
         } else if (message.type === "ice-candidate" && message.candidate) {
-          await peerConnectionRef.current.addIceCandidate(
-            new RTCIceCandidate(message.candidate)
-          );
+          await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(message.candidate));
         } else if (message.type === "callType" && message.isOffer) {
           isOffer = message.isOffer;
         }
@@ -266,20 +235,14 @@ export const Session = () => {
     pc.ontrack = (event: RTCTrackEvent) => {
       if (remoteAudioRef.current && event.streams[0]) {
         remoteAudioRef.current.srcObject = event.streams[0];
-        opponentVolumeAnalyzerRef.current = new AudioVolumeAnalyzer(
-          setIsOpponentSpeak
-        );
+        opponentVolumeAnalyzerRef.current = new AudioVolumeAnalyzer(setIsOpponentSpeak);
         opponentVolumeAnalyzerRef.current.start(event.streams[0]);
       }
     };
 
     pc.oniceconnectionstatechange = () => {
       console.log("ICE Connection State:", pc.iceConnectionState);
-      if (
-        pc.iceConnectionState === "disconnected" ||
-        pc.iceConnectionState === "failed" ||
-        pc.iceConnectionState === "closed"
-      ) {
+      if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed" || pc.iceConnectionState === "closed") {
         cleanupResources();
       }
     };
@@ -291,9 +254,7 @@ export const Session = () => {
   const startCall = async (forceExcute: boolean): Promise<void> => {
     if (!forceExcute && !isOffer) {
       console.log("not start call", forceExcute, isOffer);
-      console.log(
-        `not start call forceExcute=${forceExcute}, isOffer=${isOffer}`
-      );
+      console.log(`not start call forceExcute=${forceExcute}, isOffer=${isOffer}`);
       return;
     } else {
       console.log("startCall()");
@@ -335,9 +296,7 @@ export const Session = () => {
     }
   };
 
-  const handleOffer = async (
-    offer: RTCSessionDescriptionInit
-  ): Promise<void> => {
+  const handleOffer = async (offer: RTCSessionDescriptionInit): Promise<void> => {
     console.log("handle offer");
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
@@ -389,69 +348,31 @@ export const Session = () => {
 
   // userInfo
   const initialUserCardInfo = { name: "", icon: <Person /> };
-  const [userCardInfo, setUserCardInfo] =
-    useState<UserCardData>(initialUserCardInfo);
-  const [opponentUserCardInfo, setOpponentUserCardInfo] =
-    useState<UserCardData>(initialUserCardInfo);
+  const [userCardInfo, setUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
+  const [opponentUserCardInfo, setOpponentUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
 
+  const cardInfo1: userCardInfo = {
+    name: "つよぽん",
+    icon: <Avatar src="https://source.unsplash.com/random" sx={{ width: 80, height: 80 }} />,
+  };
+  const cardInfo2: userCardInfo = {
+    name: "タキ",
+    icon: <Avatar src="https://source.unsplash.com/random" sx={{ width: 80, height: 80 }} />,
+  };
   const getFullAvatarUrl = (avatarUrl: string) => {
     if (!avatarUrl) return ""; // デフォルトのアバター画像のURLを設定することもできます
     if (avatarUrl.startsWith("http")) return avatarUrl; // すでに完全なURLの場合
     return `http://localhost:8081${avatarUrl}`; // ローカル開発環境の場合
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userInfoResponse = await api.get<UserData>("/user/info");
-        const opponentUserCardDataResponse =
-          await api.get<UserData>("/user/info");
-        const userInfo: UserCardData = {
-          name: userInfoResponse.data.username,
-          icon: (
-            <Avatar
-              src={getFullAvatarUrl(userInfoResponse.data.avatar_url)}
-              sx={{ width: 80, height: 80 }}
-            />
-          ),
-        };
-        const opponentUserInfo: UserCardData = {
-          name: opponentUserCardDataResponse.data.username,
-          icon: <Person />,
-        };
-        setUserCardInfo(userInfo);
-        setOpponentUserCardInfo(opponentUserInfo);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
   return (
-    <SessionBottomNavigationTemplate
-      value="other"
-      isMute={isMuted}
-      toggleMute={toggleMute}
-      setMemoOpen={setMemoOpen}
-      setAssistantOpen={setAssistantOpen}
-      onPriorityHighClick={handlePriorityHighClick}
-    >
-      <SessionContainer
-        theme={theme}
-        users={[userCardInfo, opponentUserCardInfo]}
-        isSpeak={isSpeak && !isMuted}
-        isOpponentSpeak={isOpponentSpeak}
-      />
+    <SessionBottomNavigationTemplate value="other" isMute={isMuted} toggleMute={toggleMute} setMemoOpen={setMemoOpen} setAssistantOpen={setAssistantOpen} onPriorityHighClick={handlePriorityHighClick}>
+      <SessionContainer theme={theme} users={[cardInfo1, cardInfo2]} isSpeak={isSpeak && !isMuted} isOpponentSpeak={isOpponentSpeak} />
       <TopicPopup isVisible={showTopicPopup} onClose={handleCloseTopicPopup} />
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="">
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList
-              onChange={handleChange}
-              sx={{ display: "grid", placeContent: "center" }}
-            >
+            <TabList onChange={handleChange} sx={{ display: "grid", placeContent: "center" }}>
               <Tab label=" 持ち込みメモ" value="1" />
               <Tab label="ワードリスト" value="2" />
             </TabList>
@@ -464,11 +385,7 @@ export const Session = () => {
           </TabPanel>
         </TabContext>
       </HalfModal>
-      <HalfModal
-        open={assistantOpen}
-        handleClose={handleAssistantClose}
-        title="アシスタント"
-      >
+      <HalfModal open={assistantOpen} handleClose={handleAssistantClose} title="アシスタント">
         <Box sx={{ overflow: "auto", pt: 1, pb: 1, maxHeight: "30vh" }}>
           <List>
             {/* アシスタントからの初期メッセージ */}
@@ -503,17 +420,13 @@ export const Session = () => {
               <ListItem
                 key={index}
                 sx={{
-                  justifyContent: message.startsWith("You:")
-                    ? "flex-end"
-                    : "flex-start",
+                  justifyContent: message.startsWith("You:") ? "flex-end" : "flex-start",
                 }}
               >
                 <Paper
                   sx={{
                     padding: "5px",
-                    backgroundColor: message.startsWith("You:")
-                      ? "#f0f0f0"
-                      : "background.default",
+                    backgroundColor: message.startsWith("You:") ? "#f0f0f0" : "background.default",
                     maxWidth: "60%",
                     wordWrap: "break-word",
                   }}
@@ -550,12 +463,7 @@ export const Session = () => {
             }}
             disabled={isLoading} // ローディング中は入力を無効化
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSendMessage}
-            disabled={isLoading}
-          >
+          <Button variant="contained" color="primary" onClick={handleSendMessage} disabled={isLoading}>
             {isLoading ? "送信中..." : "送信"}
           </Button>
         </Box>
