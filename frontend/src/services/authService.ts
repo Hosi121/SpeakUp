@@ -54,11 +54,12 @@ export const signIn = async (email: string, password: string): Promise<void> => 
 
   try {
     const response = await api.post<SignInResponse>('/signin', requestData);
-    // バックエンドから受け取ったトークンをlocalStorageに保存
-    localStorage.setItem("token", response.data.accessToken);
-    // 必要に応じてメッセージを表示
-    console.log(response.data.message);
+    // Use the correct 'token' from SignInResponse
+    localStorage.setItem("token", response.data.token);
+    // Optionally log user info or a success message
+    console.log(`Logged in as: ${response.data.user.username}`);
   } catch (err) {
     throw new Error('ログインに失敗しました。');
   }
 };
+
