@@ -41,8 +41,8 @@ type UserInfoMessage struct {
 // mock
 
 var matchings = map[int]int{
-	2: 4,
-	4: 2,
+	1: 3,
+	3: 1,
 }
 
 var wsToId = map[*websocket.Conn]int{}
@@ -82,7 +82,7 @@ func SignalingController(c *gin.Context) {
 			idToWs[userId] = ws
 			fmt.Printf("connect: userId=%d\n", userId)
 
-			setMatchings(1) // Todo: event_idを何らかの形で取得する
+			//setMatchings(1) // Todo: event_idを何らかの形で取得する
 			opponentId := matchings[userId]
 			// Todo: ↑に当てはまるマッチングのstatusをPROGRESSに変更
 			var response Message
