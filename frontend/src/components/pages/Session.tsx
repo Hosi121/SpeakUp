@@ -66,19 +66,19 @@ export const Session = () => {
     return () => clearTimeout(timer);
   }, [isPriorityHighClicked]);
 
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      navigate("/sessioninterval");
-      const nextStep = sessionStep + 1;
-      setSessionStep(nextStep);
-      if (nextStep >= 3) {
-        navigate("/sessionrecord");
-      }
-    }
-  }, [countdown, navigate]);
+  //useEffect(() => {
+  //  if (countdown > 0) {
+  //    const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+  //    return () => clearTimeout(timer);
+  //  } else {
+  //    navigate("/sessioninterval");
+  //    const nextStep = sessionStep + 1;
+  //    setSessionStep(nextStep);
+  //    if (nextStep >= 3) {
+  //      navigate("/sessionrecord");
+  //    }
+  //  }
+  //}, [countdown, navigate]);
   useEffect(() => {
     // コンポーネント読み込み時にメモを取得
     const getMemo = async () => {
