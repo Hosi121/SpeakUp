@@ -382,6 +382,8 @@ export const Session = () => {
   const initialUserCardInfo = { name: "", icon: <Person /> };
   const [userCardInfo, setUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
   const [opponentUserCardInfo, setOpponentUserCardInfo] = useState<UserCardData>(initialUserCardInfo);
+  const uci1 = { name: "つよぽん", icon: <Avatar src="https://source.unsplash.com/random" sx={{ width: 80, height: 80 }} /> };
+  const uci2 = { name: "タク", icon: <Avatar src="https://source.unsplash.com/random" sx={{ width: 80, height: 80 }} /> };
 
   const getFullAvatarUrl = (avatarUrl: string) => {
     if (!avatarUrl) return ''; // デフォルトのアバター画像のURLを設定することもできます
@@ -420,7 +422,7 @@ export const Session = () => {
     >
       <SessionContainer
         theme={theme}
-        users={[userCardInfo, opponentUserCardInfo]}
+        users={[uci1, uci2]}
         isSpeak={isSpeak && !isMuted}
         isOpponentSpeak={isOpponentSpeak}
       />
