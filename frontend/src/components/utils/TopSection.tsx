@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, IconButton } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationModal from "../utils/NotificationModal";

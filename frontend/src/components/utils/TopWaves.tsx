@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./TopWaves.module.css";
 import { Box } from "@mui/material";
 

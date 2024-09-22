@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Container, Stack, Box } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";

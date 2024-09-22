@@ -1,25 +1,32 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Button, Container, TextField, Typography, Link } from '@mui/material';
-import { signUp } from '../../services/authService';  // authServiceのサインアップ関数をインポート
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Link,
+} from "@mui/material";
+import { signUp } from "../../services/authService"; // authServiceのサインアップ関数をインポート
 import Logo from "../../assets/logo.tsx";
 
 const SignUp = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');  // パスワードの状態
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); // パスワードの状態
+  const [, setError] = useState("");
   const navigate = useNavigate();
   const handleSignUp = async () => {
     if (password.length < 8) {
-      setError('パスワードは8文字以上である必要があります。');
+      setError("パスワードは8文字以上である必要があります。");
       return;
     }
 
     try {
-      const data = await signUp(username, email, password);  // authServiceの関数を使用
-      console.log('サインアップ成功:', data);
-      navigate('/login');  // サインアップ後、ログインページにリダイレクト
+      const data = await signUp(username, email, password); // authServiceの関数を使用
+      console.log("サインアップ成功:", data);
+      navigate("/login"); // サインアップ後、ログインページにリダイレクト
     } catch (error) {
       setError((error as Error).message);
     }
@@ -29,14 +36,14 @@ const SignUp = () => {
     <Container
       maxWidth="md"
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: '#FFDD66',
-        padding: '16px',
-        borderRadius: '16px',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        backgroundColor: "#FFDD66",
+        padding: "16px",
+        borderRadius: "16px",
       }}
     >
       <Box
@@ -106,8 +113,8 @@ const SignUp = () => {
       <Link
         component="button"
         variant="body2"
-        sx={{ mt: 2, cursor: 'pointer', textDecoration: 'underline' }}
-        onClick={() => navigate('/login')}
+        sx={{ mt: 2, cursor: "pointer", textDecoration: "underline" }}
+        onClick={() => navigate("/login")}
       >
         ログインページに戻る
       </Link>

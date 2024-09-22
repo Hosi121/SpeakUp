@@ -4,10 +4,20 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import notifications from "../../mock/notifications.json"; // Import the JSON file directly
 
+// Define the notification object type
+type Notification = {
+  id: number;
+  time: string;
+  user: string;
+  type: string;
+  message: string;
+  profileIcon: string;
+};
+
 const NotificationModal = () => {
   // State to control the modal open/close
   const [open, setOpen] = useState(false);
-  const [notificationsData, setNotificationsData] = useState([]);
+  const [notificationsData, setNotificationsData] = useState<Notification[]>([]); // Explicitly set the type of notificationsData
 
   // Function to open the modal
   const handleOpen = () => {

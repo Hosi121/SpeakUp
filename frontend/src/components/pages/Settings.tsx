@@ -1,5 +1,18 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, IconButton, Avatar, TextField, Button, Paper, Grid, Divider, useTheme, styled, Container } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Avatar,
+  TextField,
+  Button,
+  Paper,
+  Grid,
+  Divider,
+  useTheme,
+  styled,
+  Container,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -90,7 +103,9 @@ const SettingsContainer = () => {
     return `http://localhost:8081${avatarUrl}`; // ローカル開発環境の場合
   };
 
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files[0]) {
       const formData = new FormData();
       formData.append("avatar", event.target.files[0]);
@@ -101,7 +116,11 @@ const SettingsContainer = () => {
             "Content-Type": "multipart/form-data",
           },
         });
-        setUser((prevUser) => (prevUser ? { ...prevUser, avatar_url: response.data.avatar_url } : null));
+        setUser((prevUser) =>
+          prevUser
+            ? { ...prevUser, avatar_url: response.data.avatar_url }
+            : null
+        );
       } catch (error) {
         console.error("Failed to upload avatar:", error);
         // Handle error (e.g., show notification)
@@ -187,7 +206,14 @@ const SettingsContainer = () => {
   };
 
   return (
-    <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
+    <Container
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "100vh",
+      }}
+    >
       <Container sx={{ pt: 3 }}>
         <Box
           sx={{
@@ -202,8 +228,13 @@ const SettingsContainer = () => {
           <IconButton onClick={handleGoBack}>
             <ArrowBack sx={{ fontSize: 40 }} />
           </IconButton>
-          <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "left" }}>
-            <SettingsIcon sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }} />
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: "bold", textAlign: "left" }}
+          >
+            <SettingsIcon
+              sx={{ fontSize: 40, mr: 2, verticalAlign: "bottom" }}
+            />
             設定
           </Typography>
         </Box>
@@ -213,29 +244,57 @@ const SettingsContainer = () => {
             <StyledPaper elevation={0}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                 <AvatarUpload>
-                  <Avatar src={getFullAvatarUrl(user.avatar_url)} sx={{ width: 100, height: 100 }} />
-                  <UploadButton component="label" size="small">
+                  <Avatar
+                    src={getFullAvatarUrl(user.avatar_url)}
+                    sx={{ width: 100, height: 100 }}
+                  />
+                  <UploadButton size="small">
                     <AddIcon />
-                    <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} />
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                    />
                   </UploadButton>
                 </AvatarUpload>
                 <Box>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                    <MilitaryTechIcon sx={{ color: getRankColor(rank), marginRight: 1 }} />{" "}
+                    <MilitaryTechIcon
+                      sx={{ color: getRankColor(rank), marginRight: 1 }}
+                    />{" "}
                     {editName ? (
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <StyledTextField value={newName} onChange={(e) => setNewName(e.target.value)} variant="outlined" size="small" />
-                        <IconButton onClick={handleSaveName} size="small" sx={{ ml: 1 }}>
+                        <StyledTextField
+                          value={newName}
+                          onChange={(e) => setNewName(e.target.value)}
+                          variant="outlined"
+                          size="small"
+                        />
+                        <IconButton
+                          onClick={handleSaveName}
+                          size="small"
+                          sx={{ ml: 1 }}
+                        >
                           <CheckIcon />
                         </IconButton>
-                        <IconButton onClick={() => setEditName(false)} size="small">
+                        <IconButton
+                          onClick={() => setEditName(false)}
+                          size="small"
+                        >
                           <CloseIcon />
                         </IconButton>
                       </Box>
                     ) : (
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography variant="h6">{truncateString(user.username, MAX_USERNAME_LENGTH)}</Typography>
-                        <IconButton onClick={() => setEditName(true)} size="small" sx={{ ml: 1 }}>
+                        <Typography variant="h6">
+                          {truncateString(user.username, MAX_USERNAME_LENGTH)}
+                        </Typography>
+                        <IconButton
+                          onClick={() => setEditName(true)}
+                          size="small"
+                          sx={{ ml: 1 }}
+                        >
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Box>
@@ -243,11 +302,23 @@ const SettingsContainer = () => {
                   </Box>
                   {editEmail ? (
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <StyledTextField value={newEmail} onChange={(e) => setNewEmail(e.target.value)} variant="outlined" size="small" />
-                      <IconButton onClick={handleSaveEmail} size="small" sx={{ ml: 1 }}>
+                      <StyledTextField
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                        variant="outlined"
+                        size="small"
+                      />
+                      <IconButton
+                        onClick={handleSaveEmail}
+                        size="small"
+                        sx={{ ml: 1 }}
+                      >
                         <CheckIcon />
                       </IconButton>
-                      <IconButton onClick={() => setEditEmail(false)} size="small">
+                      <IconButton
+                        onClick={() => setEditEmail(false)}
+                        size="small"
+                      >
                         <CloseIcon />
                       </IconButton>
                     </Box>
@@ -256,7 +327,11 @@ const SettingsContainer = () => {
                       <Typography variant="body1" color="text.secondary">
                         {truncateString(user.email, MAX_EMAIL_LENGTH)}
                       </Typography>
-                      <IconButton onClick={() => setEditEmail(true)} size="small" sx={{ ml: 1 }}>
+                      <IconButton
+                        onClick={() => setEditEmail(true)}
+                        size="small"
+                        sx={{ ml: 1 }}
+                      >
                         <EditIcon fontSize="small" />
                       </IconButton>
                     </Box>

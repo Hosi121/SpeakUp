@@ -20,12 +20,12 @@ import Login from "./components/pages/Login.tsx";
 import { Stats } from "./components/pages/Stats.tsx";
 import { ConversationHistory } from "./components/pages/ConversationHistory.tsx";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import AdminPage from "./components/pages/AdminPage.tsx";
+import AdminPage from "./components/pages/adminPage.tsx";
 import FriendList from "./components/utils/FriendList.tsx";
 import Theme from "./styles/Theme.tsx";
 import { SessionHistoryFriendlist } from "./components/pages/SessionHistoryFriendlist.tsx";
 import TrophyNotification from "./components/pages/TrophyNotification.tsx";
-import { SessionStepContext, SessionStepContextProvider } from "./components/utils/SessionStepContextProvider.tsx";
+import { SessionStepContextProvider } from "./components/utils/SessionStepContextProvider.tsx";
 
 const router = createBrowserRouter([
   {

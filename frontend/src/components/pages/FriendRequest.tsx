@@ -1,46 +1,79 @@
-import React from "react";
-import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton } from "@mui/material";
-import { Star, ArrowBack } from "@mui/icons-material";
+import { useState, useEffect, useCallback } from 'react';
+import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar, ListItemText, Container, IconButton, Snackbar, CircularProgress } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection";
+import api from "../../services/api";
 
 interface Friend {
   id: number;
   username: string;
   avatar: string;
-  topic: string;
-  date: string;
-  level: number;
   isFriend: boolean;
 }
 
-const friends: Friend[] = [
-  {
-    id: 1,
-    username: "Mike",
-    avatar: "",
-    topic: "好きなスポーツ",
-    date: "2024/5/15",
-    level: 3,
-    isFriend: true,
-  },
-  {
-    id: 2,
-    username: "ゆい",
-    avatar: "",
-    topic: "好きなスポーツ",
-    date: "2024/5/15",
-    level: 3,
-    isFriend: false,
-  },
-];
-
-interface FriendRequestComponentProps {
-  friends: Friend[];
-}
-
-const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
+const FriendRequestComponent: React.FC = () => {
   const navigate = useNavigate();
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const userIds = [2, 3]; // セッションしたユーザーのID
+
+  const fetchUserInfo = async (userId: number): Promise<Friend> => {
+    try {
+      const [userResponse, avatarResponse] = await Promise.all([
+        api.get(`/users/search/id/${userId}`),
+        api.get(`/users/${userId}/avatar`)
+      ]);
+      
+      return {
+        id: userId,
+        username: userResponse.data.username,
+        avatar: avatarResponse.data.avatarURL,
+        isFriend: false,
+      };
+    } catch (error: any) {
+      console.error(`Failed to fetch user info for user ${userId}:`, error);
+      throw error;
+    }
+  };
+
+  const fetchFriends = useCallback(async () => {
+    setLoading(true);
+    try {
+      const friendsData = await Promise.all(userIds.map(fetchUserInfo));
+      setFriends(friendsData);
+    } catch (error: any) {
+      console.error('Failed to fetch friends:', error);
+      setError(`Failed to fetch friends: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchFriends();
+  }, [fetchFriends]);
+
+  const sendFriendRequest = async (targetUserId: number) => {
+    try {
+      const response = await api.post('/friend/register', { target_user_id: targetUserId });
+      console.log('Friend request response:', response.data);
+      return true;
+    } catch (error: any) {
+      console.error('Failed to send friend request:', error.response?.data || error.message);
+      let errorMessage = 'Failed to send friend request';
+      if (error.response) {
+        errorMessage += `: ${error.response.data.error || error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage += ': No response received from server';
+      } else {
+        errorMessage += `: ${error.message}`;
+      }
+      setError(errorMessage);
+      return false;
+    }
+  };
 
   const handleEndSession = () => {
     navigate("/home");
@@ -49,6 +82,30 @@ const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
   const handleGoBack = () => {
     navigate(-1);
   };
+
+  const handleFriendRequest = async (friendId: number) => {
+    const success = await sendFriendRequest(friendId);
+    if (success) {
+      console.log('Friend request sent successfully');
+      setFriends(prevFriends =>
+        prevFriends.map(friend =>
+          friend.id === friendId ? { ...friend, isFriend: true } : friend
+        )
+      );
+    }
+  };
+
+  const handleCloseError = () => {
+    setError(null);
+  };
+
+  if (loading) {
+    return (
+      <Container sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container
@@ -89,35 +146,25 @@ const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
             <Paper key={friend.id} elevation={3} sx={{ marginBottom: 2, padding: 2 }}>
               <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
                 <ListItemAvatar>
-                  {friend.isFriend ? (
-                    <Avatar sx={{ bgcolor: "gold" }}>
-                      <Star />
-                    </Avatar>
-                  ) : (
-                    <Avatar src={friend.avatar} alt={friend.username} />
-                  )}
+                  <Avatar src={friend.avatar} alt={friend.username} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={friend.username}
                   secondary={
                     <>
                       <Typography component="span" variant="body2" color="text.primary">
-                        話したテーマ：{friend.topic}
-                      </Typography>
-                      <br />
-                      <Typography component="span" variant="body2" color="text.primary">
-                        話した日付：{friend.date}
-                      </Typography>
-                      <br />
-                      <Typography component="span" variant="body2" color="text.primary">
-                        レベル {friend.level}
+                        User ID: {friend.id}
                       </Typography>
                     </>
                   }
                 />
               </ListItem>
               <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-                <Button variant="contained" disabled={friend.isFriend}>
+                <Button 
+                  variant="contained" 
+                  disabled={friend.isFriend}
+                  onClick={() => handleFriendRequest(friend.id)}
+                >
                   {friend.isFriend ? "フレンド申請済" : "フレンド申請"}
                 </Button>
                 <Button variant="contained">メッセージ</Button>
@@ -136,12 +183,19 @@ const FriendRequestComponent = ({ friends }: FriendRequestComponentProps) => {
           セッションを終わる→
         </Button>
       </Box>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={handleCloseError}
+        message={error}
+      />
     </Container>
   );
 };
 
 export const FriendRequest: React.FC = () => {
-  return <FriendRequestComponent friends={friends} />;
+  return <FriendRequestComponent />;
 };
 
 export default FriendRequest;

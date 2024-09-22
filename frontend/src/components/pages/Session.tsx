@@ -96,7 +96,7 @@ export const Session = () => {
   const handleMemoClose = () => setMemoOpen(false);
   const handleAssistantClose = () => setAssistantOpen(false);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
   const handleCloseTopicPopup = () => {
@@ -144,6 +144,7 @@ export const Session = () => {
         ...prevMessages,
         "Error: Failed to get response",
       ]);
+      console.log(error);
     } finally {
       setIsLoading(false); // ローディング状態を終了
     }
@@ -376,9 +377,9 @@ export const Session = () => {
     }
   };
 
-  const endCall = (): void => {
-    cleanupResources();
-  };
+  //const endCall = (): void => {
+  //  cleanupResources();
+  //};
 
   // visualize speaker
   const volumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);

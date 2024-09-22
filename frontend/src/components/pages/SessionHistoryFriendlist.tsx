@@ -23,13 +23,13 @@ const SessionHistoryFriendlistContainer = () => {
   const [history, setHistory] = useState<History[]>([]);
   const [value, setValue] = React.useState("1");
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
   useEffect(() => {
     setHistory(History);
-  });
+  }, [setHistory]);
 
   return (
     <Container
@@ -46,7 +46,10 @@ const SessionHistoryFriendlistContainer = () => {
           <Box sx={{ width: "100%" }}>
             <TabContext value={value}>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <TabList onChange={handleChange} sx={{ display: "grid", placeContent: "center" }}>
+                <TabList
+                  onChange={handleChange}
+                  sx={{ display: "grid", placeContent: "center" }}
+                >
                   <Tab label=" セッション履歴" value="1" />
                   <Tab label="フレンド" value="2" />
                 </TabList>

@@ -1,4 +1,10 @@
-import { Box, Container, LinearProgress, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  LinearProgress,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import { MemoInputField } from "../utils/MemoInputField";
@@ -48,7 +54,10 @@ const WaitingContainer = () => {
           position: "relative",
         }}
       >
-        <IconButton onClick={handleGoBack} sx={{ position: "absolute", top: 0, left: 3 }}>
+        <IconButton
+          onClick={handleGoBack}
+          sx={{ position: "absolute", top: 0, left: 3 }}
+        >
           <ArrowBack sx={{ fontSize: 40 }} />
         </IconButton>
         <Typography
@@ -80,7 +89,7 @@ const WaitingContainer = () => {
           <Typography variant="subtitle1" gutterBottom component="div">
             持ち込みメモ
           </Typography>
-          <MemoInputField value={memo} onChange={setMemo} label="メモ入力" />
+          <MemoInputField value={memo} setValue={setMemo} label="メモ入力" />
         </Box>
 
         <Box mt={3} width="100%">
@@ -119,7 +128,13 @@ const WaitingContainer = () => {
               }}
             />
           </Box>
-          <Box mt={2} display="flex" alignItems="center" ml="auto" sx={{ width: "fit-content" }}>
+          <Box
+            mt={2}
+            display="flex"
+            alignItems="center"
+            ml="auto"
+            sx={{ width: "fit-content" }}
+          >
             <Typography pr={1}>Now loading...</Typography>
             <CircularLineSpinner size={18} strokeWidth={1.6} />
           </Box>
