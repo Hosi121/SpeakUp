@@ -30,10 +30,10 @@ func secureFileServer(root string) http.HandlerFunc {
 			return
 		}
 
-		log.Println(path)
-		if path == "/" || !strings.Contains(path, ".") {
+		if !strings.Contains(path, ".") {
 			r.URL.Path = "/"
 		}
+		log.Println("r.URL.Path: " + r.URL.Path)
 
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
