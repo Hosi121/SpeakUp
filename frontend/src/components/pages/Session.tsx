@@ -40,6 +40,8 @@ type UserCardData = {
 
 
 export const Session = () => {
+  const [signalingIp, setSignalingIp] = useState("192.168.1.42");
+  const [signalingId, setSignalingId] = useState(0);
   const [memoOpen, setMemoOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [messages, setMessages] = useState<string[]>([]);
@@ -69,7 +71,7 @@ export const Session = () => {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else {
-      navigate("/sessioninterval");
+      //navigate("/sessioninterval");
     }
   }, [countdown, navigate]);
   useEffect(() => {
@@ -144,8 +146,8 @@ export const Session = () => {
 
   // WebRTC関連の処理
   // webbbb vimジャンプ用
-  const host = "10.70.174.101";
-  const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
+  const host = signalingIp;
+  const WEBSOCKET_URL = "ws://" + host + ":8083/ws";
   let isOffer = false;
 
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -167,16 +169,21 @@ export const Session = () => {
     }
   }, []);
 
-  useEffect(() => {
+  //useEffect(() => {
+  //  connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
+  //  setTimeout(() => startCall(false), 2000);
+  //  return () => {
+  //    if (websocketRef.current) {
+  //      websocketRef.current.close();
+  //    }
+  //    cleanupResources();
+  //  };
+  //}, [cleanupResources]);
+  // 実験用．ボタンで通信開始．
+  const setUpWebRtc = () => {
     connectToSignalingServer(); // コンポーネントがマウントされたときにシグナリングサーバーに接続する
     setTimeout(() => startCall(false), 2000);
-    return () => {
-      if (websocketRef.current) {
-        websocketRef.current.close();
-      }
-      cleanupResources();
-    };
-  }, [cleanupResources]);
+  }
 
   const connectToSignalingServer = (): void => {
     const ws = new WebSocket(WEBSOCKET_URL);
@@ -184,12 +191,14 @@ export const Session = () => {
     ws.onopen = () => {
       console.log("Connected to signaling server");
 
-      const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
-      const authMessage = {
-        type: "Authorization",
-        token: `Bearer ${token}`,
-      };
-      ws.send(JSON.stringify(authMessage));
+      //const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
+      //const authMessage = {
+      //  type: "Authorization",
+      //  token: `Bearer ${token}`,
+      //};
+      //ws.send(JSON.stringify(authMessage));
+      const idData = { hashedId: signalingId };
+      ws.send(JSON.stringify(idData));
     };
 
     ws.onmessage = async (event: MessageEvent) => {
@@ -541,7 +550,18 @@ export const Session = () => {
         </Box>
       </HalfModal>
       <audio ref={remoteAudioRef} autoPlay />
-    </SessionBottomNavigationTemplate>
+      <Box>
+        <p>
+          signalingIp: <input value={signalingIp} onChange={(e) => setSignalingIp(e.target.value)} />
+        </p>
+        <p>
+          signalingID: <input value={signalingId} onChange={(e) => setSignalingId(Number(e.target.value))} />
+        </p>
+        <p>
+          <Button onClick={setUpWebRtc}>WebRTC通信開始</Button>
+        </p>
+      </Box>
+    </SessionBottomNavigationTemplate >
   );
 };
 
