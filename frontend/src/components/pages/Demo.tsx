@@ -40,11 +40,10 @@ export const Demo: React.FC = () => {
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
 
-  const [hashedId, setHashedId] = useState(0);
   const SPEAKUP_KEY = 'speakupdemo';
-  localStorage.setItem('key', 'value1');
-  localStorage.saveKey = 'value2';
-  const speakupStorage = JSON.parse(localStorage.getItem(SPEAKUP_KEY) || '{"hashedId": 0, "signalingIp": "192.168.1.42"}') as SpeakUpLocalStorage;
+  const jsonData = localStorage.getItem(SPEAKUP_KEY) ?? '{"hashedId": 0, "signalingIp": "192.168.1.42"}';
+  const speakupStorage = JSON.parse(jsonData) as SpeakUpLocalStorage;
+  const [hashedId, setHashedId] = useState(speakupStorage.hashedId);
   const [signalingIp, setSignalingIp] = useState(speakupStorage.signalingIp);
   const saveSpeakupStorage = () => {
     const newStorageData = {
