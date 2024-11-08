@@ -25,6 +25,7 @@ import FriendList from "./components/utils/FriendList.tsx";
 import Theme from "./styles/Theme.tsx";
 import { SessionHistoryFriendlist } from "./components/pages/SessionHistoryFriendlist.tsx";
 import TrophyNotification from "./components/pages/TrophyNotification.tsx";
+import { Demo } from "./components/pages/Demo.tsx";
 
 const router = createBrowserRouter([
   {
@@ -114,6 +115,10 @@ const router = createBrowserRouter([
   {
     path: "trophynotification",
     element: <TrophyNotification />,
+  },
+  {
+    path: "demo",
+    element: <Demo />,
   },
 ]);
 
