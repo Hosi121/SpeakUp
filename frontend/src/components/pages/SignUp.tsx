@@ -8,7 +8,7 @@ const SignUp = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');  // パスワードの状態
-  const [error, setError] = useState('');
+  const [_, setError] = useState('');
   const navigate = useNavigate();
   const handleSignUp = async () => {
     if (password.length < 8) {

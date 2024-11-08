@@ -4,7 +4,7 @@ import { Box, Button, Container, TextField, Typography, IconButton, InputAdornme
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { signIn } from '../../services/authService';
-import Logo from "../../assets/logo.tsx";        
+import Logo from "../../assets/logo.tsx";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -65,11 +65,11 @@ const Login = () => {
       </Typography>
 
       {/* Email Field */}
-      <TextField 
-        label="Email" 
-        type="email" 
-        fullWidth 
-        variant="outlined" 
+      <TextField
+        label="Email"
+        type="email"
+        fullWidth
+        variant="outlined"
         margin="normal"
         value={email}
         onChange={(e) => setEmail(e.target.value)}

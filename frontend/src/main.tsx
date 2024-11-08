@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "./App.tsx";
 import { Settings } from "./components/pages/Settings.tsx";
 import { Home } from "./components/pages/Home.tsx";
 import { SessionList } from "./components/pages/SessionList.tsx";
@@ -20,17 +19,17 @@ import Login from "./components/pages/Login.tsx";
 import { Stats } from "./components/pages/Stats.tsx";
 import { ConversationHistory } from "./components/pages/ConversationHistory.tsx";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import AdminPage from "./components/pages/AdminPage.tsx";
 import FriendList from "./components/utils/FriendList.tsx";
 import Theme from "./styles/Theme.tsx";
 import { SessionHistoryFriendlist } from "./components/pages/SessionHistoryFriendlist.tsx";
 import TrophyNotification from "./components/pages/TrophyNotification.tsx";
 import { Demo } from "./components/pages/Demo.tsx";
+import AdminPage from "./components/pages/adminPage.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <Demo />,
   },
   {
     path: "settings",

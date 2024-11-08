@@ -91,7 +91,7 @@ export const Session = () => {
   const handleMemoClose = () => setMemoOpen(false);
   const handleAssistantClose = () => setAssistantOpen(false);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
   const handleCloseTopicPopup = () => {
@@ -375,10 +375,6 @@ export const Session = () => {
         setIsMuted(!audioTrack.enabled);
       }
     }
-  };
-
-  const endCall = (): void => {
-    cleanupResources();
   };
 
   // visualize speaker

@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
-import { Box, Typography, Paper, List, ListItem, ListItemIcon, ListItemText, Container, Stack } from "@mui/material";
+import { useEffect } from "react";
+import { Box, Typography, Paper, List, Container, Stack } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import trophyData from "../../assets/trophy.json";
 import TopSection from "../utils/TopSection"; // Import the new TopSection component
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 
 const StatsContainer = () => {
-  const [trophies, setTrophies] = useState([]);
+  //const [trophies, _] = useState([]);
 
   // Fetch the trophy data from trophy.json
   useEffect(() => {
-    setTrophies(trophyData.trophies);
+    //setTrophies(trophyData.trophies);
   }, []);
 
   return (
@@ -49,14 +48,6 @@ const StatsContainer = () => {
               与えられたトロフィー
             </Typography>
             <List>
-              {trophies.map((trophy, index) => (
-                <ListItem key={index}>
-                  <ListItemIcon>
-                    <EmojiEventsIcon sx={{ fontSize: 30 }} />
-                  </ListItemIcon>
-                  <ListItemText primary={trophy.description} />
-                </ListItem>
-              ))}
             </List>
           </Box>
         </Stack>

@@ -30,7 +30,7 @@ const MemoContainer = () => {
       console.log("Memos saved successfully");
       // 成功メッセージを表示するなどの処理
     } catch (error) {
-      console.error("Failed to save memos", error);
+      console.error("Failedtosavememos", error);
     }
   };
 

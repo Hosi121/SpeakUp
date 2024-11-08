@@ -3,7 +3,6 @@ import { Box, Typography, IconButton, Avatar, TextField, Button, Paper, Grid, Di
 import EditIcon from "@mui/icons-material/Edit";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
@@ -48,17 +47,6 @@ const AvatarUpload = styled(Box)(({ theme }) => ({
   marginRight: theme.spacing(3),
 }));
 
-const UploadButton = styled(IconButton)(({ theme }) => ({
-  position: "absolute",
-  right: -8,
-  bottom: -8,
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.common.white,
-  "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
-  },
-}));
-
 const SettingsContainer = () => {
   const theme = useTheme();
   const [user, setUser] = useState<UserData | null>(null);
@@ -90,24 +78,24 @@ const SettingsContainer = () => {
     return `http://localhost:8081${avatarUrl}`; // ローカル開発環境の場合
   };
 
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const formData = new FormData();
-      formData.append("avatar", event.target.files[0]);
+  //const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //  if (event.target.files && event.target.files[0]) {
+  //    const formData = new FormData();
+  //    formData.append("avatar", event.target.files[0]);
 
-      try {
-        const response = await api.put("/user/avatar", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        setUser((prevUser) => (prevUser ? { ...prevUser, avatar_url: response.data.avatar_url } : null));
-      } catch (error) {
-        console.error("Failed to upload avatar:", error);
-        // Handle error (e.g., show notification)
-      }
-    }
-  };
+  //    try {
+  //      const response = await api.put("/user/avatar", formData, {
+  //        headers: {
+  //          "Content-Type": "multipart/form-data",
+  //        },
+  //      });
+  //      setUser((prevUser) => (prevUser ? { ...prevUser, avatar_url: response.data.avatar_url } : null));
+  //    } catch (error) {
+  //      console.error("Failed to upload avatar:", error);
+  //      // Handle error (e.g., show notification)
+  //    }
+  //  }
+  //};
 
   const handleSaveName = () => {
     if (user) {
@@ -214,10 +202,6 @@ const SettingsContainer = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                 <AvatarUpload>
                   <Avatar src={getFullAvatarUrl(user.avatar_url)} sx={{ width: 100, height: 100 }} />
-                  <UploadButton component="label" size="small">
-                    <AddIcon />
-                    <input type="file" hidden accept="image/*" onChange={handleAvatarUpload} />
-                  </UploadButton>
                 </AvatarUpload>
                 <Box>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>

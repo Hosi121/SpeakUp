@@ -14,6 +14,9 @@ import Paper from "@mui/material/Paper";
 import ListItemText from "@mui/material/ListItemText";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { AudioVolumeAnalyzer } from "../utils/AudioVolumeAnalyzer";
+import SessionContainer from "../utils/SessionContainer";
+import { Person } from "@mui/icons-material";
 
 const STUN_SERVERS = {
   iceServers: [
@@ -23,8 +26,13 @@ const STUN_SERVERS = {
 };
 
 type HashedId = { hashedId: number };
+type SpeakUpLocalStorage = {
+  hashedId: number;
+  signalingIp: string;
+}
 
 export const Demo: React.FC = () => {
+  const [developDisplay, setDevelopDisplay] = useState('block');
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInCall, setIsInCall] = useState<boolean>(false);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -33,7 +41,18 @@ export const Demo: React.FC = () => {
   const localStreamRef = useRef<MediaStream | null>(null);
 
   const [hashedId, setHashedId] = useState(0);
-  const [signalingIp, setSignalingIp] = useState("192.168.1.42");
+  const SPEAKUP_KEY = 'speakupdemo';
+  localStorage.setItem('key', 'value1');
+  localStorage.saveKey = 'value2';
+  const speakupStorage = JSON.parse(localStorage.getItem(SPEAKUP_KEY) || '{"hashedId": 0, "signalingIp": "192.168.1.42"}') as SpeakUpLocalStorage;
+  const [signalingIp, setSignalingIp] = useState(speakupStorage.signalingIp);
+  const saveSpeakupStorage = () => {
+    const newStorageData = {
+      hashedId: hashedId,
+      signalingIp: signalingIp,
+    };
+    localStorage.setItem(SPEAKUP_KEY, JSON.stringify(newStorageData));
+  }
   const WEBSOCKET_URL = `ws://${signalingIp}:8083/ws`;
   const handleSetHashId = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = Number(e.target.value);
@@ -131,6 +150,8 @@ export const Demo: React.FC = () => {
     pc.ontrack = (event: RTCTrackEvent) => {
       if (remoteAudioRef.current && event.streams[0]) {
         remoteAudioRef.current.srcObject = event.streams[0];
+        opponentVolumeAnalyzerRef.current = new AudioVolumeAnalyzer(setIsOpponentSpeak);
+        opponentVolumeAnalyzerRef.current.start(event.streams[0]);
       }
     };
 
@@ -170,6 +191,8 @@ export const Demo: React.FC = () => {
       }
 
       setIsInCall(true);
+      volumeAnalyzerRef.current = new AudioVolumeAnalyzer(setisSpeak);
+      volumeAnalyzerRef.current.start(stream);
     } catch (error) {
       console.error("Error starting call:", error);
       cleanupResources();
@@ -214,15 +237,34 @@ export const Demo: React.FC = () => {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const toggleMute = (): void => {
     setIsMuted((prev) => !prev);
-  }
+    if (localStreamRef.current) {
+      const audioTrack = localStreamRef.current.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        setIsMuted(!audioTrack.enabled);
+      }
+    }
+  };
+  // visualize speaker
+  const volumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);
+  const opponentVolumeAnalyzerRef = useRef<AudioVolumeAnalyzer | null>(null);
+  const [isSpeak, setisSpeak] = useState(false);
+  const [isOpponentSpeak, setIsOpponentSpeak] = useState(false);
+
+  // userInfo
+  const initialUserCardInfo = { name: "", icon: <Person /> };
+  const userCardInfo = initialUserCardInfo;
+  const opponentUserCardInfo = initialUserCardInfo;
+
+
   const [memoOpen, setMemoOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const handleMemoClose = () => setMemoOpen(false);
   const handleAssistantClose = () => setAssistantOpen(false);
   const [value, setValue] = useState("1");
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => setValue(newValue);
-  const [memo1, setMemo1] = useState("");
-  const [memo2, setMemo2] = useState("");
+  const handleChange = (_: React.SyntheticEvent, newValue: string) => setValue(newValue);
+  const memo1 = ""; // もともとusestate
+  const memo2 = "";
   const [inputMessage, setInputMessage] = useState<string>("");
 
   return (
@@ -234,6 +276,13 @@ export const Demo: React.FC = () => {
       setAssistantOpen={setAssistantOpen}
       onPriorityHighClick={() => { }}
     >
+      <SessionContainer
+        theme={"好きな言葉"}
+        users={[userCardInfo, opponentUserCardInfo]}
+        isSpeak={isSpeak && !isMuted}
+        isOpponentSpeak={isOpponentSpeak}
+      />
+      {/* ここから下126行は無視する */}
       <HalfModal open={memoOpen} handleClose={handleMemoClose} title="">
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -359,50 +408,55 @@ export const Demo: React.FC = () => {
           gap: "1rem",
         }}
       >
-        <button
-          onClick={connectToSignalingServer}
-          disabled={isConnected}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: isConnected ? "#ccc" : "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: isConnected ? "default" : "pointer",
-          }}
-        >
-          {isConnected ? "Connected to Server" : "Connect to Server"}
-        </button>
-        <button
-          onClick={isInCall ? endCall : startCall}
-          disabled={!isConnected}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: !isConnected
-              ? "#ccc"
-              : isInCall
-                ? "#dc3545"
-                : "#28a745",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: !isConnected ? "default" : "pointer",
-          }}
-        >
-          {isInCall ? "End Call" : "Start Call"}
-        </button>
-        <audio ref={remoteAudioRef} autoPlay />
-        <div>
-          <p>
-            ip: <input value={signalingIp} onChange={(e) => setSignalingIp(e.target.value)} />
-          </p>
-          <p>
-            Hashed ID:
-            <input onChange={e => handleSetHashId(e)} value={hashedId} />
-          </p>
-        </div>
+        {/* ここから上126行は無視する */}
+        <Box sx={{ display: developDisplay }}>
+          <button
+            onClick={connectToSignalingServer}
+            disabled={isConnected}
+            style={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              backgroundColor: isConnected ? "#ccc" : "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: isConnected ? "default" : "pointer",
+            }}
+          >
+            {isConnected ? "Connected to Server" : "Connect to Server"}
+          </button>
+          <button
+            onClick={isInCall ? endCall : startCall}
+            disabled={!isConnected}
+            style={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              backgroundColor: !isConnected
+                ? "#ccc"
+                : isInCall
+                  ? "#dc3545"
+                  : "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: !isConnected ? "default" : "pointer",
+            }}
+          >
+            {isInCall ? "End Call" : "Start Call"}
+          </button>
+          <audio ref={remoteAudioRef} autoPlay />
+          <div>
+            <p>
+              ip: <input value={signalingIp} onChange={(e) => setSignalingIp(e.target.value)} />
+            </p>
+            <p>
+              Hashed ID:
+              <input onChange={e => handleSetHashId(e)} value={hashedId} />
+            </p>
+            <Button onClick={saveSpeakupStorage}>Save</Button>
+          </div>
+          <Button onClick={() => setDevelopDisplay('none')}>to demo</Button>
+        </Box>
       </div>
     </SessionBottomNavigationTemplate>
   );

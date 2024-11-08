@@ -7,7 +7,7 @@ import notifications from "../../mock/notifications.json"; // Import the JSON fi
 const NotificationModal = () => {
   // State to control the modal open/close
   const [open, setOpen] = useState(false);
-  const [notificationsData, setNotificationsData] = useState([]);
+  const [notificationsData, setNotificationsData] = useState<any[]>([]);
 
   // Function to open the modal
   const handleOpen = () => {

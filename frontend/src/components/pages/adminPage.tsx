@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { 
-  Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, 
-  TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert 
+import {
+  Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
+  TextField, Typography, Snackbar, Tab, Tabs, Paper, Alert
 } from '@mui/material';
 import api from '../../services/api';
 
@@ -60,12 +60,12 @@ const AdminPage: React.FC = () => {
     handleCloseDialog();
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 
   const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
+    _?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
     if (reason === 'clickaway') {
@@ -165,7 +165,7 @@ const AdminPage: React.FC = () => {
             fullWidth
             label="ユーザー名で検索"
             sx={{ mt: 2 }}
-            // 検索機能は未実装のため、入力欄のみ配置
+          // 検索機能は未実装のため、入力欄のみ配置
           />
         </Box>
       )}
