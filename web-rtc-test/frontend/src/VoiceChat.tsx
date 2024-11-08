@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
-const WEBSOCKET_URL = "ws://10.70.174.101:8080/ws";
 const STUN_SERVERS = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -19,6 +18,8 @@ const VoiceChat: React.FC = () => {
   const localStreamRef = useRef<MediaStream | null>(null);
 
   const [hashedId, setHashedId] = useState(0);
+  const [signalingIp, setSignalingIp] = useState("192.168.1.42");
+  const WEBSOCKET_URL = `ws://${signalingIp}:8083/ws`;
   const handleSetHashId = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = Number(e.target.value);
     setHashedId(id);
@@ -204,10 +205,6 @@ const VoiceChat: React.FC = () => {
         gap: "1rem",
       }}
     >
-      <p>
-        Hashed ID:
-        <input onChange={e => handleSetHashId(e)} />
-      </p>
       <button
         onClick={connectToSignalingServer}
         disabled={isConnected}
@@ -243,6 +240,15 @@ const VoiceChat: React.FC = () => {
         {isInCall ? "End Call" : "Start Call"}
       </button>
       <audio ref={remoteAudioRef} autoPlay />
+      <div>
+        <p>
+          ip: <input value={signalingIp} onChange={(e) => setSignalingIp(e.target.value)} />
+        </p>
+        <p>
+          Hashed ID:
+          <input onChange={e => handleSetHashId(e)} value={hashedId} />
+        </p>
+      </div>
     </div>
   );
 };
