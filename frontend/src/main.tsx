@@ -26,6 +26,12 @@ import Theme from "./styles/Theme.tsx";
 import { SessionHistoryFriendlist } from "./components/pages/SessionHistoryFriendlist.tsx";
 import TrophyNotification from "./components/pages/TrophyNotification.tsx";
 import { SessionStepContextProvider } from "./components/utils/SessionStepContextProvider.tsx";
+import { isTestMode } from "./services/appMode.ts";
+import { seedMockData } from "./services/mockStore.ts";
+
+if (isTestMode) {
+  seedMockData();
+}
 
 const router = createBrowserRouter([
   {
