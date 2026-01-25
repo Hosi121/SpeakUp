@@ -7,6 +7,7 @@ import HomeLogo from "../../assets/homeLogo";
 import { IconButton } from "../utils/IconButton";
 import { LibraryBooks, Mic } from "@mui/icons-material";
 import api from "../../services/api";
+import { Event } from "../../types/types";
 
 type SessionData = {
   dateTime: string;
@@ -14,22 +15,9 @@ type SessionData = {
   theme: string;
 };
 
-type EventData = {
-  id: number;
-  event_start: string;
-  event_end: string;
-  theme_id: number;
-  theme: {
-    theme_text: string;
-    topic1: string;
-    topic2: string;
-    topic3: string;
-  };
-};
-
 const HomeContainer = () => {
   const [, setSessionData] = useState<SessionData[]>([]);
-  const [eventData, setEventData] = useState<EventData[]>([]);
+  const [eventData, setEventData] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +55,7 @@ const HomeContainer = () => {
 
     const now = new Date();
     return (
-      eventData.find((event) => new Date(event.event_start) > now) ||
+      eventData.find((event) => new Date(event.eventStart) > now) ||
       eventData[0]
     );
   };
@@ -133,7 +121,7 @@ const HomeContainer = () => {
                   textAlign: "center",
                 }}
               >
-                {new Date(nextEvent.event_start).toLocaleString("ja-JP", {
+                {new Date(nextEvent.eventStart).toLocaleString("ja-JP", {
                   month: "long",
                   day: "numeric",
                   hour: "2-digit",
@@ -148,7 +136,7 @@ const HomeContainer = () => {
                   textAlign: "center",
                 }}
               >
-                テーマ: {nextEvent.theme.theme_text}
+                テーマ: {nextEvent.theme.themeText}
               </Typography>
               <Typography
                 sx={{

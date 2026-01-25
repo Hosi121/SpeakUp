@@ -6,7 +6,7 @@ import api from "../../services/api";
 interface Friend {
   id: number;
   username: string;
-  avatar: string;
+  avatarUrl: string;
 }
 
 const FriendList: React.FC = () => {
@@ -36,7 +36,7 @@ const FriendList: React.FC = () => {
       {friends.map((friend) => (
         <ListItem key={friend.id} sx={{ mb: 3, width: "100%", p: 0 }}>
           <ListItemAvatar sx={{ mr: 1 }}>
-            <Avatar src={friend.avatar} alt={friend.username} sx={{ width: "50px", height: "50px" }} />
+            <Avatar src={friend.avatarUrl} alt={friend.username} sx={{ width: "50px", height: "50px" }} />
           </ListItemAvatar>
           <ListItemText primary={friend.username} primaryTypographyProps={{ fontSize: "1.5rem" }} />
           <Button variant="contained" onClick={() => handleMessage(friend.username)} sx={{ borderRadius: 3 }}>

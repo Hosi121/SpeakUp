@@ -18,7 +18,7 @@ import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate"
 import api from "../../services/api";
 
 interface FriendInfo {
-  avatar: string;
+  avatarUrl: string;
   username: string;
 }
 
@@ -99,7 +99,7 @@ const MessageContainer: React.FC = () => {
                 height: "80px",
                 borderRadius: "50%",
                 backgroundColor: "secondary.main",
-                backgroundImage: `url(${friendInfo.avatar})`,
+                backgroundImage: `url(${friendInfo.avatarUrl})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 margin: "0 auto",
@@ -131,10 +131,10 @@ const MessageContainer: React.FC = () => {
                   height: "40px",
                   borderRadius: "50%",
                   backgroundColor: "secondary.main",
-                  backgroundImage: `url(${friendInfo.avatar})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  mr: 2,
+                backgroundImage: `url(${friendInfo.avatarUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                mr: 2,
                 }}
               ></Box>
               <Paper

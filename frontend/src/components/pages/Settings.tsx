@@ -29,10 +29,10 @@ export interface UserData {
   id: number;
   username: string;
   email: string;
-  avatar_url: string;
+  avatarUrl: string;
   role: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const rank = 5;
@@ -118,7 +118,7 @@ const SettingsContainer = () => {
         });
         setUser((prevUser) =>
           prevUser
-            ? { ...prevUser, avatar_url: response.data.avatar_url }
+            ? { ...prevUser, avatarUrl: response.data.avatarUrl }
             : null
         );
       } catch (error) {
@@ -245,7 +245,7 @@ const SettingsContainer = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                 <AvatarUpload>
                   <Avatar
-                    src={getFullAvatarUrl(user.avatar_url)}
+                    src={getFullAvatarUrl(user.avatarUrl)}
                     sx={{ width: 100, height: 100 }}
                   />
                   <UploadButton size="small">

@@ -1,8 +1,8 @@
 export interface EventDetails {
-    dateTime: string;
-    theme: string;
-    topics: string[];
-  }
+  eventStart: string;
+  theme: string;
+  topics: string[];
+}
   
  export interface ChatResponse {
     choices: Array<{
@@ -11,17 +11,17 @@ export interface EventDetails {
         content: string;
       };
       index: number;
-      finish_reason: string;
+      finishReason: string;
     }>;
   }
   
 export interface Event {
     id: number;
-    event_start: string;
-    event_end: string;
-    theme_id: number;
+    eventStart: string;
+    eventEnd: string;
+    themeId: number;
     theme: {
-      theme_text: string;
+      themeText: string;
       topic1: string;
       topic2: string;
       topic3: string;
@@ -31,7 +31,7 @@ export interface Event {
 export  interface User {
     id: number;
     username: string;
-    avatarURL: string;
+    avatarUrl: string;
     email: string;
     createdAt: string;
   }

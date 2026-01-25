@@ -8,7 +8,7 @@ import api from "../../services/api";
 interface Friend {
   id: number;
   username: string;
-  avatar: string;
+  avatarUrl: string;
   isFriend: boolean;
 }
 
@@ -29,7 +29,7 @@ const FriendRequestComponent: React.FC = () => {
       return {
         id: userId,
         username: userResponse.data.username,
-        avatar: avatarResponse.data.avatarURL,
+        avatarUrl: avatarResponse.data.avatarUrl,
         isFriend: false,
       };
     } catch (error: any) {
@@ -57,7 +57,7 @@ const FriendRequestComponent: React.FC = () => {
 
   const sendFriendRequest = async (targetUserId: number) => {
     try {
-      const response = await api.post('/friend/register', { target_user_id: targetUserId });
+      const response = await api.post('/friend/register', { targetUserId });
       console.log('Friend request response:', response.data);
       return true;
     } catch (error: any) {
@@ -146,7 +146,7 @@ const FriendRequestComponent: React.FC = () => {
             <Paper key={friend.id} elevation={3} sx={{ marginBottom: 2, padding: 2 }}>
               <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
                 <ListItemAvatar>
-                  <Avatar src={friend.avatar} alt={friend.username} />
+                  <Avatar src={friend.avatarUrl} alt={friend.username} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={friend.username}

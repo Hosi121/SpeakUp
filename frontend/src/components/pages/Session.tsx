@@ -410,7 +410,7 @@ export const Session = () => {
           name: userInfoResponse.data.username,
           icon: (
             <Avatar
-              src={getFullAvatarUrl(userInfoResponse.data.avatar_url)}
+              src={getFullAvatarUrl(userInfoResponse.data.avatarUrl)}
               sx={{ width: 80, height: 80 }}
             />
           ),

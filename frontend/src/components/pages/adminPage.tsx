@@ -65,7 +65,7 @@ const AdminPage: React.FC = () => {
     try {
       const isoDateTime = new Date(dateTime).toISOString();
       const eventDetails: EventDetails = {
-        dateTime: isoDateTime,
+        eventStart: isoDateTime,
         theme,
         topics,
       };
@@ -119,10 +119,10 @@ const AdminPage: React.FC = () => {
         response.data.map(async (user: User) => {
           try {
             const avatarResponse = await api.get(`/users/${user.id}/avatar`);
-            return { ...user, avatarURL: avatarResponse.data.avatarURL };
+            return { ...user, avatarUrl: avatarResponse.data.avatarUrl };
           } catch (error) {
             console.error(`Failed to fetch avatar for user ${user.id}`, error);
-            return { ...user, avatarURL: "" };
+            return { ...user, avatarUrl: "" };
           }
         })
       );
@@ -159,7 +159,7 @@ const AdminPage: React.FC = () => {
                 最後に作成したイベント
               </Typography>
               <Typography variant="body1">
-                予定日時: {new Date(eventDetails.dateTime).toLocaleString()}
+                予定日時: {new Date(eventDetails.eventStart).toLocaleString()}
               </Typography>
               <Typography
                 variant="h6"
@@ -274,7 +274,7 @@ const AdminPage: React.FC = () => {
                 <ListItem key={user.id}>
                   <ListItemAvatar>
                     <Avatar
-                      src={user.avatarURL || "/default-avatar.png"}
+                      src={user.avatarUrl || "/default-avatar.png"}
                       alt={user.username}
                     />
                   </ListItemAvatar>
