@@ -3,7 +3,8 @@ import { Box, Typography, Avatar, Button, Paper, List, ListItem, ListItemAvatar,
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection";
-import api from "../../services/api";
+import { sendFriendRequest as sendFriendRequestRequest } from "../../services/friendService";
+import { fetchUserSummaryById } from "../../services/userService";
 
 interface Friend {
   id: number;
@@ -21,15 +22,11 @@ const FriendRequestComponent: React.FC = () => {
 
   const fetchUserInfo = async (userId: number): Promise<Friend> => {
     try {
-      const [userResponse, avatarResponse] = await Promise.all([
-        api.get(`/users/search/id/${userId}`),
-        api.get(`/users/${userId}/avatar`)
-      ]);
-      
+      const summary = await fetchUserSummaryById(userId);
       return {
         id: userId,
-        username: userResponse.data.username,
-        avatarUrl: avatarResponse.data.avatarUrl,
+        username: summary.username,
+        avatarUrl: summary.avatarUrl,
         isFriend: false,
       };
     } catch (error: any) {
@@ -57,8 +54,7 @@ const FriendRequestComponent: React.FC = () => {
 
   const sendFriendRequest = async (targetUserId: number) => {
     try {
-      const response = await api.post('/friend/register', { targetUserId });
-      console.log('Friend request response:', response.data);
+      await sendFriendRequestRequest(targetUserId);
       return true;
     } catch (error: any) {
       console.error('Failed to send friend request:', error.response?.data || error.message);
@@ -86,7 +82,6 @@ const FriendRequestComponent: React.FC = () => {
   const handleFriendRequest = async (friendId: number) => {
     const success = await sendFriendRequest(friendId);
     if (success) {
-      console.log('Friend request sent successfully');
       setFriends(prevFriends =>
         prevFriends.map(friend =>
           friend.id === friendId ? { ...friend, isFriend: true } : friend

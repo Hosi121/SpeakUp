@@ -20,20 +20,15 @@ import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
-import api from "../../services/api";
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
-
-export interface UserData {
-  id: number;
-  username: string;
-  email: string;
-  avatarUrl: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { UserProfile } from "../../types/types";
+import {
+  fetchUserProfile,
+  updateUserProfile,
+  uploadAvatar,
+} from "../../services/userService";
 
 const rank = 5;
 
@@ -74,7 +69,7 @@ const UploadButton = styled(IconButton)(({ theme }) => ({
 
 const SettingsContainer = () => {
   const theme = useTheme();
-  const [user, setUser] = useState<UserData | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [editName, setEditName] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
   const [newName, setNewName] = useState("");
@@ -84,11 +79,10 @@ const SettingsContainer = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await api.get<UserData>("/user/info");
-        console.log("Fetched user data:", response.data);
-        setUser(response.data);
-        setNewName(response.data.username);
-        setNewEmail(response.data.email);
+        const profile = await fetchUserProfile();
+        setUser(profile);
+        setNewName(profile.username);
+        setNewEmail(profile.email);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
       }
@@ -107,18 +101,11 @@ const SettingsContainer = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.files && event.target.files[0]) {
-      const formData = new FormData();
-      formData.append("avatar", event.target.files[0]);
-
       try {
-        const response = await api.put("/user/avatar", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const avatarUrl = await uploadAvatar(event.target.files[0]);
         setUser((prevUser) =>
           prevUser
-            ? { ...prevUser, avatarUrl: response.data.avatarUrl }
+            ? { ...prevUser, avatarUrl }
             : null
         );
       } catch (error) {
@@ -133,7 +120,7 @@ const SettingsContainer = () => {
       // Update the user's name via API
       const updateUser = async () => {
         try {
-          await api.put(`/user/update`, { username: newName });
+          await updateUserProfile({ username: newName });
           setUser({ ...user, username: newName });
           setEditName(false);
         } catch (error) {
@@ -150,7 +137,7 @@ const SettingsContainer = () => {
       // Update the user's email via API
       const updateUser = async () => {
         try {
-          await api.put(`/user/update`, { email: newEmail });
+          await updateUserProfile({ email: newEmail });
           setUser({ ...user, email: newEmail });
           setEditEmail(false);
         } catch (error) {

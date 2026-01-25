@@ -1,28 +1,24 @@
 import { useEffect, useState } from "react";
 import { Avatar, Button, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import api from "../../services/api";
-
-interface Friend {
-  id: number;
-  username: string;
-  avatarUrl: string;
-}
+import { fetchFriendList } from "../../services/friendService";
+import type { FriendSummary } from "../../types/types";
 
 const FriendList: React.FC = () => {
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const [friends, setFriends] = useState<FriendSummary[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     // フレンドリストを取得
-    api
-      .get<{ friends: Friend[] }>("/friend/me")
-      .then((response) => {
-        setFriends(response.data.friends);
-      })
-      .catch((error) => {
+    const loadFriends = async () => {
+      try {
+        const data = await fetchFriendList();
+        setFriends(data);
+      } catch (error) {
         console.error("Failed to fetch friend list", error);
-      });
+      }
+    };
+    loadFriends();
   }, []);
 
   const handleMessage = (friendName: string) => {
@@ -30,7 +26,6 @@ const FriendList: React.FC = () => {
     navigate(`/message/${friendName}`);
   };
 
-  console.log(friends);
   return (
     <List>
       {friends.map((friend) => (

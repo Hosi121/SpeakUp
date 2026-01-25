@@ -20,9 +20,9 @@ import {
   Avatar,
   CircularProgress,
 } from "@mui/material";
-import api from "../../services/api";
 import { Event, EventDetails, User } from "../../types/types";
 import * as eventService from "../../services/eventService";
+import { fetchUserAvatar, searchUsers } from "../../services/userService";
 
 const AdminPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -57,7 +57,6 @@ const AdminPage: React.FC = () => {
       setTheme(generatedTheme);
     } catch (error) {
       setErrorMessage("テーマの生成に失敗しました");
-      console.log(error);
     }
   };
 
@@ -78,7 +77,6 @@ const AdminPage: React.FC = () => {
       setEvents(fetchedEvents);
     } catch (error) {
       setErrorMessage("イベントの作成に失敗しました");
-      console.log(error);
     }
   };
 
@@ -114,12 +112,12 @@ const AdminPage: React.FC = () => {
   const handleSearchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/users/search?q=${searchQuery}`);
+      const foundUsers = await searchUsers(searchQuery);
       const usersWithAvatars = await Promise.all(
-        response.data.map(async (user: User) => {
+        foundUsers.map(async (user) => {
           try {
-            const avatarResponse = await api.get(`/users/${user.id}/avatar`);
-            return { ...user, avatarUrl: avatarResponse.data.avatarUrl };
+            const avatarUrl = await fetchUserAvatar(user.id);
+            return { ...user, avatarUrl };
           } catch (error) {
             console.error(`Failed to fetch avatar for user ${user.id}`, error);
             return { ...user, avatarUrl: "" };

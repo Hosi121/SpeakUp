@@ -24,8 +24,7 @@ const Login = () => {
   // ログイン処理
   const handleLogin = async () => {
     try {
-      const data = await signIn(email, password);  // authServiceの関数を使用
-      console.log('ログイン成功:', data);
+      await signIn(email, password);  // authServiceの関数を使用
       navigate('/home');  // ログイン成功後にリダイレクト
     } catch (err) {
       setError((err as Error).message);  // エラーメッセージを設定

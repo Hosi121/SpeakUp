@@ -15,12 +15,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
-import api from "../../services/api";
-
-interface FriendInfo {
-  avatarUrl: string;
-  username: string;
-}
+import { fetchFriendInfo } from "../../services/friendService";
+import type { FriendInfo } from "../../types/types";
 
 const MessageContainer: React.FC = () => {
   const { friendname } = useParams<{ friendname: string }>(); // URLパラメータからfriendnameを取得
@@ -31,14 +27,16 @@ const MessageContainer: React.FC = () => {
 
   useEffect(() => {
     // 友達の情報を取得
-    api
-      .get<FriendInfo>(`/friend/${friendname}`)
-      .then((response) => {
-        setFriendInfo(response.data);
-      })
-      .catch((error) => {
+    const loadFriendInfo = async () => {
+      if (!friendname) return;
+      try {
+        const data = await fetchFriendInfo(friendname);
+        setFriendInfo(data);
+      } catch (error) {
         console.error("Failed to fetch friend info", error);
-      });
+      }
+    };
+    loadFriendInfo();
   }, [friendname]);
 
   // メッセージ送信処理

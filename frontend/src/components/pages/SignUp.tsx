@@ -24,8 +24,7 @@ const SignUp = () => {
     }
 
     try {
-      const data = await signUp(username, email, password); // authServiceの関数を使用
-      console.log("サインアップ成功:", data);
+      await signUp(username, email, password); // authServiceの関数を使用
       navigate("/login"); // サインアップ後、ログインページにリダイレクト
     } catch (error) {
       setError((error as Error).message);

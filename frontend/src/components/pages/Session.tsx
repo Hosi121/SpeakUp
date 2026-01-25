@@ -22,7 +22,7 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 import { TopicPopup } from "../utils/TopicPopup";
 import { AudioVolumeAnalyzer } from "../utils/AudioVolumeAnalyzer";
-import { UserData } from "./Settings";
+import { fetchUserProfile } from "../../services/userService";
 import { SessionStepContext } from "../utils/SessionStepContextProvider";
 
 const theme = "好きな言葉";
@@ -120,8 +120,6 @@ export const Session = () => {
         content: userMessage,
       });
 
-      console.log("Response data:", response.data); // ここでレスポンスデータを確認
-
       // 応答メッセージを表示
       if (
         response.data &&
@@ -144,14 +142,12 @@ export const Session = () => {
         ...prevMessages,
         "Error: Failed to get response",
       ]);
-      console.log(error);
     } finally {
       setIsLoading(false); // ローディング状態を終了
     }
   };
 
   // WebRTC関連の処理
-  // webbbb vimジャンプ用
   const host = "10.70.174.101";
   const WEBSOCKET_URL = "ws://" + host + ":8081/ws";
   let isOffer = false;
@@ -190,8 +186,6 @@ export const Session = () => {
     const ws = new WebSocket(WEBSOCKET_URL);
 
     ws.onopen = () => {
-      console.log("Connected to signaling server");
-
       const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
       const authMessage = {
         type: "Authorization",
@@ -214,7 +208,6 @@ export const Session = () => {
           isOffer = message.isOffer;
         }
       } else if (message.type == "offer" && !isOffer) {
-        console.log("Received offer. start call after 1000ms.");
         setTimeout(() => startCall(true), 1000);
       }
 
@@ -242,7 +235,6 @@ export const Session = () => {
     };
 
     ws.onclose = () => {
-      console.log("Disconnected from signaling server");
       cleanupResources();
     };
 
@@ -274,7 +266,6 @@ export const Session = () => {
     };
 
     pc.oniceconnectionstatechange = () => {
-      console.log("ICE Connection State:", pc.iceConnectionState);
       if (
         pc.iceConnectionState === "disconnected" ||
         pc.iceConnectionState === "failed" ||
@@ -290,22 +281,12 @@ export const Session = () => {
   let startCallCount = 0;
   const startCall = async (forceExcute: boolean): Promise<void> => {
     if (!forceExcute && !isOffer) {
-      console.log("not start call", forceExcute, isOffer);
-      console.log(
-        `not start call forceExcute=${forceExcute}, isOffer=${isOffer}`
-      );
       return;
-    } else {
-      console.log("startCall()");
     }
     if (startCallCount > 0) {
       return;
     }
     startCallCount++;
-    if (forceExcute) {
-      console.log("forceExcute");
-    }
-    console.log("start call");
 
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
@@ -338,7 +319,6 @@ export const Session = () => {
   const handleOffer = async (
     offer: RTCSessionDescriptionInit
   ): Promise<void> => {
-    console.log("handle offer");
     const pc = createPeerConnection();
     peerConnectionRef.current = pc;
 
@@ -403,20 +383,19 @@ export const Session = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userInfoResponse = await api.get<UserData>("/user/info");
-        const opponentUserCardDataResponse =
-          await api.get<UserData>("/user/info");
+        const userInfoResponse = await fetchUserProfile();
+        const opponentUserCardDataResponse = await fetchUserProfile();
         const userInfo: UserCardData = {
-          name: userInfoResponse.data.username,
+          name: userInfoResponse.username,
           icon: (
             <Avatar
-              src={getFullAvatarUrl(userInfoResponse.data.avatarUrl)}
+              src={getFullAvatarUrl(userInfoResponse.avatarUrl)}
               sx={{ width: 80, height: 80 }}
             />
           ),
         };
         const opponentUserInfo: UserCardData = {
-          name: opponentUserCardDataResponse.data.username,
+          name: opponentUserCardDataResponse.username,
           icon: <Person />,
         };
         setUserCardInfo(userInfo);
