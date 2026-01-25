@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Box, Button, Typography, IconButton, Avatar, List, ListItem, ListItemAvatar, ListItemText, Dialog, DialogTitle, DialogContent } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { fetchNotifications, type NotificationItem } from "../../services/appData";
+import { fetchNotifications } from "../../services/appData";
+import type { NotificationItem } from "../../types/types";
 
 const NotificationModal = () => {
   // State to control the modal open/close

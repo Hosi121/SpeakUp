@@ -2,17 +2,18 @@ import { Stack } from "@mui/system";
 import { Box, Container, Tab } from "@mui/material";
 import TopSection from "../utils/TopSection";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import FriendList from "../utils/FriendList";
 import SessionHistory from "../utils/SessionHistory";
-import { fetchSessionHistory, type SessionHistoryItem } from "../../services/appData";
+import { fetchSessionHistory } from "../../services/appData";
+import type { SessionHistoryItem } from "../../types/types";
 
 const SessionHistoryFriendlistContainer = () => {
   const [history, setHistory] = useState<SessionHistoryItem[]>([]);
-  const [value, setValue] = React.useState("1");
+  const [value, setValue] = useState("1");
 
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -28,7 +29,7 @@ const SessionHistoryFriendlistContainer = () => {
       }
     };
     loadHistory();
-  }, [setHistory]);
+  }, []);
 
   return (
     <Container

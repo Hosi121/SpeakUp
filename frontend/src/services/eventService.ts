@@ -1,19 +1,39 @@
-import api from "./api";
-import { ChatResponse, Event, EventDetails } from "../types/types";
+import { apiRaw } from "./api";
+import { Event, EventDetails } from "../types/types";
+import type { ChatThemeResponseDto, CreateEventDto, EventDto } from "../types/dto";
 import { isTestMode } from "./appMode";
 import { loadMockData, saveMockData } from "./mockStore";
-import type { TopicGroup } from "./appData";
+import type { TopicGroup } from "../types/types";
+import { toApiError } from "./errorUtils";
+
+const mapEventDto = (dto: EventDto): Event => ({
+  id: dto.id,
+  eventStart: dto.event_start,
+  eventEnd: dto.event_end,
+  themeId: dto.theme_id,
+  theme: {
+    themeText: dto.theme.theme_text,
+    topic1: dto.theme.topic1,
+    topic2: dto.theme.topic2,
+    topic3: dto.theme.topic3,
+  },
+});
+
+const toCreateEventDto = (eventData: EventDetails): CreateEventDto => ({
+  event_start: eventData.eventStart,
+  theme: eventData.theme,
+  topics: eventData.topics,
+});
 
 export const fetchEvents = async (): Promise<Event[]> => {
   try {
     if (isTestMode) {
       return loadMockData<Event[]>("events");
     }
-    const response = await api.get("/events");
-    return response.data;
+    const response = await apiRaw.get<EventDto[]>("/events");
+    return response.data.map(mapEventDto);
   } catch (error) {
-    console.error("Failed to fetch events", error);
-    throw new Error("イベントの取得に失敗しました");
+    throw toApiError(error, "イベントの取得に失敗しました");
   }
 };
 
@@ -41,11 +61,15 @@ export const createEvent = async (eventData: EventDetails): Promise<EventDetails
       saveMockData("events", [...events, newEvent]);
       return eventData;
     }
-    const response = await api.post("/events", eventData);
-    return response.data;
+    const payload = toCreateEventDto(eventData);
+    const response = await apiRaw.post<CreateEventDto>("/events", payload);
+    return {
+      eventStart: response.data.event_start,
+      theme: response.data.theme,
+      topics: response.data.topics,
+    };
   } catch (error) {
-    console.error("Failed to create event", error);
-    throw new Error("イベントの作成に失敗しました");
+    throw toApiError(error, "イベントの作成に失敗しました");
   }
 };
 
@@ -61,10 +85,11 @@ export const generateTheme = async (): Promise<string> => {
       return themePool[pickIndex];
     }
     const prompt = "イベントのテーマを提案してください。";
-    const response = await api.post<ChatResponse>("/chat/theme", { content: prompt });
+    const response = await apiRaw.post<ChatThemeResponseDto>("/chat/theme", {
+      content: prompt,
+    });
     return response.data.choices[0].message.content;
   } catch (error) {
-    console.error("Failed to generate theme", error);
-    throw new Error("テーマの生成に失敗しました");
+    throw toApiError(error, "テーマの生成に失敗しました");
   }
 };

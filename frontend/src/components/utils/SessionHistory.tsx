@@ -1,23 +1,14 @@
-import React from "react";
 import { List, ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Button, Box } from "@mui/material";
-
-interface History {
-  avatar: string;
-  user: string;
-  theme: string;
-  date: string;
-  rank: number;
-  friedstate: string;
-}
+import type { SessionHistoryItem } from "../../types/types";
 
 interface SessionHistoryProps {
-  history: History[];
+  history: SessionHistoryItem[];
 }
 
 const SessionHistory = ({ history }: SessionHistoryProps) => {
   return (
     <List>
-      {history.map((data: History) => (
+      {history.map((data) => (
         <ListItem alignItems="flex-start" sx={{ mb: 2, display: "flex", flexDirection: "column" }}>
           <Box sx={{ mb: 1, display: "flex", flexDirection: "row", width: "100%", flexWrap: "wrap" }}>
             <ListItemAvatar sx={{ width: "30%" }}>
@@ -33,7 +24,7 @@ const SessionHistory = ({ history }: SessionHistoryProps) => {
                 </Box>
               }
               secondary={
-                <React.Fragment>
+                <>
                   <Typography component="span" variant="body2" color="text.primary">
                     話したテーマ: {data.theme}
                   </Typography>
@@ -45,11 +36,11 @@ const SessionHistory = ({ history }: SessionHistoryProps) => {
                   <Typography component="span" variant="body2" color="text.secondary">
                     {`ランク${data.rank}`}
                   </Typography>
-                </React.Fragment>
+                </>
               }
             />
           </Box>
-          {data.friedstate === "friend" && (
+          {data.friendState === "friend" && (
             <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
               <Button sx={{ width: "55%" }} variant="contained" disabled color="primary">
                 フレンド申請済
@@ -59,7 +50,7 @@ const SessionHistory = ({ history }: SessionHistoryProps) => {
               </Button>
             </Box>
           )}
-          {data.friedstate === "pending" && (
+          {data.friendState === "pending" && (
             <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
               <Button sx={{ width: "55%" }} variant="contained" disabled color="primary">
                 フレンド申請済
@@ -69,7 +60,7 @@ const SessionHistory = ({ history }: SessionHistoryProps) => {
               </Button>
             </Box>
           )}
-          {data.friedstate === "unapplied" && (
+          {data.friendState === "unapplied" && (
             <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
               <Button sx={{ width: "55%" }} variant="contained" color="primary">
                 フレンド申請

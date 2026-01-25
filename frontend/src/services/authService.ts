@@ -1,5 +1,6 @@
-import api from './api';
+import { apiRaw } from './api';
 import { isTestMode } from "./appMode";
+import { toApiError } from "./errorUtils";
 
 // サインアップリクエストの型
 interface SignUpRequest {
@@ -39,10 +40,10 @@ export const signUp = async (username: string, email: string, password: string):
   };
 
   try {
-    const response = await api.post<SignUpResponse>('/signup', requestData);
+    const response = await apiRaw.post<SignUpResponse>('/signup', requestData);
     return response.data;
-  } catch (err) {
-    throw new Error('サインアップに失敗しました。');
+  } catch (error) {
+    throw toApiError(error, "サインアップに失敗しました。");
   }
 };
 
@@ -58,12 +59,10 @@ export const signIn = async (email: string, password: string): Promise<void> => 
       localStorage.setItem("token", "test-token");
       return;
     }
-    const response = await api.post<SignInResponse>('/signin', requestData);
+    const response = await apiRaw.post<SignInResponse>('/signin', requestData);
     // Use the correct 'token' from SignInResponse
     localStorage.setItem("token", response.data.token);
-    // Optionally log user info or a success message
-    console.log(`Logged in as: ${response.data.user.username}`);
-  } catch (err) {
-    throw new Error('ログインに失敗しました。');
+  } catch (error) {
+    throw toApiError(error, "ログインに失敗しました。");
   }
 };

@@ -46,8 +46,8 @@ export const Session = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false); // ローディング状態を管理
-  const [memo1, setMemo1] = useState(""); // メモ1を管理
-  const [memo2, setMemo2] = useState(""); // メモ2を管理
+  const [carryInMemo, setCarryInMemo] = useState("");
+  const [wordList, setWordList] = useState("");
   const [value, setValue] = useState("1");
   const [isMuted, setIsMuted] = useState(false);
   const [countdown, setCountdown] = useState(sessionTime + 3);
@@ -84,8 +84,8 @@ export const Session = () => {
     const getMemo = async () => {
       try {
         const data = await fetchMemo();
-        setMemo1(data.memo1 || ""); // memo1だけ取得
-        setMemo2(data.memo2 || "");
+        setCarryInMemo(data.carryInMemo);
+        setWordList(data.wordList);
       } catch (error) {
         console.error("Failed to fetch memo", error);
       }
@@ -457,10 +457,10 @@ export const Session = () => {
             </TabList>
           </Box>
           <TabPanel value="1">
-            <Typography variant="body1">{memo1}</Typography>
+            <Typography variant="body1">{carryInMemo}</Typography>
           </TabPanel>
           <TabPanel value="2">
-            <Typography variant="body1">{memo2}</Typography>
+            <Typography variant="body1">{wordList}</Typography>
           </TabPanel>
         </TabContext>
       </HalfModal>

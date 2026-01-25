@@ -4,7 +4,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import TopSection from "../utils/TopSection";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { fetchConversationHistory, type ConversationHistoryItem } from "../../services/appData";
+import { fetchConversationHistory } from "../../services/appData";
+import type { ConversationHistoryItem } from "../../types/types";
 
 const ConversationHistoryContainer = () => {
   const [data, setData] = useState<ConversationHistoryItem[]>([]);

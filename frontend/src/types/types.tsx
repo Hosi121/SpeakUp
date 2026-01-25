@@ -3,18 +3,7 @@ export interface EventDetails {
   theme: string;
   topics: string[];
 }
-  
- export interface ChatResponse {
-    choices: Array<{
-      message: {
-        role: string;
-        content: string;
-      };
-      index: number;
-      finishReason: string;
-    }>;
-  }
-  
+
 export interface Event {
     id: number;
     eventStart: string;
@@ -35,3 +24,72 @@ export  interface User {
     email: string;
     createdAt: string;
   }
+
+export interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  avatarUrl: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserNotes {
+  carryInMemo: string;
+  wordList: string;
+}
+
+export interface SessionData {
+  theme: string;
+  dateTime: string;
+  sessions: number[];
+}
+
+export interface ConversationExample {
+  english: string;
+  japanese: string;
+}
+
+export interface ConversationHistoryItem {
+  date: string;
+  previousDate: string;
+  sessions: number;
+  completionRate: string;
+  comment: string;
+  examples: ConversationExample[];
+}
+
+export interface SessionHistoryItem {
+  avatar: string;
+  user: string;
+  theme: string;
+  date: string;
+  rank: number;
+  friendState: "friend" | "pending" | "unapplied";
+}
+
+export interface TopicGroup {
+  theme: string;
+  topics: string[];
+}
+
+export interface NotificationItem {
+  id: number;
+  time: string;
+  user: string;
+  type: string;
+  message: string;
+  profileIcon: string;
+}
+
+export interface FriendSummary {
+  id: number;
+  username: string;
+  avatarUrl: string;
+}
+
+export interface FriendInfo {
+  username: string;
+  avatarUrl: string;
+}

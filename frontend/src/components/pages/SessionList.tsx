@@ -5,7 +5,8 @@ import { Accordion, AccordionDetails, AccordionSummary, Button, Checkbox, Contai
 import TopSection from "../utils/TopSection";
 import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { fetchSessions, type SessionData } from "../../services/appData";
+import { fetchSessions } from "../../services/appData";
+import type { SessionData } from "../../types/types";
 
 const SessionListContainer = () => {
   const [sessionData, setSessionData] = useState<SessionData[]>([]);

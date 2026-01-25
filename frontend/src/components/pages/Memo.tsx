@@ -7,16 +7,16 @@ import { MemoInputField } from "../utils/MemoInputField";
 import { fetchMemo, saveMemo } from "../../services/memoService";
 
 const MemoContainer = () => {
-  const [memo1, setMemo1] = useState("");
-  const [memo2, setMemo2] = useState("");
+  const [carryInMemo, setCarryInMemo] = useState("");
+  const [wordList, setWordList] = useState("");
 
   useEffect(() => {
     // ページ読み込み時にメモを取得
     const getMemo = async () => {
       try {
         const data = await fetchMemo();
-        setMemo1(data.memo1 || "");
-        setMemo2(data.memo2 || "");
+        setCarryInMemo(data.carryInMemo);
+        setWordList(data.wordList);
       } catch (error) {
         console.error("Failed to fetch memos", error);
       }
@@ -26,8 +26,7 @@ const MemoContainer = () => {
 
   const handleSave = async () => {
     try {
-      await saveMemo(memo1, memo2);
-      console.log("Memos saved successfully");
+      await saveMemo({ carryInMemo, wordList });
       // 成功メッセージを表示するなどの処理
     } catch (error) {
       console.error("Failed to save memos", error);
@@ -57,14 +56,14 @@ const MemoContainer = () => {
           </Typography>
           <MemoInputField
             label="持ち込みメモ"
-            value={memo1}
-            setValue={setMemo1}
+            value={carryInMemo}
+            setValue={setCarryInMemo}
           />
           <Box sx={{ mt: 3 }}>
             <MemoInputField
               label="ワードリスト"
-              value={memo2}
-              setValue={setMemo2}
+              value={wordList}
+              setValue={setWordList}
             />
           </Box>
           <Button
