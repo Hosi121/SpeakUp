@@ -73,19 +73,11 @@ export const uploadAvatar = async (file: File): Promise<string> => {
 
 export const searchUsers = async (query: string): Promise<User[]> => {
   try {
-    const response = await api.get<UserDto[]>(`/users/search?q=${query}`);
+    const encodedQuery = encodeURIComponent(query);
+    const response = await api.get<UserDto[]>(`/users/search?q=${encodedQuery}`);
     return response.data.map(mapUserDto);
   } catch (error) {
     throw toApiError(error, "ユーザーの検索に失敗しました");
-  }
-};
-
-export const fetchUserAvatar = async (userId: number): Promise<string> => {
-  try {
-    const response = await api.get<AvatarDto>(`/users/${userId}/avatar`);
-    return response.data.avatar_url;
-  } catch (error) {
-    throw toApiError(error, "アバターの取得に失敗しました");
   }
 };
 

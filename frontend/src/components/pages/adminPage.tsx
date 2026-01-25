@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import { Event, EventDetails, User } from "../../types/types";
 import * as eventService from "../../services/eventService";
-import { fetchUserAvatar, searchUsers } from "../../services/userService";
+import { searchUsers } from "../../services/userService";
 
 const AdminPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -31,7 +31,7 @@ const AdminPage: React.FC = () => {
   const [topics, setTopics] = useState<string[]>(["", "", ""]);
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
+  const [lastCreatedEvent, setLastCreatedEvent] = useState<Event | null>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [, setEvents] = useState<Event[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -63,15 +63,15 @@ const AdminPage: React.FC = () => {
   const handleSubmit = async () => {
     try {
       const isoDateTime = new Date(dateTime).toISOString();
-      const eventDetails: EventDetails = {
+      const eventPayload: EventDetails = {
         eventStart: isoDateTime,
         theme,
         topics,
       };
 
-      await eventService.createEvent(eventDetails);
+      const createdEvent = await eventService.createEvent(eventPayload);
       setSuccessMessage("イベントが正常に作成されました");
-      setEventDetails(eventDetails);
+      setLastCreatedEvent(createdEvent);
       handleCloseDialog();
       const fetchedEvents = await eventService.fetchEvents();
       setEvents(fetchedEvents);
@@ -84,7 +84,7 @@ const AdminPage: React.FC = () => {
     setOpenDialog(true);
     setSuccessMessage("");
     setErrorMessage("");
-    setEventDetails(null);
+    setLastCreatedEvent(null);
   };
 
   const handleCloseDialog = () => {
@@ -113,18 +113,7 @@ const AdminPage: React.FC = () => {
     setIsLoading(true);
     try {
       const foundUsers = await searchUsers(searchQuery);
-      const usersWithAvatars = await Promise.all(
-        foundUsers.map(async (user) => {
-          try {
-            const avatarUrl = await fetchUserAvatar(user.id);
-            return { ...user, avatarUrl };
-          } catch (error) {
-            console.error(`Failed to fetch avatar for user ${user.id}`, error);
-            return { ...user, avatarUrl: "" };
-          }
-        })
-      );
-      setUsers(usersWithAvatars);
+      setUsers(foundUsers);
     } catch (error) {
       console.error("Failed to search users", error);
       setErrorMessage("ユーザーの検索に失敗しました");
@@ -146,7 +135,7 @@ const AdminPage: React.FC = () => {
             イベント作成
           </Button>
 
-          {eventDetails && (
+          {lastCreatedEvent && (
             <Paper sx={{ mt: 4, p: 5 }}>
               <Typography
                 variant="h6"
@@ -157,7 +146,7 @@ const AdminPage: React.FC = () => {
                 最後に作成したイベント
               </Typography>
               <Typography variant="body1">
-                予定日時: {new Date(eventDetails.eventStart).toLocaleString()}
+                予定日時: {new Date(lastCreatedEvent.eventStart).toLocaleString()}
               </Typography>
               <Typography
                 variant="h6"
@@ -167,7 +156,7 @@ const AdminPage: React.FC = () => {
               >
                 テーマ
               </Typography>
-              <Typography variant="body1">{eventDetails.theme}</Typography>
+              <Typography variant="body1">{lastCreatedEvent.theme.themeText}</Typography>
               <Typography
                 variant="h6"
                 fontWeight="bolder"
@@ -177,7 +166,11 @@ const AdminPage: React.FC = () => {
                 トピック
               </Typography>
               <List sx={{ width: "100%", p: 0 }}>
-                {eventDetails.topics.map((topic, index) => (
+                {[
+                  lastCreatedEvent.theme.topic1,
+                  lastCreatedEvent.theme.topic2,
+                  lastCreatedEvent.theme.topic3,
+                ].map((topic, index) => (
                   <ListItem key={index} sx={{ p: 0 }}>
                     <ListItemText sx={{ textAlign: "center" }}>
                       {topic || "(未入力)"}

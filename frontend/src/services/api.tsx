@@ -13,14 +13,16 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
   );
 };
 
-const api = axios.create({
-  baseURL: "http://localhost:8081",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const createApi = (): AxiosInstance =>
+  axios.create({
+    baseURL: "http://localhost:8081",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
+const api = createApi();
 attachAuthInterceptor(api);
 
-export const apiRaw = api;
+export const apiRaw = createApi();
 export default api;

@@ -29,7 +29,8 @@ export const fetchFriendList = async (): Promise<FriendSummary[]> => {
 
 export const fetchFriendInfo = async (friendName: string): Promise<FriendInfo> => {
   try {
-    const response = await api.get<FriendInfoDto>(`/friend/${friendName}`);
+    const encodedName = encodeURIComponent(friendName);
+    const response = await api.get<FriendInfoDto>(`/friend/${encodedName}`);
     return mapFriendInfoDto(response.data);
   } catch (error) {
     throw toApiError(error, "フレンド情報の取得に失敗しました");

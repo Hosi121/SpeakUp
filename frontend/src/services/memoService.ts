@@ -1,4 +1,4 @@
-import { apiRaw } from "./api";
+import api from "./api";
 import type { MemoDto } from "../types/dto";
 import type { UserNotes } from "../types/types";
 import { toApiError } from "./errorUtils";
@@ -16,7 +16,7 @@ const toMemoDto = (notes: UserNotes): MemoDto => ({
 // メモを取得する関数
 export const fetchMemo = async (): Promise<UserNotes> => {
   try {
-    const response = await apiRaw.get<MemoDto>("/memo");
+    const response = await api.get<MemoDto>("/memo");
     return fromMemoDto(response.data);
   } catch (error) {
     throw toApiError(error, "メモの取得に失敗しました");
@@ -26,7 +26,7 @@ export const fetchMemo = async (): Promise<UserNotes> => {
 // メモを保存する関数
 export const saveMemo = async (notes: UserNotes): Promise<UserNotes> => {
   try {
-    const response = await apiRaw.put<MemoDto>("/memo", toMemoDto(notes));
+    const response = await api.put<MemoDto>("/memo", toMemoDto(notes));
     return fromMemoDto(response.data);
   } catch (error) {
     throw toApiError(error, "メモの保存に失敗しました");

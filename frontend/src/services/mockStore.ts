@@ -5,7 +5,7 @@ import sessionHistory from "../mock/session_history.json";
 import sessions from "../mock/sessions.json";
 import topics from "../mock/topics.json";
 
-const SEED_VERSION = "1";
+const SEED_VERSION = "2";
 const VERSION_KEY = "speakup.seed.version";
 const KEY_PREFIX = "speakup.seed.";
 

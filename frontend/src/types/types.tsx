@@ -60,13 +60,15 @@ export interface ConversationHistoryItem {
   examples: ConversationExample[];
 }
 
+export type FriendState = "friend" | "pending" | "unapplied";
+
 export interface SessionHistoryItem {
   avatar: string;
   user: string;
   theme: string;
   date: string;
   rank: number;
-  friendState: "friend" | "pending" | "unapplied";
+  friendState: FriendState;
 }
 
 export interface TopicGroup {

@@ -16,13 +16,13 @@ import HomeLogo from "../../assets/homeLogo";
 import { Person } from "@mui/icons-material";
 import { SessionBottomNavigationTemplate } from "../templates/SessionBottomNavigationTemplate";
 import SessionContainer from "../utils/SessionContainer";
-import api from "../../services/api";
 import { fetchMemo } from "../../services/memoService"; // Import the fetchMemo function
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 import { TopicPopup } from "../utils/TopicPopup";
 import { AudioVolumeAnalyzer } from "../utils/AudioVolumeAnalyzer";
 import { fetchUserProfile } from "../../services/userService";
+import { askAssistant } from "../../services/chatService";
 import { SessionStepContext } from "../utils/SessionStepContextProvider";
 
 const theme = "好きな言葉";
@@ -115,32 +115,17 @@ export const Session = () => {
     setInputMessage(""); // 送信後に入力フィールドをクリア
 
     try {
-      // サーバーにリクエストを送信
-      const response = await api.post("/chat/ask", {
-        content: userMessage,
-      });
-
-      // 応答メッセージを表示
-      if (
-        response.data &&
-        response.data.choices &&
-        response.data.choices[0].message.content
-      ) {
-        const assistantMessage = response.data.choices[0].message.content;
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          `Assistant: ${assistantMessage}`,
-        ]);
-      } else {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          "Error: Invalid response format",
-        ]);
-      }
-    } catch (error) {
+      const assistantMessage = await askAssistant(userMessage);
       setMessages((prevMessages) => [
         ...prevMessages,
-        "Error: Failed to get response",
+        `Assistant: ${assistantMessage}`,
+      ]);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to get response";
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        `Error: ${message}`,
       ]);
     } finally {
       setIsLoading(false); // ローディング状態を終了

@@ -1,4 +1,4 @@
-import { apiRaw } from "./api";
+import api from "./api";
 import { Event, EventDetails } from "../types/types";
 import type { ChatThemeResponseDto, CreateEventDto, EventDto } from "../types/dto";
 import { isTestMode } from "./appMode";
@@ -30,14 +30,14 @@ export const fetchEvents = async (): Promise<Event[]> => {
     if (isTestMode) {
       return loadMockData<Event[]>("events");
     }
-    const response = await apiRaw.get<EventDto[]>("/events");
+    const response = await api.get<EventDto[]>("/events");
     return response.data.map(mapEventDto);
   } catch (error) {
     throw toApiError(error, "イベントの取得に失敗しました");
   }
 };
 
-export const createEvent = async (eventData: EventDetails): Promise<EventDetails> => {
+export const createEvent = async (eventData: EventDetails): Promise<Event> => {
   try {
     if (isTestMode) {
       const events = loadMockData<Event[]>("events");
@@ -59,15 +59,11 @@ export const createEvent = async (eventData: EventDetails): Promise<EventDetails
         },
       };
       saveMockData("events", [...events, newEvent]);
-      return eventData;
+      return newEvent;
     }
     const payload = toCreateEventDto(eventData);
-    const response = await apiRaw.post<CreateEventDto>("/events", payload);
-    return {
-      eventStart: response.data.event_start,
-      theme: response.data.theme,
-      topics: response.data.topics,
-    };
+    const response = await api.post<EventDto>("/events", payload);
+    return mapEventDto(response.data);
   } catch (error) {
     throw toApiError(error, "イベントの作成に失敗しました");
   }
@@ -85,7 +81,7 @@ export const generateTheme = async (): Promise<string> => {
       return themePool[pickIndex];
     }
     const prompt = "イベントのテーマを提案してください。";
-    const response = await apiRaw.post<ChatThemeResponseDto>("/chat/theme", {
+    const response = await api.post<ChatThemeResponseDto>("/chat/theme", {
       content: prompt,
     });
     return response.data.choices[0].message.content;

@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom";
 import TopSection from "../utils/TopSection";
 import { sendFriendRequest as sendFriendRequestRequest } from "../../services/friendService";
 import { fetchUserSummaryById } from "../../services/userService";
+import type { FriendState } from "../../types/types";
 
 interface Friend {
   id: number;
   username: string;
   avatarUrl: string;
-  isFriend: boolean;
+  friendState: FriendState;
 }
 
 const FriendRequestComponent: React.FC = () => {
@@ -27,7 +28,7 @@ const FriendRequestComponent: React.FC = () => {
         id: userId,
         username: summary.username,
         avatarUrl: summary.avatarUrl,
-        isFriend: false,
+        friendState: "unapplied",
       };
     } catch (error: any) {
       console.error(`Failed to fetch user info for user ${userId}:`, error);
@@ -84,7 +85,7 @@ const FriendRequestComponent: React.FC = () => {
     if (success) {
       setFriends(prevFriends =>
         prevFriends.map(friend =>
-          friend.id === friendId ? { ...friend, isFriend: true } : friend
+          friend.id === friendId ? { ...friend, friendState: "pending" } : friend
         )
       );
     }
@@ -157,10 +158,10 @@ const FriendRequestComponent: React.FC = () => {
               <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
                 <Button 
                   variant="contained" 
-                  disabled={friend.isFriend}
+                  disabled={friend.friendState !== "unapplied"}
                   onClick={() => handleFriendRequest(friend.id)}
                 >
-                  {friend.isFriend ? "フレンド申請済" : "フレンド申請"}
+                  {friend.friendState === "unapplied" ? "フレンド申請" : "フレンド申請済"}
                 </Button>
                 <Button variant="contained">メッセージ</Button>
               </Box>

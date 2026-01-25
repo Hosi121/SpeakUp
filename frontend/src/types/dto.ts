@@ -19,16 +19,22 @@ export interface CreateEventDto {
   topics: string[];
 }
 
-export interface ChatThemeResponseDto {
-  choices: Array<{
-    message: {
-      role: string;
-      content: string;
-    };
-    index: number;
-    finish_reason: string;
-  }>;
+export interface ChatMessageDto {
+  role: string;
+  content: string;
 }
+
+export interface ChatChoiceDto {
+  message: ChatMessageDto;
+  index: number;
+  finish_reason: string;
+}
+
+export interface ChatResponseDto {
+  choices: ChatChoiceDto[];
+}
+
+export type ChatThemeResponseDto = ChatResponseDto;
 
 export interface MemoDto {
   memo1?: string;
