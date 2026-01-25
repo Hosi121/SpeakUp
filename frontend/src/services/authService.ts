@@ -1,6 +1,5 @@
 import api from './api';
-
-const isTestMode = import.meta.env.VITE_TEST_MODE === "true";
+import { isTestMode } from "./appMode";
 
 // サインアップリクエストの型
 interface SignUpRequest {

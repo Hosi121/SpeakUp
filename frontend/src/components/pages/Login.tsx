@@ -4,6 +4,7 @@ import { Box, Button, Container, TextField, Typography, IconButton, InputAdornme
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { signIn } from '../../services/authService';
+import { isTestMode } from '../../services/appMode';
 import Logo from "../../assets/logo.tsx";        
 
 const Login = () => {
@@ -12,7 +13,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const isTestMode = import.meta.env.VITE_TEST_MODE === "true";
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
