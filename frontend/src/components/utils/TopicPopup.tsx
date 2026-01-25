@@ -1,7 +1,7 @@
 import { Card, CardContent, Typography, List, ListItem, ListItemText, IconButton } from "@mui/material";
-import topics from "../../mock/topics.json";
 import { useEffect, useState } from "react";
 import { Close } from "@mui/icons-material";
+import { fetchTopics } from "../../services/appData";
 
 type TopicPopupProps = {
   isVisible: boolean;
@@ -12,8 +12,16 @@ export const TopicPopup = ({ isVisible, onClose }: TopicPopupProps) => {
   const [topicData, setTopicData] = useState<string[]>([]);
 
   useEffect(() => {
-    const allTopics = topics.flatMap((topic) => topic.topics);
-    setTopicData(allTopics);
+    const loadTopics = async () => {
+      try {
+        const topics = await fetchTopics();
+        const allTopics = topics.flatMap((topic) => topic.topics);
+        setTopicData(allTopics);
+      } catch (error) {
+        console.error("Failed to fetch topics", error);
+      }
+    };
+    loadTopics();
   }, []);
 
   if (!isVisible) {

@@ -3,26 +3,29 @@ import { Stack } from "@mui/system";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
 import { Accordion, AccordionDetails, AccordionSummary, Button, Checkbox, Container, FormControlLabel, FormGroup, Typography } from "@mui/material";
 import TopSection from "../utils/TopSection";
-import sessions from "../../mock/sessions.json";
 import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
-type SessionData = {
-  dateTime: string;
-  sessions: number[];
-};
+import { fetchSessions, type SessionData } from "../../services/appData";
 
 const SessionListContainer = () => {
   const [sessionData, setSessionData] = useState<SessionData[]>([]);
   const [selectedSessions, setSelectedSessions] = useState<{ [key: string]: number[] }>({});
 
   useEffect(() => {
-    setSessionData(sessions);
-    const initialSelections: { [key: string]: number[] } = {};
-    sessions.forEach((session) => {
-      initialSelections[session.dateTime] = [...session.sessions];
-    });
-    setSelectedSessions(initialSelections);
+    const loadSessions = async () => {
+      try {
+        const data = await fetchSessions();
+        setSessionData(data);
+        const initialSelections: { [key: string]: number[] } = {};
+        data.forEach((session) => {
+          initialSelections[session.dateTime] = [...session.sessions];
+        });
+        setSelectedSessions(initialSelections);
+      } catch (error) {
+        console.error("Failed to fetch sessions", error);
+      }
+    };
+    loadSessions();
   }, []);
 
   const handleCheckboxChange = (dateTime: string, session: number) => {

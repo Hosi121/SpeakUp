@@ -12,13 +12,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
 import { CircularLineSpinner } from "../utils/CircularLineSpinner";
+import * as eventService from "../../services/eventService";
 
 const WaitingContainer = () => {
   const navigate = useNavigate();
   const [memo, setMemo] = useState("");
-  const scheduledTime = new Date("2024-09-20T07:51:00"); // mock
-  const startedAt = new Date();
-  const allWaitingTime = scheduledTime.getTime() - startedAt.getTime();
+  const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
+  const [startedAt, setStartedAt] = useState<Date | null>(null);
   const [remainTimeProgressRatio, setRemainTimeProgressRatio] = useState(0);
 
   const handleGoBack = () => {
@@ -26,20 +26,55 @@ const WaitingContainer = () => {
   };
 
   useEffect(() => {
+    const loadSchedule = async () => {
+      try {
+        const events = await eventService.fetchEvents();
+        const now = new Date();
+        const nextEvent =
+          events.find((event) => new Date(event.eventStart) > now) ?? events[0];
+        const nextTime = nextEvent
+          ? new Date(nextEvent.eventStart)
+          : new Date(now.getTime() + 5 * 60 * 1000);
+        setScheduledTime(nextTime);
+        setStartedAt(new Date());
+      } catch (error) {
+        console.error("Failed to fetch schedule", error);
+        setScheduledTime(new Date(Date.now() + 5 * 60 * 1000));
+        setStartedAt(new Date());
+      }
+    };
+    loadSchedule();
+  }, []);
+
+  useEffect(() => {
+    if (!scheduledTime || !startedAt) {
+      return;
+    }
+    const allWaitingTime = scheduledTime.getTime() - startedAt.getTime();
+    if (allWaitingTime <= 0) {
+      navigate("/miccheck");
+      return;
+    }
     const intervalId = setInterval(() => {
       const now = new Date();
       const remainTime = scheduledTime.getTime() - now.getTime();
-      const progressRaito = 1 - remainTime / allWaitingTime;
-      const actualProgressRaito = Math.min(1, progressRaito);
-      setRemainTimeProgressRatio(actualProgressRaito);
+      const progressRatio = 1 - remainTime / allWaitingTime;
+      const actualProgressRatio = Math.min(1, progressRatio);
+      setRemainTimeProgressRatio(actualProgressRatio);
       if (remainTime <= 0) {
         clearInterval(intervalId);
         navigate("/miccheck");
       }
     }, 800);
-  }, []);
+    return () => clearInterval(intervalId);
+  }, [scheduledTime, startedAt, navigate]);
 
-  const scheduledTimeStr = `${scheduledTime.getMonth() + 1}月${scheduledTime.getDate()}日${scheduledTime.getHours()}:${scheduledTime.getMinutes().toString().padStart(2, "0")}`;
+  const scheduledTimeStr = scheduledTime
+    ? `${scheduledTime.getMonth() + 1}月${scheduledTime.getDate()}日${scheduledTime.getHours()}:${scheduledTime
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}`
+    : "Loading...";
 
   return (
     <Container sx={{ padding: 3, paddingBottom: 4 }}>

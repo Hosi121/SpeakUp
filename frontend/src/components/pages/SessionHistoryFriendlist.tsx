@@ -8,19 +8,10 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import FriendList from "../utils/FriendList";
 import SessionHistory from "../utils/SessionHistory";
-import History from "../../mock/session_history.json";
-
-interface History {
-  avatar: string;
-  user: string;
-  theme: string;
-  date: string;
-  rank: number;
-  friedstate: string;
-}
+import { fetchSessionHistory, type SessionHistoryItem } from "../../services/appData";
 
 const SessionHistoryFriendlistContainer = () => {
-  const [history, setHistory] = useState<History[]>([]);
+  const [history, setHistory] = useState<SessionHistoryItem[]>([]);
   const [value, setValue] = React.useState("1");
 
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -28,7 +19,15 @@ const SessionHistoryFriendlistContainer = () => {
   };
 
   useEffect(() => {
-    setHistory(History);
+    const loadHistory = async () => {
+      try {
+        const data = await fetchSessionHistory();
+        setHistory(data);
+      } catch (error) {
+        console.error("Failed to fetch session history", error);
+      }
+    };
+    loadHistory();
   }, [setHistory]);
 
   return (

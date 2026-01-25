@@ -6,17 +6,10 @@ import TopWaves from "../utils/TopWaves";
 import HomeLogo from "../../assets/homeLogo";
 import { IconButton } from "../utils/IconButton";
 import { LibraryBooks, Mic } from "@mui/icons-material";
-import api from "../../services/api";
 import { Event } from "../../types/types";
-
-type SessionData = {
-  dateTime: string;
-  sessions: number[];
-  theme: string;
-};
+import * as eventService from "../../services/eventService";
 
 const HomeContainer = () => {
-  const [, setSessionData] = useState<SessionData[]>([]);
   const [eventData, setEventData] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,19 +18,8 @@ const HomeContainer = () => {
     const fetchData = async () => {
       try {
         // APIからイベントデータを取得
-        const response = await api.get("/events");
-        setEventData(response.data);
-
-        // 既存のJSONデータを取得（実際のアプリケーションでは、このデータもAPIから取得するかもしれません）
-        const sessionResponse = await import("../../mock/sessions.json");
-        setSessionData([
-          {
-            ...sessionResponse.default,
-            theme: "",
-            dateTime: "",
-            sessions: [],
-          },
-        ]);
+        const events = await eventService.fetchEvents();
+        setEventData(events);
 
         setLoading(false);
       } catch (error) {

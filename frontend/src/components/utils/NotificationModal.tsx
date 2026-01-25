@@ -2,22 +2,12 @@ import { useState, useEffect } from "react";
 import { Box, Button, Typography, IconButton, Avatar, List, ListItem, ListItemAvatar, ListItemText, Dialog, DialogTitle, DialogContent } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import notifications from "../../mock/notifications.json"; // Import the JSON file directly
-
-// Define the notification object type
-type Notification = {
-  id: number;
-  time: string;
-  user: string;
-  type: string;
-  message: string;
-  profileIcon: string;
-};
+import { fetchNotifications, type NotificationItem } from "../../services/appData";
 
 const NotificationModal = () => {
   // State to control the modal open/close
   const [open, setOpen] = useState(false);
-  const [notificationsData, setNotificationsData] = useState<Notification[]>([]); // Explicitly set the type of notificationsData
+  const [notificationsData, setNotificationsData] = useState<NotificationItem[]>([]); // Explicitly set the type of notificationsData
 
   // Function to open the modal
   const handleOpen = () => {
@@ -31,7 +21,15 @@ const NotificationModal = () => {
 
   // Load notifications from imported JSON
   useEffect(() => {
-    setNotificationsData(notifications); // Set the imported JSON data as state
+    const loadNotifications = async () => {
+      try {
+        const data = await fetchNotifications();
+        setNotificationsData(data);
+      } catch (error) {
+        console.error("Failed to fetch notifications", error);
+      }
+    };
+    loadNotifications();
   }, []);
 
   return (

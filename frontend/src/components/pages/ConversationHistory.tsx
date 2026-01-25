@@ -2,24 +2,23 @@ import { useState, useEffect } from "react";
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Container, Stack, Box } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { BottomNavigationTemplate } from "../templates/BottomNavigationTemplate";
-import conversation_history from "../../mock/conversation_history.json"; // Import the JSON file directly
 import TopSection from "../utils/TopSection";
 import DescriptionIcon from "@mui/icons-material/Description";
-
-type SessionData = {
-  date: string;
-  previousDate: string;
-  sessions: number;
-  completionRate: string;
-  comment: string;
-  examples: { english: string; japanese: string }[];
-};
+import { fetchConversationHistory, type ConversationHistoryItem } from "../../services/appData";
 
 const ConversationHistoryContainer = () => {
-  const [data, setData] = useState<SessionData[]>([]);
+  const [data, setData] = useState<ConversationHistoryItem[]>([]);
 
   useEffect(() => {
-    setData(conversation_history);
+    const loadHistory = async () => {
+      try {
+        const history = await fetchConversationHistory();
+        setData(history);
+      } catch (error) {
+        console.error("Failed to fetch conversation history", error);
+      }
+    };
+    loadHistory();
   }, []);
 
   return (
