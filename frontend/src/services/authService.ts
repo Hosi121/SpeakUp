@@ -1,5 +1,7 @@
 import api from './api';
 
+const isTestMode = import.meta.env.VITE_TEST_MODE === "true";
+
 // サインアップリクエストの型
 interface SignUpRequest {
   username: string;
@@ -53,6 +55,10 @@ export const signIn = async (email: string, password: string): Promise<void> => 
   };
 
   try {
+    if (isTestMode) {
+      localStorage.setItem("token", "test-token");
+      return;
+    }
     const response = await api.post<SignInResponse>('/signin', requestData);
     // Use the correct 'token' from SignInResponse
     localStorage.setItem("token", response.data.token);
@@ -62,4 +68,3 @@ export const signIn = async (email: string, password: string): Promise<void> => 
     throw new Error('ログインに失敗しました。');
   }
 };
-

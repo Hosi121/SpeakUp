@@ -12,6 +12,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const isTestMode = import.meta.env.VITE_TEST_MODE === "true";
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
@@ -28,6 +29,15 @@ const Login = () => {
       navigate('/home');  // ログイン成功後にリダイレクト
     } catch (err) {
       setError((err as Error).message);  // エラーメッセージを設定
+    }
+  };
+
+  const handleTestLogin = async () => {
+    try {
+      await signIn("test@example.com", "test");
+      navigate('/home');
+    } catch (err) {
+      setError((err as Error).message);
     }
   };
 
@@ -117,6 +127,16 @@ const Login = () => {
       >
         サインイン
       </Button>
+      {isTestMode && (
+        <Button
+          variant="outlined"
+          fullWidth
+          sx={{ marginBottom: 2 }}
+          onClick={handleTestLogin}
+        >
+          Test Login (Bypass)
+        </Button>
+      )}
 
       {/* Forgot Password and Sign Up */}
       <Box
