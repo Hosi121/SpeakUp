@@ -130,6 +130,6 @@ func UpdateMemo(client *ent.Client) gin.HandlerFunc {
 			}
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Memo updated successfully"})
+		c.JSON(http.StatusOK, MemoResponse{Memo1: req.Memo1, Memo2: req.Memo2})
 	}
 }
