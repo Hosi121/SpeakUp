@@ -10,9 +10,10 @@ import (
 )
 
 type EventInput struct {
-	DateTime string   `json:"dateTime"`
-	Theme    string   `json:"theme"`
-	Topics   []string `json:"topics"`
+	EventStart string   `json:"event_start"`
+	DateTime   string   `json:"dateTime"`
+	Theme      string   `json:"theme"`
+	Topics     []string `json:"topics"`
 }
 
 func CreateEvent(client *ent.Client) gin.HandlerFunc {
@@ -24,9 +25,19 @@ func CreateEvent(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
+		startValue := input.EventStart
+		if startValue == "" {
+			startValue = input.DateTime
+		}
+		if startValue == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "event_start is required"})
+			return
+		}
+
 		// 複数のフォーマットを試行
 		layouts := []string{
 			time.RFC3339,
+			time.RFC3339Nano,
 			"2006-01-02T15:04:05Z07:00",
 			"2006-01-02T15:04:05",
 			"2006-01-02 15:04:05",
@@ -35,7 +46,7 @@ func CreateEvent(client *ent.Client) gin.HandlerFunc {
 		var startTime time.Time
 		var err error
 		for _, layout := range layouts {
-			startTime, err = time.Parse(layout, input.DateTime)
+			startTime, err = time.Parse(layout, startValue)
 			if err == nil {
 				break
 			}
@@ -55,12 +66,23 @@ func CreateEvent(client *ent.Client) gin.HandlerFunc {
 			return
 		}
 
+		var topic1, topic2, topic3 string
+		if len(input.Topics) > 0 {
+			topic1 = input.Topics[0]
+		}
+		if len(input.Topics) > 1 {
+			topic2 = input.Topics[1]
+		}
+		if len(input.Topics) > 2 {
+			topic3 = input.Topics[2]
+		}
+
 		// AI_THEMESを作成
 		theme, err := tx.AI_THEMES.Create().
 			SetThemeText(input.Theme).
-			SetTopic1(input.Topics[0]).
-			SetTopic2(input.Topics[1]).
-			SetTopic3(input.Topics[2]).
+			SetTopic1(topic1).
+			SetTopic2(topic2).
+			SetTopic3(topic3).
 			Save(c)
 
 		if err != nil {
@@ -89,9 +111,16 @@ func CreateEvent(client *ent.Client) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Event created successfully",
-			"event":   event,
-			"theme":   theme,
+			"id":          event.ID,
+			"event_start": event.EventStart.Format(time.RFC3339),
+			"event_end":   event.EventEnd.Format(time.RFC3339),
+			"theme_id":    theme.ID,
+			"theme": gin.H{
+				"theme_text": theme.ThemeText,
+				"topic1":     theme.Topic1,
+				"topic2":     theme.Topic2,
+				"topic3":     theme.Topic3,
+			},
 		})
 	}
 }
