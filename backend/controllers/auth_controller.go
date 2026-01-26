@@ -49,7 +49,11 @@ func SignUp(c *gin.Context) {
 
 	// 成功レスポンス
 	slog.Info("User signed up successfully", slog.String("email", request.Email))
-	c.JSON(http.StatusOK, gin.H{"message": "User signed up successfully", "user": resp})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "User signed up successfully",
+		"user":    resp,
+	})
 
 	// DBの用意
 	dsn := config.GetDSN()
@@ -135,7 +139,13 @@ func SignIn(client *ent.Client) gin.HandlerFunc {
 		// Return success response
 		c.JSON(http.StatusOK, gin.H{
 			"message":     "User signed in successfully",
+			"token":       jwtToken,
 			"accessToken": jwtToken,
+			"user": gin.H{
+				"id":       strconv.Itoa(user.ID),
+				"email":    user.Email,
+				"username": user.Username,
+			},
 		})
 	}
 }
