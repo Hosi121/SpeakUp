@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Hosi121/SpeakUp/ent"
@@ -18,6 +19,7 @@ import (
 type UserResponse struct {
 	ID        int       `json:"id"`
 	Username  string    `json:"username"`
+	Email     string    `json:"email"`
 	AvatarURL string    `json:"avatar_url"`
 	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
@@ -59,8 +61,9 @@ func GetUserInfo(client *ent.Client) gin.HandlerFunc {
 		response := UserResponse{
 			ID:        user.ID,
 			Username:  user.Username,
-			AvatarURL: user.AvatarURL,
-			Role:      "user",
+			Email:     user.Email,
+			AvatarURL: normalizeAvatarURL(user.AvatarURL),
+			Role:      string(user.Role),
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
 		}
@@ -210,10 +213,11 @@ func SearchUsers(client *ent.Client) gin.HandlerFunc {
 		var userResponses []gin.H
 		for _, user := range searchedUsers {
 			userResponses = append(userResponses, gin.H{
-				"id":        user.ID,
-				"username":  user.Username,
-				"email":     user.Email,
-				"createdAt": user.CreatedAt,
+				"id":         user.ID,
+				"username":   user.Username,
+				"email":      user.Email,
+				"avatar_url": normalizeAvatarURL(user.AvatarURL),
+				"created_at": user.CreatedAt,
 			})
 		}
 
@@ -247,10 +251,10 @@ func GetUserAvatar(client *ent.Client) gin.HandlerFunc {
 		}
 
 		// Construct the full avatar URL
-		avatarURL := "http://localhost:8081" + user.AvatarURL
+		avatarURL := normalizeAvatarURL(user.AvatarURL)
 
 		c.JSON(http.StatusOK, gin.H{
-			"avatarURL": avatarURL,
+			"avatar_url": avatarURL,
 		})
 	}
 }
@@ -275,10 +279,21 @@ func SearchUserByID(client *ent.Client) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"id":        user.ID,
-			"username":  user.Username,
-			"email":     user.Email,
-			"createdAt": user.CreatedAt,
+			"id":         user.ID,
+			"username":   user.Username,
+			"email":      user.Email,
+			"avatar_url": normalizeAvatarURL(user.AvatarURL),
+			"created_at": user.CreatedAt,
 		})
 	}
+}
+
+func normalizeAvatarURL(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	if strings.HasPrefix(raw, "http://") || strings.HasPrefix(raw, "https://") {
+		return raw
+	}
+	return "http://localhost:8081" + raw
 }

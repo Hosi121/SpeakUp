@@ -9,9 +9,9 @@ import (
 )
 
 type Friend struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Avatar   string `json:"avatar"`
+	ID        int    `json:"id"`
+	Username  string `json:"username"`
+	AvatarURL string `json:"avatar_url"`
 }
 
 type FriendRecord struct {
@@ -22,9 +22,9 @@ type FriendRecord struct {
 
 // モックデータ
 var friends = []Friend{
-	{ID: 1, Username: "Alice", Avatar: "https://example.com/avatar1.png"},
-	{ID: 2, Username: "Bob", Avatar: "https://example.com/avatar2.png"},
-	{ID: 3, Username: "Charlie", Avatar: "https://example.com/avatar3.png"},
+	{ID: 1, Username: "Alice", AvatarURL: "https://example.com/avatar1.png"},
+	{ID: 2, Username: "Bob", AvatarURL: "https://example.com/avatar2.png"},
+	{ID: 3, Username: "Charlie", AvatarURL: "https://example.com/avatar3.png"},
 }
 
 func GetFriendList() gin.HandlerFunc {
